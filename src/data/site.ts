@@ -17,7 +17,7 @@ export const heroCards = [
 
 export const aboutPolaroids = [
   { src: ph(600, 800, "Lobby"), caption: "" },
-  { src: ph(600, 800, "Shaping Communities"), caption: "Shaping Communities" },
+  { src: ph(600, 800, "Community"), caption: "Shaping Communities" },
   { src: ph(600, 800, "Tower"), caption: "" },
 ];
 
