@@ -87,6 +87,11 @@
   --ink: oklch(0.97 0 0);
   --ink-muted: oklch(0.78 0 0);
   --ink-dim: oklch(0.62 0 0);
+  --gold: oklch(0.78 0.105 78);
+  --night: oklch(0.13 0 0);
+  --paper: oklch(0.949 0 0);
+  --paper-ink: oklch(0.28 0 0);
+  --paper-muted: oklch(0.58 0 0);
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
