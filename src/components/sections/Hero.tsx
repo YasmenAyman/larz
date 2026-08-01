@@ -1,10 +1,20 @@
 import { Facebook, Instagram, Linkedin } from "lucide-react";
 import { PillButton } from "@/components/shared/PillButton";
-import { heroCards, ph } from "@/data/site";
+// import { heroCards, ph } from "@/data/site";
+import heroImage1 from "@/assets/hero-image-1.png";
+import heroImage2 from "@/assets/hero-image-2.png";
+import heroImage3 from "@/assets/hero-image-3.png";
+import tower_img from "@/assets/tower_img.png"
 
+
+const heroCards = [
+  heroImage1,
+  heroImage2,
+  heroImage3,
+];
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-surface pt-36 pb-16 sm:pt-40 lg:pt-44 lg:pb-24">
+    <section className="relative overflow-hidden bg-surface pt-36 pb-16 sm:pt-40 lg:pt-44 lg:pb-2">
       <span
         aria-hidden="true"
         className="pointer-events-none absolute top-24 left-1/2 -translate-x-1/2 text-[22vw] leading-none font-light tracking-[0.12em] text-ink/[0.05] select-none"
@@ -43,25 +53,8 @@ export function Hero() {
         </div>
 
         <div className="relative">
-          <ul className="absolute top-1/2 -left-2 z-10 hidden -translate-y-1/2 flex-col gap-4 lg:flex">
-            {[
-              { Icon: Facebook, label: "Facebook" },
-              { Icon: Instagram, label: "Instagram" },
-              { Icon: Linkedin, label: "LinkedIn" },
-            ].map(({ Icon, label }) => (
-              <li key={label}>
-                <a
-                  href="#"
-                  aria-label={label}
-                  className="grid size-9 place-items-center rounded-full border border-hairline text-ink"
-                >
-                  <Icon className="size-4" strokeWidth={1.5} />
-                </a>
-              </li>
-            ))}
-          </ul>
           <img
-            src={ph(900, 900, "Tower")}
+            src={tower_img}
             alt="LARZ tower exterior"
             className="ml-auto aspect-square w-full max-w-[620px] object-cover"
           />

@@ -10,9 +10,9 @@ export function Header() {
   return (
     <header className="absolute inset-x-0 top-0 z-50 px-4 pt-5 sm:px-8">
       <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4">
-        <div className="flex flex-1 items-center gap-6 rounded-full border border-hairline/60 bg-surface-card/80 px-6 py-3 backdrop-blur-sm lg:max-w-[640px]">
+        <div className="flex flex-1 items-center gap-6 rounded-full border border-hairline/60 bg-surface-card/80 px-6 py-3 backdrop-blur-sm w-full  mx-auto ">
           <Logo />
-          <nav className="hidden flex-1 items-center justify-between lg:flex">
+          <nav className="hidden flex-1 items-center justify-center lg:flex gap-4">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
@@ -24,22 +24,6 @@ export function Header() {
               </Link>
             ))}
           </nav>
-        </div>
-
-        <div className="hidden items-center gap-2 lg:flex">
-          <Link
-            to="/contact"
-            className="rounded-full border border-hairline/60 bg-surface-card/80 px-6 py-3 text-sm text-ink backdrop-blur-sm transition-colors hover:bg-surface-card"
-          >
-            Book a Consultation
-          </Link>
-          <Link
-            to="/contact"
-            aria-label="Book a Consultation"
-            className="grid size-12 place-items-center rounded-full border border-hairline/60 bg-surface-card/80 text-ink backdrop-blur-sm transition-colors hover:bg-surface-card"
-          >
-            <ArrowUpRight className="size-4" strokeWidth={1.5} />
-          </Link>
         </div>
 
         <button

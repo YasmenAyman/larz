@@ -1,3 +1,13 @@
+import project_img_1 from "@/assets/project_img_1.png";
+import project_img_2 from "@/assets/project_img_2.png";
+import project_img_3 from "@/assets/project_img_3.png";
+import project_img_4 from "@/assets/project_img_4.png";
+import gallery_1 from "@/assets/Gallery_1.png";
+import gallery_2 from "@/assets/Gallery_2.png";
+import gallery_3 from "@/assets/Gallery_3.png";
+import gallery_4 from "@/assets/Gallery_4.png";
+import gallery_5 from "@/assets/Gallery_5.png";
+
 export const ph = (w: number, h: number, label: string) =>
   `https://placehold.co/${w}x${h}/1c1c1c/8a8a8a?text=${encodeURIComponent(label)}`;
 
@@ -7,12 +17,6 @@ export const navLinks = [
   { label: "Projects", to: "/projects" },
   { label: "Blogs", to: "/blogs" },
   { label: "Evemts", to: "/events" },
-];
-
-export const heroCards = [
-  ph(400, 400, "KOV"),
-  ph(400, 400, "Facade"),
-  ph(400, 400, "Interior"),
 ];
 
 export const aboutPolaroids = [
@@ -32,19 +36,19 @@ export const projects = [
   {
     title: "KOV New Cairo",
     location: "Golden Square, New Cairo",
-    image: ph(900, 1000, "KOV New Cairo"),
+    image: project_img_1,
   },
-  { title: "LARZ Business Hub", location: "New Cairo", image: ph(500, 1000, "LARZ Business Hub") },
-  { title: "LARZ Business Hub", location: "New Cairo", image: ph(500, 1000, "LARZ Business Hub") },
-  { title: "LARZ Business Hub", location: "New Cairo", image: ph(500, 1000, "LARZ Business Hub") },
+  { title: "LARZ Business Hub", location: "New Cairo", image:  project_img_2,},
+  { title: "LARZ Business Hub", location: "New Cairo", image:  project_img_3,},
+  { title: "LARZ Business Hub", location: "New Cairo", image:  project_img_4,},
 ];
 
 export const gallery = [
-  ph(600, 700, "Gallery 1"),
-  ph(600, 700, "Gallery 2"),
-  ph(600, 700, "Gallery 3"),
-  ph(600, 700, "Gallery 4"),
-  ph(600, 700, "Gallery 5"),
+  gallery_1,
+  gallery_2,
+  gallery_3,
+  gallery_4,
+  gallery_5,
 ];
 
 export const testimonials = [
