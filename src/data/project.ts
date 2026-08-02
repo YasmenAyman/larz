@@ -17,14 +17,14 @@ export const masterplanImage = project_img_2;
 export const mapImage = gallery_5;
 
 export const homeTypes = [
-  { tag: "Studio", name: "The Studio", size: "50–54" },
-  { tag: "1 Bedroom", name: "Apartment", size: "78–90" },
-  { tag: "2 Bedroom", name: "Apartment", size: "99–116" },
-  { tag: "Grand 2 Bed", name: "Apartment", size: "125–143" },
-  { tag: "3 Bedroom", name: "Apartment", size: "150–161" },
-  { tag: "Grand 3 Bed", name: "Apartment", size: "170–175" },
-  { tag: "Signature 3 Bed", name: "Apartment", size: "179–190" },
-  { tag: "Duplex", name: "The Duplex", size: "190–196" },
+  { tag: "Studio", name: "The Studio", size: "50–54", slug: "kov-new-cairo" },
+  { tag: "1 Bedroom", name: "Apartment", size: "78–90", slug: "kov-new-cairo" },
+  { tag: "2 Bedroom", name: "Apartment", size: "99–116", slug: "kov-new-cairo" },
+  { tag: "Grand 2 Bed", name: "Apartment", size: "125–143", slug: "larz-riverside" },
+  { tag: "3 Bedroom", name: "Apartment", size: "150–161", slug: "larz-riverside" },
+  { tag: "Grand 3 Bed", name: "Apartment", size: "170–175", slug: "larz-business-hub" },
+  { tag: "Signature 3 Bed", name: "Apartment", size: "179–190", slug: "larz-medical-park" },
+  { tag: "Duplex", name: "The Duplex", size: "190–196", slug: "larz-riverside" },
 ];
 
 export const constructionUpdates = [
