@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, Play } from "lucide-react";
 import { Eyebrow } from "@/components/projects/Eyebrow";
 import { homeTypes } from "@/data/project";
