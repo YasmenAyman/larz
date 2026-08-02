@@ -47,11 +47,16 @@ export function FeaturedProjects() {
                   {project.location}
                 </p>
                 <div className="mt-8 flex items-center justify-between">
-                  <Link to="/projects" className="text-sm text-ink">
+                  <Link
+                    to="/projects/$slug"
+                    params={{ slug: project.slug }}
+                    className="text-sm text-ink"
+                  >
                     Explore Project
                   </Link>
                   <Link
-                    to="/projects"
+                    to="/projects/$slug"
+                    params={{ slug: project.slug }}
                     aria-label={`Explore ${project.title}`}
                     className="grid size-9 place-items-center rounded-full bg-surface-card text-ink"
                   >
@@ -60,9 +65,16 @@ export function FeaturedProjects() {
                 </div>
               </div>
             ) : (
-              <h3 className="absolute bottom-6 left-1/2 -translate-x-1/2 text-lg whitespace-nowrap text-ink [writing-mode:vertical-rl] sm:bottom-8">
-                {project.title}
-              </h3>
+              <Link
+                to="/projects/$slug"
+                params={{ slug: project.slug }}
+                className="absolute inset-0"
+                aria-label={`Explore ${project.title}`}
+              >
+                <h3 className="absolute bottom-6 left-1/2 -translate-x-1/2 text-lg whitespace-nowrap text-ink [writing-mode:vertical-rl] sm:bottom-8">
+                  {project.title}
+                </h3>
+              </Link>
             )}
           </article>
         ))}
