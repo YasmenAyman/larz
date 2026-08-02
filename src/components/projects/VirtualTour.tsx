@@ -39,9 +39,11 @@ export function VirtualTour() {
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {homeTypes.map((home) => (
-              <article
+              <Link
                 key={home.tag}
-                className="border border-hairline/40 bg-surface-card/40 p-5 transition-colors hover:border-gold/50"
+                to="/projects/$slug"
+                params={{ slug: home.slug }}
+                className="block border border-hairline/40 bg-surface-card/40 p-5 transition-colors hover:border-gold/50"
               >
                 <p className="text-[0.6rem] tracking-[0.22em] text-ink-dim uppercase">{home.tag}</p>
                 <h3 className="mt-3 text-base font-light text-ink">{home.name}</h3>
@@ -52,7 +54,7 @@ export function VirtualTour() {
                 <p className="mt-5 flex items-center gap-2 text-[0.6rem] tracking-[0.22em] text-ink-muted uppercase">
                   View in 3D <ArrowRight className="size-3" strokeWidth={1.5} />
                 </p>
-              </article>
+              </Link>
             ))}
           </div>
 
