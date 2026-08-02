@@ -6,7 +6,7 @@ const icons = { award: Award, building: Building2, users: Users, globe: Globe };
 
 export function About() {
   return (
-    <section className="bg-surface py-20">
+    <section className="bg-surface py-20 bg_pattern">
       <div className="mx-auto max-w-[1440px] px-4 sm:px-8">
         <dl className="mt-20 grid grid-cols-2 gap-x-10 gap-y-12 lg:grid-cols-4">
           {stats.map((stat, i) => {

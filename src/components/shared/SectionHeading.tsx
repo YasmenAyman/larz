@@ -13,8 +13,8 @@ export function SectionHeading({
 }) {
   return (
     <div className={cn("text-center", className)}>
-      <p className="text-[0.7rem] tracking-[0.32em] text-ink-dim uppercase">{eyebrow}</p>
-      <h2 className="mx-auto mt-5 max-w-3xl text-3xl leading-[1.25] font-light text-ink sm:text-4xl md:text-[2.6rem]">
+      <p className="text-[1.2rem] tracking-[0.32em] text-ink-dim uppercase">{eyebrow}</p>
+      <h2 className="mx-auto mt-2 max-w-3xl text-3xl leading-[1.25] font-normal text-ink sm:text-4xl md:text-[3.3rem]">
         {title}
       </h2>
       {description && (

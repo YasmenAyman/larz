@@ -58,7 +58,7 @@ export function FeaturedProjects() {
                     to="/projects/$slug"
                     params={{ slug: project.slug }}
                     aria-label={`Explore ${project.title}`}
-                    className="grid size-9 place-items-center rounded-full bg-surface-card text-ink"
+                    className="grid size-9 place-items-center rounded-full bg-[#7C6C65] text-ink"
                   >
                     <ArrowUpRight className="size-4" strokeWidth={1.5} />
                   </Link>
@@ -71,7 +71,7 @@ export function FeaturedProjects() {
                 className="absolute inset-0"
                 aria-label={`Explore ${project.title}`}
               >
-                <h3 className="absolute bottom-6 left-1/2 -translate-x-1/2 text-lg whitespace-nowrap text-ink [writing-mode:vertical-rl] sm:bottom-8">
+                <h3 className="absolute bottom-6 left-10 -translate-x-1/2 text-2xl whitespace-nowrap text-ink [writing-mode:sideways-lr] sm:bottom-8">
                   {project.title}
                 </h3>
               </Link>

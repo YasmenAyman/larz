@@ -15,7 +15,7 @@ export function PillButton({ label, to = "/", className, variant = "pill" }: Pro
       <div className={cn("flex items-center gap-2", className)}>
         <Link
           to={to}
-          className="rounded-full border border-hairline bg-surface-card/70 px-6 py-3 text-sm text-ink transition-colors hover:bg-surface-card"
+          className="rounded-full border border-hairline bg-surface-card/70 px-8 py-2 text-sm text-ink transition-colors hover:bg-surface-card"
         >
           {label}
         </Link>
@@ -34,7 +34,7 @@ export function PillButton({ label, to = "/", className, variant = "pill" }: Pro
     <Link
       to={to}
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-hairline bg-surface-card/70 px-6 py-3 text-sm text-ink transition-colors hover:bg-surface-card",
+        "inline-flex items-center gap-2 rounded-full border border-hairline bg-surface-card/70 px-8 py-2 text-sm text-ink transition-colors hover:bg-surface-card",
         className,
       )}
     >

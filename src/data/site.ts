@@ -8,6 +8,9 @@ import gallery_3 from "@/assets/Gallery_3.png";
 import gallery_4 from "@/assets/Gallery_4.png";
 import gallery_5 from "@/assets/Gallery_5.png";
 
+import user_1 from "@/assets/user_1.png";
+import user_2 from "@/assets/user_2.png";
+
 export const ph = (w: number, h: number, label: string) =>
   `https://placehold.co/${w}x${h}/1c1c1c/8a8a8a?text=${encodeURIComponent(label)}`;
 
@@ -142,14 +145,28 @@ export const testimonials = [
       '"Choosing Larz for our commercial investment was the right decision. The strategic location, modern design, and professional support throughout the process gave us complete confidence in our investment."',
     name: "Ahmed K.",
     role: "Business Owner",
-    image: ph(400, 500, "Ahmed K."),
+    image: user_2,
   },
   {
     quote:
       '"From the very first consultation to the final handover, the entire experience was seamless. The attention to detail and construction quality exceeded our expectations, making our new home everything we envisioned."',
     name: "Muhammed Y.",
     role: "Homeowner",
-    image: ph(400, 500, "Muhammed Y."),
+    image: user_1,
+  },
+  {
+    quote:
+      '"Choosing Larz for our commercial investment was the right decision. The strategic location, modern design, and professional support throughout the process gave us complete confidence in our investment."',
+    name: "Ahmed K.",
+    role: "Business Owner",
+    image: user_2,
+  },
+  {
+    quote:
+      '"From the very first consultation to the final handover, the entire experience was seamless. The attention to detail and construction quality exceeded our expectations, making our new home everything we envisioned."',
+    name: "Muhammed Y.",
+    role: "Homeowner",
+    image: user_1,
   },
 ];
 

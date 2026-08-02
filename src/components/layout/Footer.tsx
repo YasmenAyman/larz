@@ -3,10 +3,11 @@ import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react
 import { Logo } from "@/components/shared/Logo";
 import { PillButton } from "@/components/shared/PillButton";
 import { contact, footerMenu, ph } from "@/data/site";
+import Footer_bg from "@/assets/Footer_bg.png";
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden rounded-t-[2.5rem] bg-surface-deep">
+    <footer className="relative overflow-hidden rounded-t-[2.5rem] bg-surface-deep" style={{ backgroundImage: `url(${Footer_bg})`, }}>
       <img
         src={ph(1600, 900, "Architecture")}
         alt=""

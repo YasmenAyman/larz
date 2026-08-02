@@ -86,7 +86,7 @@
   --hairline: oklch(0.36 0 0);
   --ink: oklch(0.97 0 0);
   --ink-muted: oklch(0.78 0 0);
-  --ink-dim: oklch(0.62 0 0);
+  --ink-dim: #7C6C65;
   --gold: oklch(0.78 0.105 78);
   --night: oklch(0.13 0 0);
   --paper: oklch(0.949 0 0);
@@ -173,3 +173,11 @@
     font-family: var(--font-sans);
   }
 }
+
+.bg_pattern {
+  background-image: url(/src/assets/herobg.png);
+  background-size: 100% auto;
+  background-position: bottom center
+}
+
+
