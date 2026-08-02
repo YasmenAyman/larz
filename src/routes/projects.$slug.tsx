@@ -5,11 +5,13 @@ import { Footer } from "@/components/layout/Footer";
 import { Eyebrow } from "@/components/projects/Eyebrow";
 import { projects } from "@/data/site";
 
+type Project = (typeof projects)[number];
+
 export const Route = createFileRoute("/projects/$slug")({
   loader: ({ params }) => {
     const project = projects.find((p) => p.slug === params.slug);
     if (!project) throw notFound();
-    return { project };
+    return { project } as { project: Project };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
@@ -50,7 +52,7 @@ function ProjectNotFound() {
 }
 
 function ProjectDetailPage() {
-  const { project } = Route.useLoaderData();
+  const { project } = Route.useLoaderData() as { project: Project };
   const others = projects.filter((p) => p.slug !== project.slug);
 
   return (
