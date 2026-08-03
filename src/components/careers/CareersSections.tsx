@@ -161,32 +161,35 @@ export function OpenPositions() {
 
         <div className="relative mx-auto max-w-[1180px] px-4 py-16 sm:px-8">
           <div className="grid gap-6 md:grid-cols-2">
-            {openPositions.map((role, i) => (
-              <article
-                key={i}
-                className="rounded-2xl border border-hairline/50 bg-surface-card/70 p-6 backdrop-blur-md transition-colors hover:bg-surface-card/90"
+            {openPositions.map((role) => (
+              <Link
+                key={role.slug}
+                to="/careers/$slug"
+                params={{ slug: role.slug }}
+                className="block rounded-2xl border border-hairline/50 bg-surface-card/70 p-6 backdrop-blur-md transition-colors hover:bg-surface-card/90"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-light text-ink">{role.title}</h3>
-                    <p className="mt-1 text-sm text-ink-muted">{role.type}</p>
+                <article>
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-xl font-light text-ink">{role.title}</h3>
+                      <p className="mt-1 text-sm text-ink-muted">{role.type}</p>
+                    </div>
+                    <span
+                      aria-hidden="true"
+                      className="grid size-10 shrink-0 place-items-center rounded-full border border-hairline/70 bg-surface/60 text-ink"
+                    >
+                      <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                    </span>
                   </div>
-                  <Link
-                    to="/contact"
-                    aria-label={`Apply for ${role.title}`}
-                    className="grid size-10 shrink-0 place-items-center rounded-full border border-hairline/70 bg-surface/60 text-ink transition-colors hover:bg-surface-card"
-                  >
-                    <ArrowUpRight className="size-4" strokeWidth={1.5} />
-                  </Link>
-                </div>
-                <p className="mt-5 max-w-[22rem] text-sm leading-relaxed text-ink-muted">
-                  {role.description}
-                </p>
-                <p className="mt-6 flex items-center gap-2 text-sm text-ink-muted">
-                  <MapPin className="size-4" strokeWidth={1.5} />
-                  {role.location}
-                </p>
-              </article>
+                  <p className="mt-5 max-w-[22rem] text-sm leading-relaxed text-ink-muted">
+                    {role.description}
+                  </p>
+                  <p className="mt-6 flex items-center gap-2 text-sm text-ink-muted">
+                    <MapPin className="size-4" strokeWidth={1.5} />
+                    {role.location}
+                  </p>
+                </article>
+              </Link>
             ))}
           </div>
 
