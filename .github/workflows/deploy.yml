@@ -92,18 +92,9 @@ jobs:
             fi
             ln -nfs "$APP_DIR/current" "$APP_DIR/public_html"
 
-            cd "$APP_DIR/current"
-            if pm2 describe larz > /dev/null; then
-              pm2 reload larz
-            else
-              pm2 start npm --name "larz" -- start
-            fi
 
-            pm2 save
-
-
-            #for restart php-fpm
-            #touch "$APP_DIR"/.restart_php_fpm
+            #for restart Or Start Node
+            touch "$APP_DIR"/.restart_or_start_Node
             
             # حذف الإصدارات القديمة (احتفظ بآخر 5)
             cd "$RELEASE_DIR" && ls -t | tail -n +6 | xargs rm -rf || true
