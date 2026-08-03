@@ -1,8 +1,11 @@
 import { ArrowUpRight, MapPin } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { careerValues, openPositions } from "@/data/careers";
-import gallery_2 from "@/assets/Gallery_2.png";
+import carrers_bg from "@/assets/carrers_bg.png";
 import project_img_4 from "@/assets/project_img_4.png";
+import herobg from "@/assets/herobg.png";
+import OpenPositions_bg from "@/assets/OpenPositions-bg.png";
+
 
 function ValueIcon({ name }: { name: (typeof careerValues)[number]["icon"] }) {
   const common = {
@@ -48,22 +51,22 @@ function ValueIcon({ name }: { name: (typeof careerValues)[number]["icon"] }) {
 export function CareersHero() {
   return (
     <section className="relative overflow-hidden bg-surface">
-      <div className="relative h-[560px] w-full sm:h-[640px]">
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-12 left-1/2 -translate-x-1/2 text-[35vw] leading-none font-light tracking-[0.12em] text-ink/[0.05] select-none z-2"
+      >
+        LARZ
+      </span>
+      <div className="relative h-[400px] w-full sm:h-[500px] mt-50">
         <img
-          src={gallery_2}
+          src={carrers_bg}
           alt="LARZ team collaborating in the studio"
-          className="absolute inset-0 size-full object-cover opacity-60 grayscale"
+          className="absolute inset-0 size-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-surface via-surface/40 to-surface" />
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute top-20 left-1/2 -translate-x-1/2 text-[24vw] leading-none font-light tracking-[0.12em] text-ink/[0.07] select-none"
-        >
-          LARZ
-        </span>
+        
 
-        <div className="relative flex h-full flex-col items-center justify-center px-4 text-center">
-          <h1 className="text-3xl leading-tight font-light text-ink sm:text-5xl md:text-[3.2rem]">
+        <div className="relative flex h-full flex-col items-center justify-center px-4 pt-16 text-center">
+          <h1 className="text-3xl leading-tight font-mediam text-ink sm:text-5xl md:text-[3.2rem]">
             Shape the Future With Us.
           </h1>
           <p className="mt-5 max-w-xl text-sm leading-relaxed text-ink-muted">
@@ -93,7 +96,7 @@ export function CareersHero() {
 
 export function WhyJoinLarz() {
   return (
-    <section className="relative overflow-hidden bg-surface py-24">
+    <section className="relative overflow-hidden bg-surface py-32 bg_pattern">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-70"
@@ -121,7 +124,7 @@ export function WhyJoinLarz() {
             <div key={value.title} className="flex flex-col items-center">
               <ValueIcon name={value.icon} />
               <h3 className="mt-6 text-lg font-light text-ink">{value.title}</h3>
-              <p className="mt-3 max-w-[16rem] text-sm leading-relaxed text-ink-muted">
+              <p className="mt-3 max-w-[18rem] text-sm leading-relaxed text-ink-muted">
                 {value.text}
               </p>
             </div>
@@ -134,7 +137,12 @@ export function WhyJoinLarz() {
 
 export function OpenPositions() {
   return (
-    <section id="open-positions" className="relative overflow-hidden bg-surface py-24">
+    <section id="open-positions" className="relative overflow-hidden bg-surface py-24 pb-6 mb-12">
+      <img
+          src={OpenPositions_bg}
+          alt="LARZ team collaborating in the studio"
+          className="absolute inset-0 size-full object-cover"
+        />
       <div className="relative mx-auto max-w-[1440px] px-4 sm:px-8">
         <p className="text-[0.7rem] tracking-[0.32em] text-ink-dim uppercase">Open Positions</p>
         <div className="mt-6 grid gap-8 lg:grid-cols-2">
@@ -151,13 +159,6 @@ export function OpenPositions() {
       </div>
 
       <div className="relative mt-16">
-        <img
-          src={project_img_4}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 size-full object-cover opacity-40 grayscale"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-surface via-surface/70 to-surface" />
 
         <div className="relative mx-auto max-w-[1180px] px-4 py-16 sm:px-8">
           <div className="grid gap-6 md:grid-cols-2">
@@ -166,13 +167,13 @@ export function OpenPositions() {
                 key={role.slug}
                 to="/careers/$slug"
                 params={{ slug: role.slug }}
-                className="block rounded-2xl border border-hairline/50 bg-surface-card/70 p-6 backdrop-blur-md transition-colors hover:bg-surface-card/90"
+                className="block rounded-2xl border border-hairline/50 bg-surface-card/20 p-6 backdrop-blur-sm transition-colors hover:bg-surface-card/90"
               >
                 <article>
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="text-xl font-light text-ink">{role.title}</h3>
-                      <p className="mt-1 text-sm text-ink-muted">{role.type}</p>
+                      <p className="mt-1 text-sm text-ink-dim">{role.type}</p>
                     </div>
                     <span
                       aria-hidden="true"

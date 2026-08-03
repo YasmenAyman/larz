@@ -22,9 +22,6 @@ export function Masterplan() {
               alt="KLOVE masterplan render"
               className="h-[220px] w-full object-cover opacity-80 sm:h-[260px]"
             />
-            <figcaption className="absolute bottom-3 left-4 text-[0.6rem] tracking-[0.24em] text-ink-dim uppercase">
-              Masterplan render
-            </figcaption>
           </figure>
         </div>
 

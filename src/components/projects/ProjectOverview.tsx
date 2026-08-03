@@ -27,9 +27,6 @@ export function ProjectOverview() {
             alt="Courtyard and greenery at KLOVE"
             className="h-[320px] w-full object-cover"
           />
-          <figcaption className="absolute bottom-3 left-4 text-[0.6rem] tracking-[0.24em] text-paper uppercase">
-            Lifestyle image — courtyard &amp; greenery
-          </figcaption>
         </figure>
       </div>
     </section>

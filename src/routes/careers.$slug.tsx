@@ -83,11 +83,11 @@ function MetaRow({
 }) {
   return (
     <li className="flex items-center gap-4 py-4">
-      <span className="grid size-11 shrink-0 place-items-center rounded-full border border-hairline/60 bg-surface/60 text-ink">
+      <span className="grid size-11 shrink-0 place-items-center rounded-full border border-hairline/60 bg-[#7C6C65] text-ink">
         <Icon className="size-4" strokeWidth={1.5} />
       </span>
       <div className={`min-w-0 flex-1 ${last ? "" : "border-b border-hairline/40 pb-4"}`}>
-        <p className="text-xs text-ink-dim">{label}</p>
+        <p className="text-xs text-ink/80">{label}</p>
         <p className="mt-1 truncate text-sm text-ink">{value}</p>
       </div>
     </li>

@@ -8,13 +8,7 @@ import Footer_bg from "@/assets/Footer_bg.png";
 export function Footer() {
   return (
     <footer className="relative overflow-hidden rounded-t-[2.5rem] bg-surface-deep" style={{ backgroundImage: `url(${Footer_bg})`, }}>
-      <img
-        src={ph(1600, 900, "Architecture")}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 size-full object-cover opacity-25"
-      />
-      <div className="relative mx-auto max-w-[1440px] px-4 py-20 sm:px-8">
+      <div className="relative mx-auto max-w-[1440px] px-4 py-20 pb-5 sm:px-8">
         <h2 className="text-center text-3xl leading-[1.3] font-light text-ink sm:text-4xl md:text-[2.6rem]">
           Let's Build
           <br />
@@ -66,7 +60,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
-          <p className="text-xs text-ink-dim">
+          <p className="text-xs text-ink">
             Developed by <span className="font-semibold text-ink">TQNIA</span> All Rights reserved
           </p>
           <ul className="flex items-center gap-3">

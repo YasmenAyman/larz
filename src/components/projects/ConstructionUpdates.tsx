@@ -23,9 +23,6 @@ export function ConstructionUpdates() {
                   className="h-[170px] w-full object-cover"
                   loading="lazy"
                 />
-                <figcaption className="absolute bottom-2 left-3 text-[0.55rem] tracking-[0.24em] text-paper uppercase">
-                  Site photo
-                </figcaption>
               </figure>
               <p className="mt-4 text-[0.6rem] tracking-[0.22em] text-paper-muted uppercase">
                 {item.tag}

@@ -38,19 +38,19 @@ export function LocationMap() {
             <img
               src={mapImage}
               alt="Interactive map of KLOVE in Al-Qornofel, New Cairo"
-              className="h-[320px] w-full object-cover"
+              className="h-full w-full object-cover"
               loading="lazy"
             />
-            <figcaption className="absolute bottom-3 left-4 text-[0.6rem] tracking-[0.24em] text-paper uppercase">
-              Interactive map
-            </figcaption>
           </figure>
         </div>
       </section>
 
-      <section className="bg-gradient-to-b from-surface-deep to-night py-24 text-center">
+      <section className="bg-gradient-to-b from-surface-deep to-night py-24 text-center" style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% 50%, #2a2210 0%, #16130a 50%, #0a0905 100%)",
+        }}>
         <div className="mx-auto max-w-3xl px-6">
-          <Eyebrow className="justify-center text-gold">KLOVE &nbsp;—&nbsp; New Cairo</Eyebrow>
+          <Eyebrow className="justify-center">KLOVE &nbsp;—&nbsp; New Cairo</Eyebrow>
           <h2 className="mt-6 text-3xl leading-[1.2] font-light text-ink sm:text-[2.4rem]">
             A better life begins in the right place.
           </h2>
