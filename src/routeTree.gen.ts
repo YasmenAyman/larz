@@ -18,6 +18,7 @@ import { Route as EventsRouteImport } from './routes/events'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as CareersIndexRouteImport } from './routes/careers.index'
+import { Route as CareersSlugRouteImport } from './routes/careers.$slug'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
 
@@ -66,6 +67,11 @@ const CareersIndexRoute = CareersIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CareersRoute,
 } as any)
+const CareersSlugRoute = CareersSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CareersRoute,
+} as any)
 const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/news': typeof NewsRoute
   '/projects': typeof ProjectsRouteWithChildren
+  '/careers/$slug': typeof CareersSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/careers/': typeof CareersIndexRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/news': typeof NewsRoute
+  '/careers/$slug': typeof CareersSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/careers': typeof CareersIndexRoute
   '/projects': typeof ProjectsIndexRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/news': typeof NewsRoute
   '/projects': typeof ProjectsRouteWithChildren
+  '/careers/$slug': typeof CareersSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/careers/': typeof CareersIndexRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/news'
     | '/projects'
+    | '/careers/$slug'
     | '/projects/$slug'
     | '/careers/'
     | '/projects/'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/events'
     | '/news'
+    | '/careers/$slug'
     | '/projects/$slug'
     | '/careers'
     | '/projects'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/news'
     | '/projects'
+    | '/careers/$slug'
     | '/projects/$slug'
     | '/careers/'
     | '/projects/'
@@ -231,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CareersIndexRouteImport
       parentRoute: typeof CareersRoute
     }
+    '/careers/$slug': {
+      id: '/careers/$slug'
+      path: '/$slug'
+      fullPath: '/careers/$slug'
+      preLoaderRoute: typeof CareersSlugRouteImport
+      parentRoute: typeof CareersRoute
+    }
     '/projects/': {
       id: '/projects/'
       path: '/'
@@ -249,10 +268,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface CareersRouteChildren {
+  CareersSlugRoute: typeof CareersSlugRoute
   CareersIndexRoute: typeof CareersIndexRoute
 }
 
 const CareersRouteChildren: CareersRouteChildren = {
+  CareersSlugRoute: CareersSlugRoute,
   CareersIndexRoute: CareersIndexRoute,
 }
 
