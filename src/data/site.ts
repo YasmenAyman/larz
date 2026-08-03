@@ -19,7 +19,7 @@ export const navLinks = [
   { label: "About US", to: "/about" },
   { label: "Projects", to: "/projects" },
   { label: "Blogs", to: "/blogs" },
-  { label: "Evemts", to: "/events" },
+  { label: "Careers", to: "/careers" },
 ];
 
 export const aboutPolaroids = [
