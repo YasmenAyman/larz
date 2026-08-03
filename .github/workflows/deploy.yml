@@ -1,0 +1,103 @@
+name: Deploy Laravel Pro To Linux
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml,zip, ctype, iconv, intl, pdo_mysql, bcmath, redis, opcache
+
+      - name: Install Dependencies
+        run: |
+          composer install
+          composer update
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install Node Dependencies
+        run: npm install
+
+      - name: Build Frontend
+        run: npm run build
+
+      - name: Copy files to server (SCP)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          target: "/home2/${{ secrets.SSH_USER }}/releases/${{ github.sha }}"
+          strip_components: 0
+          # overwrite: true   # اختياري
+
+      - name: Deploy & Run Commands on Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+
+            APP_DIR="/home2/${{ secrets.SSH_USER }}"
+            RELEASE_DIR="$APP_DIR/releases"
+            NEW_RELEASE_DIR="$RELEASE_DIR/${{ github.sha }}"
+            SHARED_DIR="$APP_DIR/shared"
+
+            echo "🚀 Deploying release: ${{ github.sha }}"
+
+            # إنشاء المجلدات المشتركة
+            mkdir -p "$SHARED_DIR"
+            mkdir -p "$RELEASE_DIR"
+
+
+            cd "$NEW_RELEASE_DIR"
+
+            # .env
+            rm -rf .env
+            ln -nfs "$SHARED_DIR/.env" .env
+
+            #.htacces
+            rsync -avzh .htaccess "$SHARED_DIR"
+            rm -rf .htaccess
+            ln -nfs "$SHARED_DIR/.htaccess" .htaccess
+
+            # تبديل الـ current symlink
+            if [ -d "$APP_DIR/current" ]; then
+              unlink "$APP_DIR/current" || true
+            fi
+            ln -nfs "$NEW_RELEASE_DIR" "$APP_DIR/current"
+
+            # ربط public_html
+            if [ -d "$APP_DIR/public_html" ]; then
+              unlink "$APP_DIR/public_html" || true
+            fi
+            ln -nfs "$APP_DIR/current" "$APP_DIR/public_html"
+
+            #/usr/local/bin/ea-php84 artisan optimize:clear
+
+            #for restart php-fpm
+            touch "$APP_DIR"/.restart_php_fpm
+            
+            # حذف الإصدارات القديمة (احتفظ بآخر 5)
+            cd "$RELEASE_DIR" && ls -t | tail -n +6 | xargs rm -rf || true
+
+            echo "✅ Deployment Completed Successfully - ${{ github.sha }}"
