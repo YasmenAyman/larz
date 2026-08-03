@@ -28,6 +28,9 @@ jobs:
       - name: Install Node Dependencies
         run: npm install
 
+      - name: Install Node For Node Js
+        run: npm ci
+
       - name: Build Frontend
         run: npm run build
 
@@ -78,19 +81,29 @@ jobs:
             # تبديل الـ current symlink
             if [ -d "$APP_DIR/current" ]; then
               unlink "$APP_DIR/current" || true
+              rm -rf current
             fi
             ln -nfs "$NEW_RELEASE_DIR" "$APP_DIR/current"
 
             # ربط public_html
             if [ -d "$APP_DIR/public_html" ]; then
               unlink "$APP_DIR/public_html" || true
+              rm -rf public_html
             fi
             ln -nfs "$APP_DIR/current" "$APP_DIR/public_html"
 
-            #/usr/local/bin/ea-php84 artisan optimize:clear
+            cd "$APP_DIR/current"
+            if pm2 describe larz > /dev/null; then
+              pm2 reload larz
+            else
+              pm2 start npm --name "larz" -- start
+            fi
+
+            pm2 save
+
 
             #for restart php-fpm
-            touch "$APP_DIR"/.restart_php_fpm
+            #touch "$APP_DIR"/.restart_php_fpm
             
             # حذف الإصدارات القديمة (احتفظ بآخر 5)
             cd "$RELEASE_DIR" && ls -t | tail -n +6 | xargs rm -rf || true
