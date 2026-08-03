@@ -7,7 +7,7 @@ import {
   OpenPositions,
 } from "@/components/careers/CareersSections";
 
-export const Route = createFileRoute("/careers")({
+export const Route = createFileRoute("/careers/")({
   head: () => ({
     meta: [
       { title: "Careers at LARZ Developments | Shape the Future With Us" },
