@@ -72,7 +72,6 @@ jobs:
             ln -nfs "$SHARED_DIR/.env" .env
 
             #.htacces
-            rsync -avzh .htaccess "$SHARED_DIR"
             rm -rf .htaccess
             ln -nfs "$SHARED_DIR/.htaccess" .htaccess
 
