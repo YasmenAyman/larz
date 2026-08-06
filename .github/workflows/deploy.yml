@@ -11,8 +11,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: 'laravel-foundation'
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -22,6 +20,7 @@ jobs:
 
 
       - name: Install Dependencies
+        working-directory: ./laravel-foundation
         run: |
           composer install
           composer update
@@ -33,9 +32,11 @@ jobs:
           cache: "npm"
 
       - name: Install Node Dependencies
+        working-directory: ./laravel-foundation
         run: npm install
 
       - name: Build Frontend
+        working-directory: ./laravel-foundation
         run: npm run build
 
       - name: Copy files to server (SCP)
