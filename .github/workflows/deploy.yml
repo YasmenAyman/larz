@@ -102,7 +102,7 @@ jobs:
             fi
             ln -nfs "$APP_DIR/current/public" "$APP_DIR/public_html"
 
-            #/usr/local/bin/ea-php84 artisan migrate --force
+            /usr/local/bin/ea-php84 artisan migrate --force
             /usr/local/bin/ea-php84 artisan optimize:clear
 
             #/usr/local/bin/ea-php84 artisan jwt:secret
