@@ -31,14 +31,13 @@ jobs:
           node-version: "24"
           cache: "npm"
 
-      - name: Install Node Dependencies
-        working-directory: ./laravel-foundation
-        run: npm install
+      #- name: Install Node Dependencies
+        #working-directory: ./laravel-foundation
+        #run: npm install
 
       #- name: Build Frontend
         #working-directory: ./laravel-foundation
         #run: npm run build
-
       - name: Copy files to server (SCP)
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -46,9 +45,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./laravel-foundation"
+          source: "laravel-foundation/**"
           target: "/home2/${{ secrets.SSH_USER }}/releases/${{ github.sha }}"
-          strip_components: 0
+          strip_components: 1
           # overwrite: true   # اختياري
 
       - name: Deploy & Run Commands on Server
