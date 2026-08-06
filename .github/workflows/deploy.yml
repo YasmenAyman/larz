@@ -38,6 +38,8 @@ jobs:
       #- name: Build Frontend
         #working-directory: ./laravel-foundation
         #run: npm run build
+
+
       - name: Copy files to server (SCP)
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -47,7 +49,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "laravel-foundation/**"
           target: "/home2/${{ secrets.SSH_USER }}/releases/${{ github.sha }}"
-          strip_components: 1
+          strip_components: 0
           # overwrite: true   # اختياري
 
       - name: Deploy & Run Commands on Server
@@ -91,14 +93,12 @@ jobs:
             # تبديل الـ current symlink
             if [ -d "$APP_DIR/current" ]; then
               unlink "$APP_DIR/current" || true
-              rm -rf "$APP_DIR/current"
             fi
             ln -nfs "$NEW_RELEASE_DIR" "$APP_DIR/current"
 
             # ربط public_html
             if [ -d "$APP_DIR/public_html" ]; then
               unlink "$APP_DIR/public_html" || true
-              rm -rf "$APP_DIR/public_html
             fi
             ln -nfs "$APP_DIR/current/public" "$APP_DIR/public_html"
 
@@ -110,7 +110,6 @@ jobs:
             
             #for restart php-fpm
             touch "$APP_DIR"/.restart_php_fpm
-
             
             # حذف الإصدارات القديمة (احتفظ بآخر 5)
             cd "$RELEASE_DIR" && ls -t | tail -n +6 | xargs rm -rf || true
