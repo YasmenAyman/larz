@@ -37,9 +37,9 @@ jobs:
           npm ci
           npm install
 
-      - name: Build Frontend
-        working-directory: ./laravel-foundation
-        run: npm run build
+      #- name: Build Frontend
+        #working-directory: ./laravel-foundation
+        #run: npm run build
 
 
       - name: Copy files to server (SCP)
