@@ -19,6 +19,11 @@ jobs:
           extensions: mbstring, xml,zip, ctype, iconv, intl, pdo_mysql, bcmath, redis, opcache
 
 
+      - name: Install Dependencies
+        run: |
+          composer install
+          composer update
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
