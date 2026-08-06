@@ -37,7 +37,7 @@ jobs:
 
       - name: Build Frontend
         working-directory: ./laravel-foundation
-        run: npm run build
+        #run: npm run build
 
       - name: Copy files to server (SCP)
         uses: appleboy/scp-action@v0.1.7
