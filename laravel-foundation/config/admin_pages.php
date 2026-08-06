@@ -13,7 +13,7 @@ return [
         'label' => 'About Us',
         'sections' => [
             'hero' => 'Hero Section', 'stats' => 'Statistics', 'story' => 'Our Story',
-            'awards' => 'Awards Section', 'partners' => 'Partners & Affiliations', 'promise-cta' => 'Promise CTA',
+            'partners' => 'Partners & Affiliations', 'promise-cta' => 'Promise CTA',
         ],
     ],
     'media' => [

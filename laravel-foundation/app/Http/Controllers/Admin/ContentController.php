@@ -25,17 +25,32 @@ class ContentController extends Controller
         $configuration = $this->pageConfiguration($page);
         $sections = PageSection::query()->where('page_key', $page)->get()->keyBy('section_key');
 
+        $sectionCards = collect($configuration['sections'])->map(fn ($label, $key) => [
+            'key' => $key,
+            'label' => $label,
+            'description' => 'Edit the structured '.$label.' settings for this page.',
+            'status' => $sections->get(str_replace('-', '_', $key))?->status ?? 'inactive',
+            'updated_at' => $sections->get(str_replace('-', '_', $key))?->updated_at?->toDateTimeString(),
+            'edit_url' => url('/admin/pages/'.$page.'/'.$key),
+        ])->values()->all();
+
+        if ($page === 'about') {
+            $awardsCount = Award::query()->count();
+            $publishedAwards = Award::query()->where('is_published', true)->count();
+            array_splice($sectionCards, 3, 0, [[
+                'key' => 'awards',
+                'label' => 'Awards',
+                'description' => 'Manage the awards and achievements displayed on the About Us page.',
+                'status' => $awardsCount > 0 ? ($publishedAwards > 0 ? 'published' : 'draft') : 'inactive',
+                'updated_at' => Award::query()->latest('updated_at')->value('updated_at')?->toDateTimeString(),
+                'edit_url' => url('/admin/pages/about/awards'),
+            ]]);
+        }
+
         return Inertia::render('Admin/Pages/Overview', [
             'page' => $page,
             'label' => $configuration['label'],
-            'sections' => collect($configuration['sections'])->map(fn ($label, $key) => [
-                'key' => $key,
-                'label' => $label,
-                'description' => 'Edit the structured '.$label.' settings for this page.',
-                'status' => $sections->get(str_replace('-', '_', $key))?->status ?? 'inactive',
-                'updated_at' => $sections->get(str_replace('-', '_', $key))?->updated_at?->toDateTimeString(),
-                'edit_url' => url('/admin/pages/'.$page.'/'.$key),
-            ])->values()->all(),
+            'sections' => $sectionCards,
         ]);
     }
 

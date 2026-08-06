@@ -21,9 +21,12 @@ class AboutController extends Controller
             'awards' => Award::query()->where('is_published', true)->orderBy('sort_order')->get()->map(fn ($award) => [
                 'title' => $award->title, 'year' => $award->year, 'copy' => $award->description, 'icon' => $award->icon_key,
             ])->values()->all(),
-            'partners' => Partner::query()->where('is_published', true)->orderBy('sort_order')->get()->map(fn ($partner) => [
-                'name' => $partner->name, 'role' => $partner->role, 'logo' => WebsiteContent::assetUrl($partner->logo),
-            ])->values()->all(),
+            'partners' => [
+                'settings' => WebsiteContent::section('about', 'partners'),
+                'items' => Partner::query()->where('is_published', true)->orderBy('sort_order')->get()->map(fn ($partner) => [
+                    'name' => $partner->name, 'role' => $partner->role, 'description' => $partner->description, 'url' => $partner->url, 'logo' => WebsiteContent::assetUrl($partner->logo),
+                ])->values()->all(),
+            ],
             'promise' => WebsiteContent::section('about', 'promise'),
             'seo' => $seo->forPage('about', '/about-us', ['title' => 'About Us | LARZ Developments'], [
                 $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')], ['name' => 'About Us', 'url' => url('/about-us')]]),

@@ -4,7 +4,7 @@ import { Eyebrow } from '@/components/shared/Eyebrow';
 import WebsiteLayout from '@/layouts/WebsiteLayout';
 const awardIcons = { award: Award, star: Star, medal: Medal, crown: Crown };
 
-export default function Index({ hero, stats, story, awards, partners, promise, seo }: { hero: { heading: string; description: string; backgroundImage: string }; stats: Array<{ value: string; label: string; note: string }>; story: { heading: string; body: string; image: string }; awards: Array<{ icon: string | null; title: string; year: number | null; copy: string | null }>; partners: Array<{ name: string; role: string | null }>; promise: { heading: string }; seo: SeoMetadata }) {
+export default function Index({ hero, stats, story, awards, partners, promise, seo }: { hero: { heading: string; description: string; backgroundImage: string }; stats: Array<{ value: string; label: string; note: string }>; story: { heading: string; body: string; image: string }; awards: Array<{ icon: string | null; title: string; year: number | null; copy: string | null }>; partners: { settings: { eyebrow?: string; heading?: string; description?: string }; items: Array<{ name: string; role: string | null; description: string | null; url: string | null; logo: string | null }> }; promise: { heading: string }; seo: SeoMetadata }) {
     const heroLines = (hero.heading ?? 'You\'re not choosing\na building.').split('\n');
     const storyParagraphs = (story.body ?? '').split('\n');
     return (
@@ -100,18 +100,22 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
 
             <section className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
                 <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-24">
-                    <Eyebrow tone="light">Partnerships &amp; affiliations</Eyebrow>
-                    <h2 className="mt-5 max-w-xl text-3xl font-light leading-[1.15] sm:text-[3rem]">The names behind our work.</h2>
-                    <p className="mt-5 max-w-lg text-sm leading-relaxed text-paper-muted">We build with partners who share our standards — in design, engineering and delivery.</p>
+                    <Eyebrow tone="light">{partners.settings.eyebrow ?? 'Partnerships & affiliations'}</Eyebrow>
+                    <h2 className="mt-5 max-w-xl text-3xl font-light leading-[1.15] sm:text-[3rem]">{partners.settings.heading ?? 'The names behind our work.'}</h2>
+                    <p className="mt-5 max-w-lg text-sm leading-relaxed text-paper-muted">{partners.settings.description ?? 'We build with partners who share our standards — in design, engineering and delivery.'}</p>
                     <div className="mt-10 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                        {partners.map(({ name, role }) => (
-                            <div key={name} className="flex min-h-[140px] flex-col items-center justify-center border border-paper-muted/30 px-5 text-center">
-                                <span className="text-[0.52rem] tracking-[0.25em] text-paper-muted">[ LOGO ]</span>
-                                <div className="my-3 h-px w-full bg-paper-muted/20" />
-                                <h3 className="text-sm text-paper-ink">{name}</h3>
-                                <p className="mt-2 text-[0.58rem] text-ink-muted">{role}</p>
-                            </div>
-                        ))}
+                        {partners.items.map(({ name, role, url, logo }) => {
+                            const Wrapper = url ? 'a' : 'div';
+                            const wrapperProps = url ? { href: url, target: '_blank', rel: 'noopener noreferrer' } : {};
+                            return (
+                                <Wrapper key={name} {...(wrapperProps as Record<string, string>)} className="flex min-h-[140px] flex-col items-center justify-center border border-paper-muted/30 px-5 text-center">
+                                    {logo ? <img src={logo} alt={name} className="h-12 w-auto max-w-[160px] object-contain" /> : <span className="text-[0.52rem] tracking-[0.25em] text-paper-muted">[ LOGO ]</span>}
+                                    <div className="my-3 h-px w-full bg-paper-muted/20" />
+                                    <h3 className="text-sm text-paper-ink">{name}</h3>
+                                    {role && <p className="mt-2 text-[0.58rem] text-ink-muted">{role}</p>}
+                                </Wrapper>
+                            );
+                        })}
                     </div>
                 </div>
             </section>

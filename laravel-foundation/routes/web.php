@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminPageRouteController;
+use App\Http\Controllers\Admin\AwardController;
+use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\CareerApplicationController;
 use App\Http\Controllers\Admin\ContactInquiryController;
 use App\Http\Controllers\Admin\JobController;
@@ -70,13 +72,27 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
     ->group(function () {
         Route::redirect('/', '/admin/dashboard')->name('index');
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
+        Route::get('/pages/about/awards', [AwardController::class, 'index'])->middleware('permission:pages.view')->name('pages.about.awards.index');
+        Route::get('/pages/about/awards/create', [AwardController::class, 'create'])->middleware('permission:pages.update')->name('pages.about.awards.create');
+        Route::post('/pages/about/awards', [AwardController::class, 'store'])->middleware('permission:pages.update')->name('pages.about.awards.store');
+        Route::get('/pages/about/awards/{award}/edit', [AwardController::class, 'edit'])->middleware('permission:pages.update')->name('pages.about.awards.edit');
+        Route::put('/pages/about/awards/{award}', [AwardController::class, 'update'])->middleware('permission:pages.update')->name('pages.about.awards.update');
+        Route::delete('/pages/about/awards/{award}', [AwardController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.about.awards.destroy');
+        Route::post('/pages/about/awards/{award}/publish', [AwardController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.about.awards.publish');
+        Route::get('/pages/about/partners', [PartnerController::class, 'index'])->middleware('permission:pages.view')->name('pages.about.partners.index');
+        Route::get('/pages/about/partners/create', [PartnerController::class, 'create'])->middleware('permission:pages.update')->name('pages.about.partners.create');
+        Route::post('/pages/about/partners', [PartnerController::class, 'store'])->middleware('permission:pages.update')->name('pages.about.partners.store');
+        Route::get('/pages/about/partners/{partner}/edit', [PartnerController::class, 'edit'])->middleware('permission:pages.update')->name('pages.about.partners.edit');
+        Route::put('/pages/about/partners/{partner}', [PartnerController::class, 'update'])->middleware('permission:pages.update')->name('pages.about.partners.update');
+        Route::delete('/pages/about/partners/{partner}', [PartnerController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.about.partners.destroy');
+        Route::post('/pages/about/partners/{partner}/publish', [PartnerController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.about.partners.publish');
         foreach (config('admin_pages', []) as $page => $pageConfig) {
             Route::get('/pages/'.$page, [AdminPageRouteController::class, 'overview'])->middleware('permission:pages.view')->name('pages.'.$page.'.index');
             foreach (array_keys($pageConfig['sections']) as $section) {
                 $sectionName = str_replace('-', '_', $section);
-                $sectionController = $page === 'home' && $section === 'gallery' ? HomeGalleryController::class : ($page === 'home' && $section === 'featured-projects' ? HomeFeaturedProjectsController::class : ($page === 'home' && $section === 'testimonials' ? TestimonialController::class : AdminPageRouteController::class));
-                $editAction = in_array($sectionController, [HomeGalleryController::class, HomeFeaturedProjectsController::class], true) ? 'edit' : ($sectionController === TestimonialController::class ? 'index' : 'section');
-                $updateAction = $sectionController === HomeGalleryController::class || $sectionController === HomeFeaturedProjectsController::class ? 'update' : ($sectionController === TestimonialController::class ? 'updateSettings' : 'updateSection');
+                $sectionController = $page === 'home' && $section === 'gallery' ? HomeGalleryController::class : ($page === 'home' && $section === 'featured-projects' ? HomeFeaturedProjectsController::class : ($page === 'home' && $section === 'testimonials' ? TestimonialController::class : ($page === 'about' && $section === 'partners' ? PartnerController::class : AdminPageRouteController::class)));
+                $editAction = in_array($sectionController, [HomeGalleryController::class, HomeFeaturedProjectsController::class], true) ? 'edit' : (in_array($sectionController, [TestimonialController::class, PartnerController::class], true) ? 'index' : 'section');
+                $updateAction = $sectionController === HomeGalleryController::class || $sectionController === HomeFeaturedProjectsController::class ? 'update' : (in_array($sectionController, [TestimonialController::class, PartnerController::class], true) ? 'updateSettings' : 'updateSection');
                 Route::get('/pages/'.$page.'/'.$section, [$sectionController, $editAction])->middleware('permission:pages.view')->name('pages.'.$page.'.'.$sectionName.'.edit');
                  Route::put('/pages/'.$page.'/'.$section, [$sectionController, $updateAction])->defaults('page', $page)->defaults('section', $section)->middleware('permission:pages.update')->name('pages.'.$page.'.'.$sectionName.'.update');
              }
