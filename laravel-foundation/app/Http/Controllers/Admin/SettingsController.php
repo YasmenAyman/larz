@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateAdminSettingsRequest;
 use App\Models\SiteSetting;
+use App\Support\WebsiteCache;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -23,8 +23,8 @@ class SettingsController extends Controller
                 SiteSetting::where('key', $key)->update(['value' => $value, 'updated_at' => now()]);
             }
         });
-        Cache::forget('website.settings.public');
-        Cache::forget('seo.defaults');
+        WebsiteCache::settings();
+        WebsiteCache::all();
         return back()->with('success', 'Global settings updated.');
     }
 }

@@ -10,9 +10,9 @@ use App\Models\PageSection;
 use App\Models\Testimonial;
 use App\Services\MediaUploadService;
 use App\Services\RichTextSanitizer;
+use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -36,7 +36,7 @@ class TestimonialController extends Controller
             ['page_key' => 'home', 'section_key' => 'testimonials'],
             ['section_type' => 'home.testimonials', 'content_snapshot' => $content, 'status' => 'published', 'published_at' => now(), 'updated_by' => $request->user()->id],
         );
-        Cache::forget('website.section.home.testimonials');
+        WebsiteCache::section('home', 'testimonials');
 
         return back()->with('success', 'Testimonials section settings updated.');
     }
@@ -64,6 +64,7 @@ class TestimonialController extends Controller
             if ($newAsset) $uploads->delete($newAsset);
             throw $exception;
         }
+        WebsiteCache::section('home', 'testimonials');
 
         return to_route('admin.pages.home.testimonials.edit')->with('success', 'Testimonial created.');
     }
@@ -106,6 +107,7 @@ class TestimonialController extends Controller
         }
 
         if ($request->hasFile('image') && $oldAsset) $uploads->deleteIfUnreferenced($oldAsset);
+        WebsiteCache::section('home', 'testimonials');
 
         return to_route('admin.pages.home.testimonials.edit')->with('success', 'Testimonial updated.');
     }
@@ -115,6 +117,7 @@ class TestimonialController extends Controller
         $asset = $testimonial->media;
         $testimonial->delete();
         if ($asset) $uploads->deleteIfUnreferenced($asset);
+        WebsiteCache::section('home', 'testimonials');
 
         return back()->with('success', 'Testimonial deleted.');
     }
@@ -122,6 +125,7 @@ class TestimonialController extends Controller
     public function togglePublished(Testimonial $testimonial): RedirectResponse
     {
         $testimonial->update(['is_published' => ! $testimonial->is_published]);
+        WebsiteCache::section('home', 'testimonials');
 
         return back()->with('success', 'Testimonial visibility updated.');
     }

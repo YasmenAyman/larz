@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Cache;
 
 final class WebsiteCache
 {
-    public const string SETTINGS_KEY = 'website.settings.public';
-    public const string NAVIGATION_KEY = 'website.navigation';
+    public const SETTINGS_KEY = 'website.settings.public';
+    public const NAVIGATION_KEY = 'website.navigation';
 
     public static function sectionKey(string $page, string $section): string
     {

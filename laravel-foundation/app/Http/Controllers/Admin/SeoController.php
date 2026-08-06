@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\SeoMetadata;
 use App\Services\MediaUploadService;
 use App\Services\SeoMetadataService;
+use App\Support\WebsiteCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +59,19 @@ class SeoController extends Controller
         }
 
         if ($request->hasFile('og_image') && $oldImage) $uploads->deleteIfUnreferenced($oldImage);
+
+        WebsiteCache::sitemap();
+        if (str_starts_with($pageKey, 'project:')) {
+            $projectId = (int) str_replace('project:', '', $pageKey);
+            $project = Project::find($projectId);
+            if ($project) WebsiteCache::project($project->slug);
+        }
+        if (str_starts_with($pageKey, 'media:')) {
+            WebsiteCache::sitemap();
+        }
+        if (in_array($pageKey, ['home', 'about', 'media', 'careers', 'contact', 'projects'], true)) {
+            WebsiteCache::sitemap();
+        }
 
         return back()->with('success', 'SEO metadata updated.');
     }
