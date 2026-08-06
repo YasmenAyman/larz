@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateHomeFeaturedProjectsRequest;
 use App\Models\PageSection;
 use App\Models\Project;
+use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,7 +30,8 @@ class HomeFeaturedProjectsController extends Controller
     {
         $data = $request->validated();
         DB::transaction(fn () => PageSection::updateOrCreate(['page_key' => 'home', 'section_key' => 'featured_projects'], ['section_type' => 'home.featured_projects', 'content_snapshot' => ['eyebrow' => $data['eyebrow'] ?? '', 'heading' => $data['heading'] ?? '', 'description' => $data['description'] ?? '', 'cta_label' => $data['cta_label'] ?? '', 'cta_url' => $data['cta_url'] ?? '', 'project_ids' => array_values($data['project_ids'])], 'status' => 'published', 'published_at' => now(), 'updated_by' => $request->user()->id]));
-        Cache::forget('website.section.home.featured_projects');
+        WebsiteCache::section('home', 'featured_projects');
+        WebsiteCache::sitemap();
         return back()->with('success', 'Featured projects updated.');
     }
 }

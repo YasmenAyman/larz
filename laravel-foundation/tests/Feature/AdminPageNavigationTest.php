@@ -132,6 +132,28 @@ class AdminPageNavigationTest extends TestCase
         $this->get('/')->assertSuccessful()->assertInertia(fn ($page) => $page->where('featuredProjectsSettings.heading', 'Selected developments')->where('projects.0.title', 'Second Project'));
     }
 
+    public function test_media_page_news_and_stories_sections_propagate_to_public_page(): void
+    {
+        $user = $this->pageEditor();
+
+        $this->actingAs($user)->get('/admin/pages/media')->assertSuccessful()->assertInertia(fn ($page) => $page->component('Admin/Pages/Overview')->where('label', 'Media Page')->has('sections', 5));
+        $this->actingAs($user)->get('/admin/pages/media/news')->assertSuccessful()->assertInertia(fn ($page) => $page->component('Admin/Content/Editor')->where('page', 'media')->where('section', 'news'));
+
+        $this->actingAs($user)->put('/admin/pages/media/news', [
+            'sections' => ['news' => ['eyebrow' => 'Latest news', 'heading' => 'New from LARZ', 'description' => 'Dynamic news copy.']],
+        ])->assertRedirect();
+
+        $this->actingAs($user)->put('/admin/pages/media/stories', [
+            'sections' => ['stories' => ['eyebrow' => 'Stories', 'heading' => 'Voices from LARZ', 'description' => 'Dynamic stories copy.']],
+        ])->assertRedirect();
+
+        $this->get('/media')->assertSuccessful()->assertInertia(fn ($page) => $page
+            ->where('newsSettings.heading', 'New from LARZ')
+            ->where('newsSettings.eyebrow', 'Latest news')
+            ->where('storiesSettings.heading', 'Voices from LARZ')
+        );
+    }
+
     public function test_page_editor_without_pages_permission_is_forbidden(): void
     {
         $user = User::factory()->create(['email_verified_at' => now()]);

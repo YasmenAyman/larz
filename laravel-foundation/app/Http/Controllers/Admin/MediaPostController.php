@@ -9,10 +9,10 @@ use App\Models\MediaCategory;
 use App\Models\MediaPost;
 use App\Services\MediaUploadService;
 use App\Services\RichTextSanitizer;
+use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -44,7 +44,8 @@ class MediaPostController extends Controller
             foreach ($newAssets as $asset) $uploads->delete($asset);
             throw $exception;
         }
-        $this->flushMediaCaches();
+        WebsiteCache::mediaSections();
+        WebsiteCache::sitemap();
         return to_route('admin.media.posts.index')->with('success', 'Media post created.');
     }
 
@@ -71,22 +72,14 @@ class MediaPostController extends Controller
         }
         if ($request->hasFile('featured_image') && $oldFeaturedImage) $uploads->deleteIfUnreferenced($oldFeaturedImage);
         if ($request->hasFile('open_graph_image') && $oldOpenGraphImage) $uploads->deleteIfUnreferenced($oldOpenGraphImage);
-        $this->flushMediaCaches();
+        WebsiteCache::mediaSections();
+        WebsiteCache::sitemap();
         return back()->with('success', 'Media post updated.');
     }
 
-    public function destroy(MediaPost $mediaPost, MediaUploadService $uploads): RedirectResponse { $assets = [$mediaPost->featuredImage, $mediaPost->openGraphImage]; $mediaPost->delete(); foreach ($assets as $asset) if ($asset) $uploads->deleteIfUnreferenced($asset); $this->flushMediaCaches(); return back()->with('success', 'Media post moved to trash.'); }
-    public function restore(int $mediaPost): RedirectResponse { MediaPost::withTrashed()->findOrFail($mediaPost)->restore(); $this->flushMediaCaches(); return back()->with('success', 'Media post restored.'); }
-    public function forceDelete(int $mediaPost): RedirectResponse { abort_unless(request()->user()->hasRole('Super Admin'), 403); MediaPost::withTrashed()->findOrFail($mediaPost)->forceDelete(); $this->flushMediaCaches(); return back()->with('success', 'Media post permanently deleted.'); }
-    public function togglePublished(MediaPost $mediaPost): RedirectResponse { $mediaPost->update(['is_published' => ! $mediaPost->is_published, 'published_at' => ! $mediaPost->is_published ? now() : null]); $this->flushMediaCaches(); return back(); }
-    public function toggleFeatured(MediaPost $mediaPost): RedirectResponse { $mediaPost->update(['is_featured' => ! $mediaPost->is_featured]); $this->flushMediaCaches(); return back(); }
-
-    private function flushMediaCaches(): void
-    {
-        Cache::forget('website.section.media.news');
-        Cache::forget('website.section.media.stories');
-        Cache::forget('website.section.media.gallery');
-        Cache::forget('website.settings.public');
-        Cache::forget('website.navigation');
-    }
+    public function destroy(MediaPost $mediaPost, MediaUploadService $uploads): RedirectResponse { $assets = [$mediaPost->featuredImage, $mediaPost->openGraphImage]; $mediaPost->delete(); foreach ($assets as $asset) if ($asset) $uploads->deleteIfUnreferenced($asset); WebsiteCache::mediaSections(); WebsiteCache::sitemap(); return back()->with('success', 'Media post moved to trash.'); }
+    public function restore(int $mediaPost): RedirectResponse { MediaPost::withTrashed()->findOrFail($mediaPost)->restore(); WebsiteCache::mediaSections(); WebsiteCache::sitemap(); return back()->with('success', 'Media post restored.'); }
+    public function forceDelete(int $mediaPost): RedirectResponse { abort_unless(request()->user()->hasRole('Super Admin'), 403); MediaPost::withTrashed()->findOrFail($mediaPost)->forceDelete(); WebsiteCache::mediaSections(); WebsiteCache::sitemap(); return back()->with('success', 'Media post permanently deleted.'); }
+    public function togglePublished(MediaPost $mediaPost): RedirectResponse { $mediaPost->update(['is_published' => ! $mediaPost->is_published, 'published_at' => ! $mediaPost->is_published ? now() : null]); WebsiteCache::mediaSections(); WebsiteCache::sitemap(); return back(); }
+    public function toggleFeatured(MediaPost $mediaPost): RedirectResponse { $mediaPost->update(['is_featured' => ! $mediaPost->is_featured]); WebsiteCache::mediaSections(); WebsiteCache::sitemap(); return back(); }
 }

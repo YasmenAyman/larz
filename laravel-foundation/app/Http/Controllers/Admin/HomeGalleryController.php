@@ -7,9 +7,9 @@ use App\Http\Requests\UpdateHomeGalleryRequest;
 use App\Models\PageSection;
 use App\Models\PhotoGalleryItem;
 use App\Services\MediaUploadService;
+use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -78,7 +78,8 @@ class HomeGalleryController extends Controller
         }
 
         foreach ($removedAssets as $asset) if ($asset) $uploads->deleteIfUnreferenced($asset);
-        Cache::forget('website.section.home.gallery');
+        WebsiteCache::section('home', 'gallery');
+        WebsiteCache::mediaGallery();
         return back()->with('success', 'Home gallery updated.');
     }
 }

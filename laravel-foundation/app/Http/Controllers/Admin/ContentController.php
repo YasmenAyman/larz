@@ -10,9 +10,9 @@ use App\Models\Partner;
 use App\Models\Project;
 use App\Models\Testimonial;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use App\Services\RichTextSanitizer;
+use App\Support\WebsiteCache;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -60,7 +60,8 @@ class ContentController extends Controller
             ['page_key' => $page, 'section_key' => $sectionKey],
             ['section_type' => $page.'.'.$sectionKey, 'content_snapshot' => $content, 'status' => 'published', 'published_at' => now(), 'updated_by' => $request->user()->id],
         );
-        Cache::forget('website.section.'.$page.'.'.$sectionKey);
+        WebsiteCache::section($page, $sectionKey);
+        WebsiteCache::sitemap();
 
         return back()->with('success', $configuration['label'].' / '.$configuration['sections'][$section].' updated.');
     }
@@ -94,7 +95,8 @@ class ContentController extends Controller
             }
         });
 
-        foreach (array_keys($sections) as $sectionKey) Cache::forget('website.section.'.$page.'.'.$sectionKey);
+        foreach (array_keys($sections) as $sectionKey) WebsiteCache::section($page, $sectionKey);
+        WebsiteCache::sitemap();
         return back()->with('success', ucfirst($page).' content updated.');
     }
 
