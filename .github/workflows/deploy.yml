@@ -49,7 +49,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "laravel-foundation/**"
           target: "/home2/${{ secrets.SSH_USER }}/releases/${{ github.sha }}"
-          strip_components: 0
+          strip_components: 1
           # overwrite: true   # اختياري
 
       - name: Deploy & Run Commands on Server
