@@ -26,6 +26,7 @@ class HomeController extends Controller
         $gallerySettings = WebsiteContent::section('home', 'gallery');
         $testimonialSettings = WebsiteContent::section('home', 'testimonials');
         $testimonials = Testimonial::query()->with('media')->where('is_published', true)->orderBy('sort_order')->get();
+        $finalCtaSettings = WebsiteContent::section('home', 'final_cta');
 
         return Inertia::render('Website/Home/Index', [
             'hero' => [...WebsiteContent::section('home', 'hero'), 'heroImage' => asset('assets/tower_img.png')],
@@ -67,6 +68,12 @@ class HomeController extends Controller
                 'role' => $item->role,
                 'image' => WebsiteContent::assetUrl($item->media),
             ])->values()->all(),
+            'finalCta' => [
+                'eyebrow' => $finalCtaSettings['eyebrow'] ?? "LET'S TALK",
+                'heading' => $finalCtaSettings['heading'] ?? "Let's Build\nThe Future Together",
+                'cta_label' => $finalCtaSettings['cta_label'] ?? 'Get In Touch',
+                'cta_url' => $finalCtaSettings['cta_url'] ?? '/contact-us',
+            ],
             'seo' => $seo->forPage('home', '/', ['title' => 'LARZ Developments | Designed for the Way You Live'], [
                 $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')]]),
             ]),

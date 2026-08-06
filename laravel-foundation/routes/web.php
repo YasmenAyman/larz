@@ -12,10 +12,18 @@ use App\Http\Controllers\Admin\HomeFeaturedProjectsController;
 use App\Http\Controllers\Admin\BrochureRequestController;
 use App\Http\Controllers\Admin\MediaCategoryController;
 use App\Http\Controllers\Admin\MediaPostController;
+use App\Http\Controllers\Admin\NearbyLocationController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\PhotoGalleryController;
 use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\NavigationController;
+use App\Http\Controllers\Admin\ProjectCategoryController;
+use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\ProjectGalleryController;
+use App\Http\Controllers\Admin\ProjectStatisticController;
+use App\Http\Controllers\Admin\ProjectUnitTypeController;
+use App\Http\Controllers\Admin\ProjectAmenityController;
+use App\Http\Controllers\Admin\ProjectUpdateController;
 use App\Http\Controllers\Admin\ProjectInquiryController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TestimonialController;
@@ -79,13 +87,12 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
         Route::put('/pages/about/awards/{award}', [AwardController::class, 'update'])->middleware('permission:pages.update')->name('pages.about.awards.update');
         Route::delete('/pages/about/awards/{award}', [AwardController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.about.awards.destroy');
         Route::post('/pages/about/awards/{award}/publish', [AwardController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.about.awards.publish');
-        Route::get('/pages/about/partners', [PartnerController::class, 'index'])->middleware('permission:pages.view')->name('pages.about.partners.index');
         Route::get('/pages/about/partners/create', [PartnerController::class, 'create'])->middleware('permission:pages.update')->name('pages.about.partners.create');
         Route::post('/pages/about/partners', [PartnerController::class, 'store'])->middleware('permission:pages.update')->name('pages.about.partners.store');
-        Route::get('/pages/about/partners/{partner}/edit', [PartnerController::class, 'edit'])->middleware('permission:pages.update')->name('pages.about.partners.edit');
-        Route::put('/pages/about/partners/{partner}', [PartnerController::class, 'update'])->middleware('permission:pages.update')->name('pages.about.partners.update');
-        Route::delete('/pages/about/partners/{partner}', [PartnerController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.about.partners.destroy');
-        Route::post('/pages/about/partners/{partner}/publish', [PartnerController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.about.partners.publish');
+        Route::get('/pages/about/partners/{partner}/edit', [PartnerController::class, 'edit'])->middleware('permission:pages.update')->name('pages.about.partners.item.edit');
+        Route::put('/pages/about/partners/{partner}', [PartnerController::class, 'update'])->middleware('permission:pages.update')->name('pages.about.partners.item.update');
+        Route::delete('/pages/about/partners/{partner}', [PartnerController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.about.partners.item.destroy');
+        Route::post('/pages/about/partners/{partner}/publish', [PartnerController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.about.partners.item.publish');
         foreach (config('admin_pages', []) as $page => $pageConfig) {
             Route::get('/pages/'.$page, [AdminPageRouteController::class, 'overview'])->middleware('permission:pages.view')->name('pages.'.$page.'.index');
             foreach (array_keys($pageConfig['sections']) as $section) {
@@ -154,6 +161,51 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
         Route::put('/project-inquiries/{projectInquiry}', [ProjectInquiryController::class, 'update'])->middleware('permission:inquiries.update')->name('project-inquiries.update');
         Route::get('/brochure-requests', [BrochureRequestController::class, 'index'])->middleware('permission:inquiries.view')->name('brochure-requests.index');
         Route::put('/brochure-requests/{brochureRequest}', [BrochureRequestController::class, 'update'])->middleware('permission:inquiries.update')->name('brochure-requests.update');
+
+        Route::get('/projects', [AdminProjectController::class, 'index'])->middleware('permission:projects.view')->name('projects.index');
+        Route::get('/projects/create', [AdminProjectController::class, 'create'])->middleware('permission:projects.create')->name('projects.create');
+        Route::post('/projects', [AdminProjectController::class, 'store'])->middleware('permission:projects.create')->name('projects.store');
+        Route::get('/projects/{project}/edit', [AdminProjectController::class, 'edit'])->middleware('permission:projects.update')->name('projects.edit');
+        Route::put('/projects/{project}', [AdminProjectController::class, 'update'])->middleware('permission:projects.update')->name('projects.update');
+        Route::delete('/projects/{project}', [AdminProjectController::class, 'destroy'])->middleware('permission:projects.delete')->name('projects.destroy');
+        Route::post('/projects/{project}/publish', [AdminProjectController::class, 'togglePublished'])->middleware('permission:projects.update')->name('projects.publish');
+        Route::post('/projects/{project}/feature', [AdminProjectController::class, 'toggleFeatured'])->middleware('permission:projects.update')->name('projects.feature');
+        Route::post('/projects/{project}/restore', [AdminProjectController::class, 'restore'])->middleware('permission:projects.update')->name('projects.restore');
+
+        Route::get('/project-categories', [ProjectCategoryController::class, 'index'])->middleware('permission:projects.view')->name('project-categories.index');
+        Route::post('/project-categories', [ProjectCategoryController::class, 'store'])->middleware('permission:projects.create')->name('project-categories.store');
+        Route::put('/project-categories/{projectCategory}', [ProjectCategoryController::class, 'update'])->middleware('permission:projects.update')->name('project-categories.update');
+        Route::delete('/project-categories/{projectCategory}', [ProjectCategoryController::class, 'destroy'])->middleware('permission:projects.delete')->name('project-categories.destroy');
+
+        Route::get('/project-galleries', [ProjectGalleryController::class, 'index'])->middleware('permission:projects.view')->name('project-galleries.index');
+        Route::post('/project-galleries', [ProjectGalleryController::class, 'store'])->middleware('permission:projects.create')->name('project-galleries.store');
+        Route::put('/project-galleries/{projectGallery}', [ProjectGalleryController::class, 'update'])->middleware('permission:projects.update')->name('project-galleries.update');
+        Route::delete('/project-galleries/{projectGallery}', [ProjectGalleryController::class, 'destroy'])->middleware('permission:projects.delete')->name('project-galleries.destroy');
+
+        Route::get('/project-statistics', [ProjectStatisticController::class, 'index'])->middleware('permission:projects.view')->name('project-statistics.index');
+        Route::post('/project-statistics', [ProjectStatisticController::class, 'store'])->middleware('permission:projects.create')->name('project-statistics.store');
+        Route::put('/project-statistics/{projectStatistic}', [ProjectStatisticController::class, 'update'])->middleware('permission:projects.update')->name('project-statistics.update');
+        Route::delete('/project-statistics/{projectStatistic}', [ProjectStatisticController::class, 'destroy'])->middleware('permission:projects.delete')->name('project-statistics.destroy');
+
+        Route::get('/project-units', [ProjectUnitTypeController::class, 'index'])->middleware('permission:projects.view')->name('project-units.index');
+        Route::post('/project-units', [ProjectUnitTypeController::class, 'store'])->middleware('permission:projects.create')->name('project-units.store');
+        Route::put('/project-units/{projectUnitType}', [ProjectUnitTypeController::class, 'update'])->middleware('permission:projects.update')->name('project-units.update');
+        Route::delete('/project-units/{projectUnitType}', [ProjectUnitTypeController::class, 'destroy'])->middleware('permission:projects.delete')->name('project-units.destroy');
+
+        Route::get('/amenities', [ProjectAmenityController::class, 'index'])->middleware('permission:projects.view')->name('amenities.index');
+        Route::post('/amenities', [ProjectAmenityController::class, 'store'])->middleware('permission:projects.create')->name('amenities.store');
+        Route::put('/amenities/{projectAmenity}', [ProjectAmenityController::class, 'update'])->middleware('permission:projects.update')->name('amenities.update');
+        Route::delete('/amenities/{projectAmenity}', [ProjectAmenityController::class, 'destroy'])->middleware('permission:projects.delete')->name('amenities.destroy');
+
+        Route::get('/project-updates', [ProjectUpdateController::class, 'index'])->middleware('permission:projects.view')->name('project-updates.index');
+        Route::post('/project-updates', [ProjectUpdateController::class, 'store'])->middleware('permission:projects.create')->name('project-updates.store');
+        Route::put('/project-updates/{projectUpdate}', [ProjectUpdateController::class, 'update'])->middleware('permission:projects.update')->name('project-updates.update');
+        Route::delete('/project-updates/{projectUpdate}', [ProjectUpdateController::class, 'destroy'])->middleware('permission:projects.delete')->name('project-updates.destroy');
+
+        Route::get('/nearby-locations', [NearbyLocationController::class, 'index'])->middleware('permission:projects.view')->name('nearby-locations.index');
+        Route::post('/nearby-locations', [NearbyLocationController::class, 'store'])->middleware('permission:projects.create')->name('nearby-locations.store');
+        Route::put('/nearby-locations/{nearbyLocation}', [NearbyLocationController::class, 'update'])->middleware('permission:projects.update')->name('nearby-locations.update');
+        Route::delete('/nearby-locations/{nearbyLocation}', [NearbyLocationController::class, 'destroy'])->middleware('permission:projects.delete')->name('nearby-locations.destroy');
     });
 
 Route::middleware('auth')->group(function () {

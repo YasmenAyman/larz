@@ -79,6 +79,7 @@ final class WebsiteCache
         Cache::forget(self::sectionKey('home', 'testimonials'));
         Cache::forget(self::sectionKey('home', 'stats'));
         Cache::forget(self::sectionKey('home', 'hero'));
+        Cache::forget(self::sectionKey('home', 'final_cta'));
     }
 
     public static function all(): void

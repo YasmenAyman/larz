@@ -37,6 +37,7 @@ export const adminNavigation: AdminNavigationGroup[] = [
                 { label: 'All Projects', href: '/admin/projects', permission: 'projects.view' },
                 { label: 'Project Categories', href: '/admin/project-categories', permission: 'projects.view' },
                 { label: 'Project Galleries', href: '/admin/project-galleries', permission: 'projects.view' },
+                { label: 'Project Statistics', href: '/admin/project-statistics', permission: 'projects.view' },
                 { label: 'Unit Types', href: '/admin/project-units', permission: 'projects.view' },
                 { label: 'Amenities', href: '/admin/amenities', permission: 'projects.view' },
                 { label: 'Construction Updates', href: '/admin/project-updates', permission: 'projects.view' },
