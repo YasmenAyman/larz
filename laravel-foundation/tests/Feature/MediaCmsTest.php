@@ -44,21 +44,19 @@ class MediaCmsTest extends TestCase
         $user = $this->mediaUser();
         $category = MediaCategory::create(['name' => 'Blog', 'slug' => 'blog', 'type' => 'blog']);
 
-        $response = $this->actingAs($user)->withSession(['_token' => 'test'])->post('/admin/media/posts', [
+        $response = $this->actingAs($user)->post('/admin/media/posts', [
             'type' => 'blog', 'media_category_id' => $category->id, 'title' => 'CMS post', 'slug' => 'cms-post',
             'excerpt' => 'Excerpt', 'content' => 'Content', 'featured_image' => UploadedFile::fake()->image('post.jpg'),
             'is_published' => true, 'is_featured' => false, 'sort_order' => 1,
-            '_token' => 'test',
         ]);
 
         $response->assertRedirect('/admin/media/posts');
         $post = MediaPost::where('slug', 'cms-post')->firstOrFail();
         $this->assertNotNull($post->featured_image_id);
 
-        $this->actingAs($user)->withSession(['_token' => 'test'])->put("/admin/media/posts/{$post->id}", [
+        $this->actingAs($user)->put("/admin/media/posts/{$post->id}", [
             'type' => 'press', 'media_category_id' => $category->id, 'title' => 'Updated post', 'slug' => 'cms-post',
             'excerpt' => 'Updated excerpt', 'content' => 'Updated content', 'is_published' => false, 'is_featured' => true, 'sort_order' => 2,
-            '_token' => 'test',
         ])->assertRedirect();
 
         $this->assertSame('Updated post', $post->fresh()->title);
@@ -71,8 +69,8 @@ class MediaCmsTest extends TestCase
         $user = $this->mediaUser();
         MediaPost::factory()->create(['slug' => 'duplicate-slug']);
 
-        $this->actingAs($user)->withSession(['_token' => 'test'])->post('/admin/media/posts', [
-            'type' => 'blog', 'title' => 'Duplicate', 'slug' => 'duplicate-slug', 'is_published' => false, '_token' => 'test',
+        $this->actingAs($user)->post('/admin/media/posts', [
+            'type' => 'blog', 'title' => 'Duplicate', 'slug' => 'duplicate-slug', 'is_published' => false,
         ])->assertSessionHasErrors('slug');
     }
 
@@ -81,13 +79,13 @@ class MediaCmsTest extends TestCase
         $user = $this->mediaUser();
         $post = MediaPost::factory()->create(['is_published' => false, 'is_featured' => false]);
 
-        $this->actingAs($user)->withSession(['_token' => 'test'])->post("/admin/media/posts/{$post->id}/publish", ['_token' => 'test'])->assertRedirect();
+        $this->actingAs($user)->post("/admin/media/posts/{$post->id}/publish")->assertRedirect();
         $this->assertTrue($post->fresh()->is_published);
-        $this->actingAs($user)->withSession(['_token' => 'test'])->post("/admin/media/posts/{$post->id}/feature", ['_token' => 'test'])->assertRedirect();
+        $this->actingAs($user)->post("/admin/media/posts/{$post->id}/feature")->assertRedirect();
         $this->assertTrue($post->fresh()->is_featured);
-        $this->actingAs($user)->withSession(['_token' => 'test'])->delete("/admin/media/posts/{$post->id}", ['_token' => 'test'])->assertRedirect();
+        $this->actingAs($user)->delete("/admin/media/posts/{$post->id}")->assertRedirect();
         $this->assertSoftDeleted($post);
-        $this->actingAs($user)->withSession(['_token' => 'test'])->post("/admin/media/posts/{$post->id}/restore", ['_token' => 'test'])->assertRedirect();
+        $this->actingAs($user)->post("/admin/media/posts/{$post->id}/restore")->assertRedirect();
         $this->assertNotSoftDeleted($post->fresh());
     }
 
@@ -101,7 +99,7 @@ class MediaCmsTest extends TestCase
     {
         $user = $this->mediaUser();
         $subscriber = NewsletterSubscriber::create(['email' => 'subscriber@example.test', 'status' => 'active', 'subscribed_at' => now()]);
-        $this->actingAs($user)->withSession(['_token' => 'test'])->put("/admin/newsletter-subscribers/{$subscriber->id}", ['status' => 'unsubscribed', '_token' => 'test'])->assertRedirect();
+        $this->actingAs($user)->put("/admin/newsletter-subscribers/{$subscriber->id}", ['status' => 'unsubscribed'])->assertRedirect();
         $this->assertSame('unsubscribed', $subscriber->fresh()->status);
         $this->actingAs($user)->get('/admin/newsletter-subscribers/export')->assertOk()->assertHeader('content-type', 'text/csv; charset=UTF-8');
     }

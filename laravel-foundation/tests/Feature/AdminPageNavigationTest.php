@@ -95,7 +95,7 @@ class AdminPageNavigationTest extends TestCase
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page->component('Admin/Pages/HomeGallery'));
 
-        $this->actingAs($user)->withSession(['_token' => 'test'])->put('/admin/pages/home/gallery', [
+        $this->actingAs($user)->put('/admin/pages/home/gallery', [
             'eyebrow' => 'Dynamic Gallery',
             'heading' => 'Dynamic heading',
             'description' => 'Dynamic description',
@@ -103,7 +103,6 @@ class AdminPageNavigationTest extends TestCase
             'cta_url' => '/projects',
             'gallery_ids' => [$item->id],
             'images' => [UploadedFile::fake()->image('new-gallery.jpg')],
-            '_token' => 'test',
         ])->assertRedirect();
 
         $this->assertDatabaseHas('page_sections', ['page_key' => 'home', 'section_key' => 'gallery']);
