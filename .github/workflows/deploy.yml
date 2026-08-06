@@ -33,10 +33,10 @@ jobs:
 
       - name: Install Node Dependencies
         working-directory: ./laravel-foundation
-        run: npm install
+        run: npm ci
 
       - name: Build Frontend
-        working-directory: ./laravel-foundation/public
+        working-directory: ./laravel-foundation
         run: npm run build
 
 
