@@ -3,10 +3,13 @@ import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SectionHeading } from '@/components/shared/SectionHeading';
+import { useI18n } from '@/i18n';
 import reviewBackground from '@assets/review_bg.png';
 
 export function Testimonials({ testimonials, settings }: { testimonials: Array<{ quote: string; name: string; role: string | null; image: string | null }>; settings: { eyebrow: string; heading: string; description: string } }) {
     const autoplayPlugin = useRef(Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true }));
+    const { locale } = useI18n();
+    const isRtl = locale === 'ar';
 
     const [emblaRef, emblaApi] = useEmblaCarousel(
         {
@@ -15,6 +18,7 @@ export function Testimonials({ testimonials, settings }: { testimonials: Array<{
             align: 'start',
             slidesToScroll: 1,
             margin: '10',
+            direction: isRtl ? 'rtl' : 'ltr',
         } as Parameters<typeof useEmblaCarousel>[0],
         [autoplayPlugin.current],
     );
@@ -22,8 +26,12 @@ export function Testimonials({ testimonials, settings }: { testimonials: Array<{
     const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
     const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
+    const PrevIcon = isRtl ? ChevronRight : ChevronLeft;
+    const NextIcon = isRtl ? ChevronLeft : ChevronRight;
+
     return (
         <section
+            dir={isRtl ? 'rtl' : 'ltr'}
             className="mb-20 bg-surface py-20 lg:py-28"
             style={{
                 backgroundImage: `url(${reviewBackground})`,
@@ -48,8 +56,8 @@ export function Testimonials({ testimonials, settings }: { testimonials: Array<{
                                 /* 1 slide mobile, 2 slides md+ */
                                 className="flex basis-full shrink-0 gap-6 rounded-2xl bg-[#121212] p-6 md:basis-[calc(50%-12px)]"
                             >
-                                {item.image ? <img src={item.image} alt={item.name} className="h-56 w-full shrink-0 rounded-xl object-cover grayscale sm:w-[50%]" draggable={false} /> : <div className="h-56 w-full shrink-0 rounded-xl bg-white/5 sm:w-[50%]" aria-hidden="true" />}
-                                <div className="flex min-w-0 flex-col justify-between">
+                                {item.image ? <img src={item.image} alt={item.name} className={`h-56 w-full shrink-0 rounded-xl object-cover grayscale sm:w-[50%] ${isRtl ? 'order-2' : ''}`} draggable={false} /> : <div className={`h-56 w-full shrink-0 rounded-xl bg-white/5 sm:w-[50%] ${isRtl ? 'order-2' : ''}`} aria-hidden="true" />}
+                                <div className={`flex min-w-0 flex-col justify-between ${isRtl ? 'text-right' : ''}`}>
                                     <blockquote className="text-sm leading-relaxed text-ink-muted">{item.quote}</blockquote>
                                     <figcaption className="mt-6">
                                         <p className="text-sm text-ink">{item.name}</p>
@@ -62,12 +70,12 @@ export function Testimonials({ testimonials, settings }: { testimonials: Array<{
                 </div>
 
                 {/* Controls */}
-                <div className="mt-8 flex items-center justify-end gap-3">
+                <div className={`mt-8 flex items-center gap-3 ${isRtl ? 'justify-start' : 'justify-end'}`}>
                     <button type="button" aria-label="Previous testimonial" onClick={scrollPrev} className="grid size-10 place-items-center rounded-l-2xl bg-white/20 text-white transition-colors hover:bg-neutral-800">
-                        <ChevronLeft className="size-4" strokeWidth={1.5} />
+                        <PrevIcon className="size-4" strokeWidth={1.5} />
                     </button>
                     <button type="button" aria-label="Next testimonial" onClick={scrollNext} className="grid size-10 place-items-center rounded-r-2xl bg-white/20 text-white transition-colors hover:bg-neutral-800">
-                        <ChevronRight className="size-4" strokeWidth={1.5} />
+                        <NextIcon className="size-4" strokeWidth={1.5} />
                     </button>
                 </div>
             </div>

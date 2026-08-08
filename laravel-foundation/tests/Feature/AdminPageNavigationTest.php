@@ -50,7 +50,7 @@ class AdminPageNavigationTest extends TestCase
 
         $this->actingAs($user)->get('/admin/pages/about/story')
             ->assertSuccessful()
-            ->assertInertia(fn ($page) => $page->component('Admin/Content/Editor')->where('page', 'about')->where('section', 'story'));
+            ->assertInertia(fn ($page) => $page->component('Admin/Pages/AboutStory'));
     }
 
     public function test_nested_section_update_persists_structured_content(): void
@@ -111,6 +111,28 @@ class AdminPageNavigationTest extends TestCase
         $this->get('/')->assertSuccessful()->assertInertia(fn ($page) => $page->where('gallerySettings.heading', 'Dynamic heading'));
     }
 
+    public function test_home_gallery_multipart_post_persists_localized_copy_and_image(): void
+    {
+        Storage::fake('public');
+        $user = $this->pageEditor();
+
+        $this->actingAs($user)->post('/admin/pages/home/gallery', [
+            '_method' => 'PUT',
+            'translations' => [
+                'en' => ['eyebrow' => 'Gallery', 'heading' => 'English heading', 'description' => 'English copy', 'cta_label' => 'Explore', 'cta_url' => '/projects'],
+                'ar' => ['eyebrow' => 'المعرض', 'heading' => 'عنوان عربي', 'description' => 'وصف عربي', 'cta_label' => 'استكشف', 'cta_url' => '/projects'],
+            ],
+            'gallery_ids' => [],
+            'images' => [UploadedFile::fake()->image('gallery-upload.jpg')],
+        ])->assertRedirect();
+
+        $section = PageSection::query()->where('page_key', 'home')->where('section_key', 'gallery')->firstOrFail();
+        $this->assertSame('English heading', $section->content_snapshot['translations']['en']['heading']);
+        $this->assertSame('عنوان عربي', $section->content_snapshot['translations']['ar']['heading']);
+        $this->assertSame(1, PhotoGalleryItem::query()->count());
+        $this->assertNotNull(PhotoGalleryItem::first()->media_asset_id);
+    }
+
     public function test_home_featured_projects_editor_selects_and_orders_projects(): void
     {
         $user = $this->pageEditor();
@@ -137,7 +159,7 @@ class AdminPageNavigationTest extends TestCase
         $user = $this->pageEditor();
 
         $this->actingAs($user)->get('/admin/pages/media')->assertSuccessful()->assertInertia(fn ($page) => $page->component('Admin/Pages/Overview')->where('label', 'Media Page')->has('sections', 5));
-        $this->actingAs($user)->get('/admin/pages/media/news')->assertSuccessful()->assertInertia(fn ($page) => $page->component('Admin/Content/Editor')->where('page', 'media')->where('section', 'news'));
+        $this->actingAs($user)->get('/admin/pages/media/news')->assertSuccessful()->assertInertia(fn ($page) => $page->component('Admin/Pages/MediaNews'));
 
         $this->actingAs($user)->put('/admin/pages/media/news', [
             'sections' => ['news' => ['eyebrow' => 'Latest news', 'heading' => 'New from LARZ', 'description' => 'Dynamic news copy.']],

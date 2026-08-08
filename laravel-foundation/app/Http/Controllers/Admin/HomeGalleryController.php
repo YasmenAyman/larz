@@ -19,6 +19,8 @@ class HomeGalleryController extends Controller
     public function edit(): Response
     {
         $settings = WebsiteContent::section('home', 'gallery');
+        $raw = PageSection::query()->where('page_key', 'home')->where('section_key', 'gallery')->value('content_snapshot') ?? [];
+        $translations = $raw['translations'] ?? ['en' => $settings, 'ar' => ['eyebrow' => '', 'heading' => '', 'description' => '', 'cta_label' => '', 'cta_url' => '']];
         return Inertia::render('Admin/Pages/HomeGallery', [
             'settings' => [
                 'eyebrow' => $settings['eyebrow'] ?? 'Our Gallery',
@@ -26,6 +28,7 @@ class HomeGalleryController extends Controller
                 'description' => $settings['description'] ?? 'A glimpse into the details, designs, and destinations that define the LARZ experience.',
                 'cta_label' => $settings['cta_label'] ?? 'Explore All',
                 'cta_url' => $settings['cta_url'] ?? '/projects',
+                'translations' => $translations,
             ],
             'items' => PhotoGalleryItem::query()->with('media')->orderBy('sort_order')->get()->map(fn ($item) => [
                 'id' => $item->id,
@@ -43,7 +46,12 @@ class HomeGalleryController extends Controller
         $removedAssets = [];
         try {
             DB::transaction(function () use ($request, $uploads, $data, &$newAssets, &$removedAssets) {
+                $translations = $data['translations'] ?? [
+                    'en' => ['eyebrow' => $data['eyebrow'] ?? '', 'heading' => $data['heading'] ?? '', 'description' => $data['description'] ?? '', 'cta_label' => $data['cta_label'] ?? '', 'cta_url' => $data['cta_url'] ?? ''],
+                    'ar' => ['eyebrow' => '', 'heading' => '', 'description' => '', 'cta_label' => '', 'cta_url' => ''],
+                ];
                 $settings = [
+                    'translations' => $translations,
                     'eyebrow' => $data['eyebrow'] ?? '',
                     'heading' => $data['heading'] ?? '',
                     'description' => $data['description'] ?? '',

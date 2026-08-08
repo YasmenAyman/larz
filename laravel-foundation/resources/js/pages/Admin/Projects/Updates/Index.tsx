@@ -61,7 +61,7 @@ export default function Index({ items, projects, filters }: { items: { data: Ite
                         <FormField label="Title" error={form.errors.title}><input value={form.data.title} onChange={(event) => form.setData('title', event.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" /></FormField>
                         <FormField label="Published on"><input type="date" value={form.data.published_on} onChange={(event) => form.setData('published_on', event.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" /></FormField>
                         <FormField label="Sort order"><input type="number" value={form.data.sort_order} onChange={(event) => form.setData('sort_order', Number(event.target.value))} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" /></FormField>
-                        <ImageUploadField label="Image" onChange={(file) => form.setData('image', file)} />
+                        <ImageUploadField label="Image" onChange={(file) => form.setData('image', Array.isArray(file) ? file[0] ?? null : file)} />
                         <FormField label="Body"><textarea rows={4} value={form.data.body} onChange={(event) => form.setData('body', event.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" /></FormField>
                         <label className="flex items-center gap-3 text-sm text-white/80"><input type="checkbox" checked={form.data.is_published} onChange={(event) => form.setData('is_published', event.target.checked)} className="size-4 rounded border-slate-700 bg-slate-900" /> Published</label>
                         <div className="flex justify-end md:col-span-2"><button type="submit" disabled={form.processing} className="rounded-lg border border-gold bg-gold/10 px-6 py-2 text-xs font-semibold tracking-wider text-gold uppercase hover:bg-gold/20 disabled:opacity-50">{form.processing ? 'Saving...' : 'Add update'}</button></div>
@@ -77,7 +77,7 @@ export default function Index({ items, projects, filters }: { items: { data: Ite
                     </label>
                 </section>
                 <section className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
-                    {items.data.length === 0 ? (
+                    {items?.data?.length === 0 ? (
                         <EmptyState title="No updates" message="Add a construction update to get started." />
                     ) : (
                         <table className="w-full text-sm text-slate-200">
@@ -92,7 +92,7 @@ export default function Index({ items, projects, filters }: { items: { data: Ite
                                 </tr>
                             </thead>
                             <tbody>
-                                {items.data.map((item) => (
+                                {items?.data?.map((item) => (
                                     <tr key={item.id} className="border-b border-slate-900">
                                         <td className="px-4 py-3 text-slate-300">{item.project}</td>
                                         <td className="px-4 py-3"><div className="h-12 w-16 overflow-hidden rounded bg-slate-800">{item.image && <img src={item.image} className="size-full object-cover" alt={item.title} />}</div></td>
@@ -106,7 +106,7 @@ export default function Index({ items, projects, filters }: { items: { data: Ite
                         </table>
                     )}
                 </section>
-                <Pagination current={items.current_page} total={items.last_page} />
+                <Pagination current={items?.current_page ?? 1} total={items?.last_page ?? 1} />
             </div>
             <ConfirmationModal open={Boolean(confirmDelete)} title="Delete update?" message="Remove this construction update?" onCancel={() => setConfirmDelete(null)} onConfirm={() => confirmDelete && remove(confirmDelete)} />
         </AdminLayout>

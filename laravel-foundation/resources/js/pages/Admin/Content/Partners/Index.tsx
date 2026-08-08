@@ -2,8 +2,9 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, EmptyState, FormField, Notification, StatusBadge } from '@/components/admin/AdminLayoutParts';
+import { useState } from 'react';
 
-type Settings = { eyebrow?: string; heading?: string; description?: string };
+type Settings = { eyebrow?: string; heading?: string; description?: string; translations?: { en?: { eyebrow?: string; heading?: string; description?: string }; ar?: { eyebrow?: string; heading?: string; description?: string } } };
 type Partner = {
     id: number;
     name: string;
@@ -17,15 +18,19 @@ type Partner = {
 
 export default function Index({ settings, partners }: { settings: Settings; partners: Partner[] }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
+    const [language, setLanguage] = useState<'en' | 'ar'>('en');
     const { data, setData, put, processing, errors } = useForm({
         sections: {
             partners: {
-                eyebrow: settings.eyebrow ?? 'Partnerships & affiliations',
-                heading: settings.heading ?? 'The names behind our work.',
-                description: settings.description ?? 'We build with partners who share our standards — in design, engineering and delivery.',
+                translations: {
+                    en: settings.translations?.en ?? { eyebrow: settings.eyebrow ?? 'Partnerships & affiliations', heading: settings.heading ?? 'The names behind our work.', description: settings.description ?? 'We build with partners who share our standards — in design, engineering and delivery.' },
+                    ar: settings.translations?.ar ?? { eyebrow: '', heading: '', description: '' },
+                },
             },
         },
     });
+    const copy = data.sections.partners.translations[language];
+    const updateCopy = (key: 'eyebrow' | 'heading' | 'description', value: string) => setData('sections', { partners: { translations: { ...data.sections.partners.translations, [language]: { ...copy, [key]: value } } } });
     const submit = (event: React.FormEvent) => {
         event.preventDefault();
         put('/admin/pages/about/partners');
@@ -54,18 +59,19 @@ export default function Index({ settings, partners }: { settings: Settings; part
                         </div>
                         <StatusBadge status="Dynamic" />
                     </div>
-                    <div className="grid gap-5 md:grid-cols-2">
-                        <FormField label="Eyebrow" error={errors['sections.partners.eyebrow']}>
-                            <input value={data.sections.partners.eyebrow} onChange={(event) => setData('sections', { partners: { ...data.sections.partners, eyebrow: event.target.value } })} className={inputClass} />
+                    <div className="flex gap-2 border-b border-white/10 pb-3"><button type="button" onClick={() => setLanguage('en')} className={`rounded-lg px-4 py-2 text-sm ${language === 'en' ? 'bg-[#C5A880] text-black' : 'bg-white/5 text-white/60'}`}>English</button><button type="button" onClick={() => setLanguage('ar')} className={`rounded-lg px-4 py-2 text-sm ${language === 'ar' ? 'bg-[#C5A880] text-black' : 'bg-white/5 text-white/60'}`}>Arabic</button></div>
+                    <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="grid gap-5 md:grid-cols-2">
+                        <FormField label="Eyebrow" error={errors[`sections.partners.translations.${language}.eyebrow`]}>
+                            <input value={copy.eyebrow ?? ''} onChange={(event) => updateCopy('eyebrow', event.target.value)} className={inputClass} />
                         </FormField>
                         <div className="md:col-span-2">
-                            <FormField label="Heading" error={errors['sections.partners.heading']}>
-                                <textarea rows={2} value={data.sections.partners.heading} onChange={(event) => setData('sections', { partners: { ...data.sections.partners, heading: event.target.value } })} className={inputClass} />
+                            <FormField label="Heading" error={errors[`sections.partners.translations.${language}.heading`]}>
+                                <textarea rows={2} value={copy.heading ?? ''} onChange={(event) => updateCopy('heading', event.target.value)} className={inputClass} />
                             </FormField>
                         </div>
                         <div className="md:col-span-2">
-                            <FormField label="Description" error={errors['sections.partners.description']}>
-                                <textarea rows={3} value={data.sections.partners.description} onChange={(event) => setData('sections', { partners: { ...data.sections.partners, description: event.target.value } })} className={inputClass} />
+                            <FormField label="Description" error={errors[`sections.partners.translations.${language}.description`]}>
+                                <textarea rows={3} value={copy.description ?? ''} onChange={(event) => updateCopy('description', event.target.value)} className={inputClass} />
                             </FormField>
                         </div>
                     </div>

@@ -29,7 +29,7 @@ class ProjectController extends Controller
             ->orderBy('sort_order')->orderByDesc('id')->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Projects/Index', [
-            'projects' => $projects->through(fn (Project $project) => $this->present($project))->values(),
+            'projects' => $projects->through(fn (Project $project) => $this->present($project)),
             'categories' => ProjectCategory::query()->orderBy('name')->get(['id', 'name']),
             'filters' => $request->only(['search', 'status', 'category']),
         ]);
@@ -46,6 +46,8 @@ class ProjectController extends Controller
     public function store(StoreProjectRequest $request, MediaUploadService $uploads): RedirectResponse
     {
         $data = $request->safe()->except(['hero_image', 'logo', 'brochure', 'map_image']);
+        $data['translations'] = $this->sanitizeTranslations($data['translations'] ?? []);
+        $data['sections'] = $this->sanitizeSections($data['sections'] ?? []);
         $data['is_published'] = $request->boolean('is_published');
         $data['is_featured'] = $request->boolean('is_featured');
         if (array_key_exists('description', $data) && $data['description'] !== null) {
@@ -90,6 +92,8 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Project $project, MediaUploadService $uploads): RedirectResponse
     {
         $data = $request->safe()->except(['hero_image', 'logo', 'brochure', 'map_image']);
+        $data['translations'] = $this->sanitizeTranslations($data['translations'] ?? []);
+        $data['sections'] = $this->sanitizeSections($data['sections'] ?? []);
         $data['is_published'] = $request->boolean('is_published');
         $data['is_featured'] = $request->boolean('is_featured');
         if (array_key_exists('description', $data) && $data['description'] !== null) {
@@ -179,6 +183,42 @@ class ProjectController extends Controller
         return $currentId;
     }
 
+    private function sanitizeTranslations(array $translations): array
+    {
+        $sanitizer = app(RichTextSanitizer::class);
+        foreach (['en', 'ar'] as $locale) {
+            if (! isset($translations[$locale]) || ! is_array($translations[$locale])) {
+                $translations[$locale] = [];
+                continue;
+            }
+            foreach (['description', 'hero_description', 'installment_information'] as $key) {
+                if (isset($translations[$locale][$key])) {
+                    $translations[$locale][$key] = $sanitizer->sanitize($translations[$locale][$key]);
+                }
+            }
+        }
+        return $translations;
+    }
+
+    private function sanitizeSections(array $sections): array
+    {
+        $sanitizer = app(RichTextSanitizer::class);
+        foreach (['en', 'ar'] as $locale) {
+            if (! isset($sections[$locale]) || ! is_array($sections[$locale])) {
+                $sections[$locale] = [];
+                continue;
+            }
+            $s = &$sections[$locale];
+            foreach (['overview.body', 'masterplan.description', 'virtualTour.description', 'homes3d.description', 'construction.description', 'location.description'] as $dot) {
+                $parts = explode('.', $dot);
+                if (isset($s[$parts[0]][$parts[1]]) && is_string($s[$parts[0]][$parts[1]])) {
+                    $s[$parts[0]][$parts[1]] = $sanitizer->sanitize($s[$parts[0]][$parts[1]]);
+                }
+            }
+        }
+        return $sections;
+    }
+
     private function uploadFile(Request $request, MediaUploadService $uploads, string $field, string $folder, array &$newAssets, ?int $currentId): ?int
     {
         if ($request->hasFile($field)) {
@@ -241,6 +281,8 @@ class ProjectController extends Controller
             $base['seo_description'] = $project->seo_description;
             $base['canonical_url'] = $project->canonical_url;
             $base['robots'] = $project->robots;
+            $base['translations'] = $project->translations ?? ['en' => [], 'ar' => []];
+            $base['sections'] = $project->sections ?? ['en' => [], 'ar' => []];
         }
         return $base;
     }

@@ -31,7 +31,7 @@ class ProjectStatisticController extends Controller
                 'note' => $item->note,
                 'sort_order' => $item->sort_order,
                 'is_active' => $item->is_active,
-            ])->values(),
+            ]),
             'projects' => Project::query()->orderBy('title')->get(['id', 'title']),
             'filters' => $request->only(['project']),
         ]);

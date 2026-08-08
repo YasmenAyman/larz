@@ -1,12 +1,16 @@
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
     const [open, setOpen] = useState(false);
+    useEffect(() => {
+        document.documentElement.lang = 'en';
+        document.documentElement.dir = 'ltr';
+    }, []);
     return (
-        <div className="relative min-h-screen bg-[#0c0c0e] font-sans text-white antialiased">
+        <div dir="ltr" className="admin-shell relative min-h-screen bg-[#0c0c0e] font-sans text-white antialiased">
             {/* Ambient background glows */}
             <div className="pointer-events-none fixed -top-40 left-1/3 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-[#C5A880]/5 blur-[160px]" />
             <div className="pointer-events-none fixed top-1/2 -right-40 h-[500px] w-[500px] rounded-full bg-amber-600/5 blur-[140px]" />

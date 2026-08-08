@@ -34,7 +34,7 @@ class ProjectGalleryController extends Controller
                 'sort_order' => $item->sort_order,
                 'is_published' => $item->is_published,
                 'image' => WebsiteContent::assetUrl($item->media),
-            ])->values(),
+            ]),
             'projects' => Project::query()->orderBy('title')->get(['id', 'title']),
             'media' => MediaAsset::query()->where('disk', 'public')->orderByDesc('id')->limit(50)->get(['id', 'path', 'original_name']),
             'filters' => $request->only(['project']),

@@ -12,4 +12,6 @@ export type PageProps<
     auth: {
         user: User;
     };
+    locale: 'en' | 'ar';
+    dir: 'ltr' | 'rtl';
 };

@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import { useI18n } from '@/i18n';
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 import { Logo } from '@/components/shared/Logo';
 import { PillButton } from '@/components/shared/PillButton';
@@ -6,6 +7,7 @@ import footerBackground from '@assets/Footer_bg.png';
 import type { WebsiteSharedProps } from '@/types/website';
 
 export function Footer() {
+    const { t } = useI18n();
     const { props } = usePage<WebsiteSharedProps>();
     const settings = props.site?.settings ?? {};
     const navigation = props.site?.navigation ?? [];
@@ -30,7 +32,7 @@ export function Footer() {
                     </div>
 
                     <nav aria-label="Footer">
-                        <h3 className="text-lg text-ink">Menu</h3>
+                        <h3 className="text-lg text-ink">{t('Menu')}</h3>
                         <ul className="mt-6 space-y-4">
                             {footerMenu.map((item) => (
                                 <li key={item.label}>
@@ -43,7 +45,7 @@ export function Footer() {
                     </nav>
 
                     <div>
-                        <h3 className="text-lg text-ink">Get in Touch</h3>
+                        <h3 className="text-lg text-ink">{t('Get in Touch')}</h3>
                         <ul className="mt-6 space-y-5 text-sm text-ink/90">
                             <li className="flex gap-3">
                                 <MapPin className="mt-0.5 size-5 shrink-0" strokeWidth={2} />
@@ -67,7 +69,7 @@ export function Footer() {
 
                 <div className="mt-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
                     <p className="text-sm text-ink">
-                        Developed by <span className="font-semibold text-ink">TQNIA</span> All Rights reserved
+                        {t('Developed by')} <span className="font-semibold text-ink">TQNIA</span> {t('All Rights reserved')}
                     </p>
                     <ul className="flex items-center gap-3">
                         {[

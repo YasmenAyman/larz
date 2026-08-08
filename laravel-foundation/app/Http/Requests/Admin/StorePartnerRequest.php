@@ -23,6 +23,12 @@ class StorePartnerRequest extends FormRequest
             'logo' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,svg', 'mimetypes:image/jpeg,image/png,image/webp,image/svg+xml', 'max:5120'],
             'sort_order' => ['integer', 'min:0'],
             'is_published' => ['boolean'],
+            'translations' => ['nullable', 'array'],
+            'translations.en' => ['nullable', 'array'],
+            'translations.ar' => ['nullable', 'array'],
+            'translations.*.name' => ['nullable', 'string', 'max:180'],
+            'translations.*.role' => ['nullable', 'string', 'max:180'],
+            'translations.*.description' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

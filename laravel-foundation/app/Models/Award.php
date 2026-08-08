@@ -9,6 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Award extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['title', 'year', 'description', 'icon_key', 'sort_order', 'is_published'];
-    protected $casts = ['year' => 'integer', 'is_published' => 'boolean'];
+    protected $fillable = ['title', 'year', 'description', 'icon_key', 'sort_order', 'is_published', 'translations'];
+    protected $casts = ['year' => 'integer', 'is_published' => 'boolean', 'translations' => 'array'];
 }

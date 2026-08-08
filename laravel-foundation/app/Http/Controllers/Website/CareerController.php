@@ -12,9 +12,12 @@ use App\Models\InternshipApplication;
 use App\Models\InternshipProgram;
 use App\Models\Job;
 use App\Models\JobApplication;
+use App\Models\MediaAsset;
+use App\Models\PageSection;
 use App\Services\FormNotificationContext;
 use App\Services\FormSubmissionService;
 use App\Services\MediaUploadService;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteContent;
 use App\Services\SeoMetadataService;
 use Inertia\Inertia;
@@ -24,12 +27,42 @@ class CareerController extends Controller
 {
     public function index(SeoMetadataService $seo): Response
     {
+        $heroRaw = \App\Models\PageSection::query()->where('page_key', 'careers')->where('section_key', 'hero')->value('content_snapshot') ?? [];
+        $hero = LocalizedContent::section($heroRaw);
+        $heroBackground = ! empty($heroRaw['background_image_id'])
+            ? WebsiteContent::assetUrl(MediaAsset::find($heroRaw['background_image_id']))
+            : asset($heroRaw['background_image'] ?? 'assets/OpenPositions-bg.png');
+        $valuesSection = LocalizedContent::section(WebsiteContent::section('careers', 'values'));
+        $vacanciesSection = LocalizedContent::section(WebsiteContent::section('careers', 'vacancies_settings'));
         return Inertia::render('Website/Careers/Index', [
-            'hero' => WebsiteContent::section('careers', 'hero'),
-            'values' => CompanyValue::query()->where('is_published', true)->orderBy('sort_order')->get()->map(fn ($value) => ['title' => $value->title, 'description' => $value->description, 'icon' => $value->icon_key])->values()->all(),
-            'jobs' => Job::query()->where('is_published', true)->where('is_featured', true)->orderBy('sort_order')->get()->map(fn ($job) => ['id' => $job->id, 'title' => $job->title, 'department' => $job->department, 'location' => $job->location, 'employmentType' => $job->employment_type])->values()->all(),
+            'hero' => [...$hero, 'backgroundImage' => $heroBackground],
+            'valuesSettings' => [
+                'eyebrow' => $valuesSection['eyebrow'] ?? 'Why LARZ',
+                'heading' => $valuesSection['heading'] ?? 'Grow with a team that builds things that last.',
+                'description' => $valuesSection['description'] ?? null,
+            ],
+            'vacanciesSettings' => [
+                'eyebrow' => $vacanciesSection['eyebrow'] ?? 'Vacancies',
+                'heading' => $vacanciesSection['heading'] ?? 'Open roles.',
+                'description' => $vacanciesSection['description'] ?? null,
+            ],
+            'values' => CompanyValue::query()->where('is_published', true)->orderBy('sort_order')->get()->map(fn ($value) => array_merge(['title' => $value->title, 'description' => $value->description, 'icon' => $value->icon_key], LocalizedContent::record($value, ['title', 'description'])))->values()->all(),
+            'jobs' => Job::query()->where('is_published', true)->orderBy('sort_order')->get()->map(fn ($job) => array_merge([
+                'id' => $job->id,
+                'title' => $job->title,
+                'department' => $job->department,
+                'location' => $job->location,
+                'employmentType' => $job->employment_type,
+                'experienceLevel' => $job->experience_level,
+                'summary' => $job->summary,
+                'description' => $job->description,
+                'requirements' => $job->requirements,
+                'responsibilities' => $job->responsibilities,
+                'benefits' => $job->benefits,
+            ], LocalizedContent::record($job, ['title', 'department', 'location', 'employment_type', 'experience_level', 'summary', 'description', 'requirements', 'responsibilities', 'benefits'])))->values()->all(),
             'internship' => InternshipProgram::query()->where('is_published', true)->orderBy('sort_order')->firstOrFail()->only(['id', 'title', 'description', 'cta_label']),
-            'cta' => WebsiteContent::section('careers', 'cta'),
+            'internshipSettings' => $this->getInternshipSettings(),
+            'cta' => $this->getGeneralCtaSettings(),
             'seo' => $seo->forPage('careers', '/careers', ['title' => 'Careers at LARZ Developments | Shape the Future With Us'], [
                 $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')], ['name' => 'Careers', 'url' => url('/careers')]]),
             ]),
@@ -131,5 +164,36 @@ class CareerController extends Controller
         $submissions->record($model, $data, $context);
 
         return back()->with('success', $successMessage);
+    }
+
+    private function getInternshipSettings(): array
+    {
+        $snapshot = PageSection::query()->where('page_key', 'careers')->where('section_key', 'internship')->value('content_snapshot') ?? [];
+        $section = LocalizedContent::section($snapshot);
+        $image = null;
+        if (! empty($snapshot['image_id'])) {
+            $image = WebsiteContent::assetUrl(MediaAsset::find($snapshot['image_id']));
+        } elseif (! empty($snapshot['image'])) {
+            $image = asset($snapshot['image']);
+        }
+
+        return [
+            'eyebrow' => $section['eyebrow'] ?? 'Internship programs',
+            'heading' => $section['heading'] ?? 'Internship programs',
+            'description' => $section['description'] ?? 'Our internships give students and recent graduates real work across design, marketing, sales and engineering – with mentorship from people who\'ve done it for decades.',
+            'cta_label' => $section['cta_label'] ?? 'APPLY FOR AN INTERNSHIP',
+            'image' => $image ?? asset('assets/DSC04142-HDR.jpg'),
+        ];
+    }
+
+    private function getGeneralCtaSettings(): array
+    {
+        $section = LocalizedContent::section(WebsiteContent::section('careers', 'general_cv_cta'));
+
+        return [
+            'eyebrow' => $section['eyebrow'] ?? 'Careers',
+            'heading' => $section['heading'] ?? "Don\u2019t see your role? Send us your CV.",
+            'cta_label' => $section['cta_label'] ?? 'Send your CV',
+        ];
     }
 }

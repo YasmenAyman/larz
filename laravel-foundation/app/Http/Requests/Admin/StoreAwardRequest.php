@@ -22,6 +22,13 @@ class StoreAwardRequest extends FormRequest
             'icon_key' => ['nullable', 'string', 'in:award,star,medal,crown'],
             'sort_order' => ['integer', 'min:0'],
             'is_published' => ['boolean'],
+            'translations' => ['nullable', 'array'],
+            'translations.en' => ['nullable', 'array'],
+            'translations.ar' => ['nullable', 'array'],
+            'translations.en.title' => ['nullable', 'string', 'max:180'],
+            'translations.en.description' => ['nullable', 'string', 'max:1000'],
+            'translations.ar.title' => ['nullable', 'string', 'max:180'],
+            'translations.ar.description' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

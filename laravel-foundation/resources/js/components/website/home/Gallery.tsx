@@ -4,15 +4,20 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PillButton } from '@/components/shared/PillButton';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import newMask from '@assets/new_mask.png';
+import { useI18n } from '@/i18n';
 
 // Repeat gallery items for continuous infinite looping
 export function Gallery({ gallery, settings }: { gallery: string[]; settings: { eyebrow: string; heading: string; description: string; cta_label: string; cta_url: string } }) {
     const repeatedGallery = [...gallery, ...gallery, ...gallery, ...gallery];
+    const { t, locale } = useI18n();
+    const isRtl = locale === 'ar';
+
     const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         align: 'start',
         dragFree: true,
         skipSnaps: false,
+        direction: isRtl ? 'rtl' : 'ltr',
     });
 
     const scrollPrev = useCallback(() => {
@@ -22,6 +27,9 @@ export function Gallery({ gallery, settings }: { gallery: string[]; settings: { 
     const scrollNext = useCallback(() => {
         if (emblaApi) emblaApi.scrollNext();
     }, [emblaApi]);
+
+    const PrevIcon = isRtl ? ChevronRight : ChevronLeft;
+    const NextIcon = isRtl ? ChevronLeft : ChevronRight;
 
     useEffect(() => {
         if (!emblaApi) return;
@@ -54,15 +62,15 @@ export function Gallery({ gallery, settings }: { gallery: string[]; settings: { 
     }, [emblaApi]);
 
     return (
-        <section className="overflow-hidden py-20 lg:py-28">
+        <section dir={isRtl ? 'rtl' : 'ltr'} className="overflow-hidden py-20 lg:py-28">
             <div className="mx-auto max-w-[1440px] px-4 sm:px-8">
                 <SectionHeading
-                    eyebrow={settings.eyebrow}
-                    title={settings.heading}
-                    description={<>{settings.description}</>}
+                    eyebrow={t(settings.eyebrow)}
+                    title={t(settings.heading)}
+                    description={<>{t(settings.description)}</>}
                 />
                 <div className="mt-8 flex justify-center">
-                    <PillButton label={settings.cta_label} to={settings.cta_url} />
+                    <PillButton label={t(settings.cta_label)} to={settings.cta_url} />
                 </div>
             </div>
 
@@ -108,7 +116,7 @@ export function Gallery({ gallery, settings }: { gallery: string[]; settings: { 
                         onClick={scrollPrev}
                         className="grid size-10 place-items-center rounded-l-2xl bg-white/20 text-white transition-colors hover:bg-neutral-800 hover:text-white"
                     >
-                        <ChevronLeft className="size-5" strokeWidth={1.75} />
+                        <PrevIcon className="size-5" strokeWidth={1.75} />
                     </button>
                     <button
                         type="button"
@@ -116,7 +124,7 @@ export function Gallery({ gallery, settings }: { gallery: string[]; settings: { 
                         onClick={scrollNext}
                         className="grid size-10 place-items-center rounded-r-2xl bg-white/20 text-white transition-colors hover:bg-neutral-800 hover:text-white"
                     >
-                        <ChevronRight className="size-5" strokeWidth={1.75} />
+                        <NextIcon className="size-5" strokeWidth={1.75} />
                     </button>
                 </div>
             </div>

@@ -73,7 +73,7 @@ export default function Index({ items, projects, filters }: { items: { data: Ite
                     </label>
                 </section>
                 <section className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
-                    {items.data.length === 0 ? (
+                    {items?.data?.length === 0 ? (
                         <EmptyState title="No nearby locations" message="Add a nearby location to a project." />
                     ) : (
                         <table className="w-full text-sm text-slate-200">
@@ -87,7 +87,7 @@ export default function Index({ items, projects, filters }: { items: { data: Ite
                                 </tr>
                             </thead>
                             <tbody>
-                                {items.data.map((item) => (
+                                {items?.data?.map((item) => (
                                     <tr key={item.id} className="border-b border-slate-900">
                                         <td className="px-4 py-3 text-slate-300">{item.project}</td>
                                         <td className="px-4 py-3 text-white">{item.place}</td>
@@ -100,7 +100,7 @@ export default function Index({ items, projects, filters }: { items: { data: Ite
                         </table>
                     )}
                 </section>
-                <Pagination current={items.current_page} total={items.last_page} />
+                <Pagination current={items?.current_page ?? 1} total={items?.last_page ?? 1} />
             </div>
             <ConfirmationModal open={Boolean(confirmDelete)} title="Delete location?" message="Remove this nearby location?" onCancel={() => setConfirmDelete(null)} onConfirm={() => confirmDelete && remove(confirmDelete)} />
         </AdminLayout>

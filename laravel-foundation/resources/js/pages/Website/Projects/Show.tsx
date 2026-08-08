@@ -1,37 +1,46 @@
-import { ArrowRight, ArrowUpRight, MapPin } from 'lucide-react';
-import { Eyebrow } from '@/components/shared/Eyebrow';
 import WebsiteLayout from '@/layouts/WebsiteLayout';
-import type { WebsiteProject } from '@/types/website';
+import { Amenities, ConstructionUpdates, LocationMap, Masterplan, ProjectFacilities, ProjectGallery, ProjectHero, ProjectOverview, ProjectStats, Homes3D, VirtualTour } from '@/components/website/projects/ProjectSections';
+import type { ProjectSections, WebsiteProject } from '@/types/website';
 import { SeoHead, type SeoMetadata } from '@/components/shared/SeoHead';
 
-export default function Show({ project, others, seo }: { project: WebsiteProject; others: Array<{ slug: string; title: string; location: string | null; image: string | null }>; seo: SeoMetadata }) {
-
+export default function Show({ project, sections, others, seo }: { project: WebsiteProject; sections: ProjectSections; others: Array<{ slug: string; title: string; location: string | null; image: string | null }>; seo: SeoMetadata }) {
     return (
         <WebsiteLayout>
             <SeoHead seo={seo} />
-            <section className="relative">
-                <div className="relative min-h-[80vh] overflow-hidden">
-                    <img src={project.heroImage ?? ''} alt={`${project.title} exterior`} className="absolute inset-0 size-full object-cover opacity-70" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-night via-night/85 to-night/30" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-night via-transparent to-night/70" />
-                    <div className="relative mx-auto flex min-h-[80vh] max-w-[1440px] flex-col justify-center px-6 pt-40 pb-16 sm:px-10 lg:px-24">
-                        <Eyebrow className="text-ink">{project.status}</Eyebrow>
-                        <h1 className="mt-8 max-w-3xl text-5xl font-light leading-[1.08] text-ink sm:text-6xl lg:text-[4.25rem]">{project.title}</h1>
-                        <p className="mt-6 flex items-center gap-2 text-sm text-ink-muted"><MapPin className="size-4" strokeWidth={1.5} />{project.location}</p>
-                        <p className="mt-8 max-w-md text-sm leading-relaxed text-ink-muted">{project.tagline}</p>
-                        <div className="mt-10 flex flex-wrap items-center gap-6"><a href="/contact" className="inline-flex items-center gap-3 border border-gold px-6 py-4 text-[0.7rem] tracking-[0.18em] text-ink uppercase transition-colors hover:bg-gold/10">Request pricing &amp; payment plan <ArrowRight className="size-3.5" strokeWidth={1.5} /></a><a href="/projects" className="text-[0.7rem] tracking-[0.18em] text-ink-dim uppercase hover:text-ink">All projects</a></div>
+            <ProjectHero project={project} sections={sections} />
+            <ProjectStats project={project} />
+            <ProjectOverview project={project} sections={sections} />
+            <Masterplan project={project} sections={sections} />
+            <VirtualTour project={project} sections={sections} />
+            <Homes3D project={project} sections={sections} />
+            <ProjectGallery project={project} />
+            <ConstructionUpdates project={project} sections={sections} />
+            <Amenities project={project} sections={sections} />
+            <ProjectFacilities project={project} />
+            <LocationMap project={project} sections={sections} />
+
+            {/* More developments */}
+            {others.length > 0 && (
+                <section className="border-t border-hairline/30 bg-surface-deep py-24">
+                    <div className="mx-auto max-w-[1440px] px-6 sm:px-10">
+                        <h2 className="text-3xl font-light text-ink sm:text-[2.25rem]">More developments</h2>
+                        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+                            {others.map((other) => (
+                                <a key={other.slug} href={`/projects/${other.slug}`} className="group relative block h-[300px] overflow-hidden">
+                                    <img src={other.image ?? ''} alt={other.title} className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-night/90 to-transparent" />
+                                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6">
+                                        <div>
+                                            <h3 className="text-base text-ink">{other.title}</h3>
+                                            <p className="mt-1 text-xs text-ink-muted">{other.location}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
                     </div>
-                </div>
-                <div className="border-t border-hairline/40"><div className="mx-auto grid max-w-[1440px] grid-cols-2 md:grid-cols-4">{project.facts.map((fact) => <div key={fact.label} className="border-r border-b border-hairline/40 px-6 py-8 last:border-r-0 sm:px-10 md:border-b-0"><p className="text-3xl font-light text-ink">{fact.value}</p><p className="mt-2 text-[0.65rem] tracking-[0.22em] text-ink-muted uppercase">{fact.label}</p></div>)}</div></div>
-            </section>
-
-            <section className="bg-paper py-24 sm:py-28"><div className="mx-auto grid max-w-5xl gap-14 px-6 sm:px-10 md:grid-cols-2 md:items-start"><div><Eyebrow tone="light">Overview</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-paper-ink sm:text-[2.25rem]">{project.tagline}</h2><p className="mt-6 text-sm leading-relaxed text-paper-muted">{project.intro}</p><ul className="mt-8">{(project.highlights ?? []).map((item) => <li key={item} className="border-b border-paper-muted/25 py-4 text-sm text-paper-ink">{item}</li>)}</ul></div><figure className="relative"><img src={project.gallery[0] ?? ''} alt={`${project.title} lifestyle view`} className="h-[420px] w-full object-cover" loading="lazy" /><figcaption className="absolute bottom-3 left-4 text-[0.6rem] tracking-[0.24em] text-paper uppercase">Project render</figcaption></figure></div></section>
-
-            <section className="bg-night py-24"><div className="mx-auto max-w-5xl px-6 sm:px-10"><Eyebrow>Gallery</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-ink sm:text-[2.25rem]">A closer look.</h2><div className="mt-10 grid gap-4 sm:grid-cols-3">{project.gallery.map((src, i) => <img key={`${src}-${i}`} src={src} alt={`${project.title} gallery image ${i + 1}`} className="h-[220px] w-full object-cover" loading="lazy" />)}</div></div></section>
-
-            <section className="border-t border-hairline/30 bg-surface-deep py-24"><div className="mx-auto max-w-[1440px] px-6 sm:px-10"><Eyebrow>More developments</Eyebrow><div className="mt-10 grid gap-4 sm:grid-cols-3">{others.map((other) => <a key={other.slug} href={`/projects/${other.slug}`} className="group relative block h-[300px] overflow-hidden"><img src={other.image ?? ''} alt={other.title} className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" /><div className="absolute inset-0 bg-gradient-to-t from-night/90 to-transparent" /><div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6"><div><h3 className="text-base text-ink">{other.title}</h3><p className="mt-1 text-xs text-ink-muted">{other.location}</p></div><span className="grid size-9 place-items-center rounded-full bg-surface-card text-ink"><ArrowUpRight className="size-4" strokeWidth={1.5} /></span></div></a>)}</div></div></section>
-
-            <section className="bg-gradient-to-b from-surface-deep to-night py-24 text-center"><div className="mx-auto max-w-3xl px-6"><Eyebrow className="justify-center text-gold">{project.title}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-ink sm:text-[2.4rem]">A better life begins in the right place.</h2><div className="mt-8 flex flex-wrap items-center justify-center gap-6"><a href="/contact" className="inline-flex items-center gap-3 border border-gold px-6 py-4 text-[0.7rem] tracking-[0.18em] text-ink uppercase transition-colors hover:bg-gold/10">Book a consultation <ArrowRight className="size-3.5" strokeWidth={1.5} /></a></div></div></section>
+                </section>
+            )}
         </WebsiteLayout>
     );
 }

@@ -17,29 +17,30 @@ final class WebsiteContent
 
     public static function section(string $page, string $key): array
     {
-        return Cache::remember('website.section.'.$page.'.'.$key, now()->addHour(), fn () => PageSection::query()
+        return LocalizedContent::section(Cache::remember('website.section.'.$page.'.'.$key, now()->addHour(), fn () => PageSection::query()
             ->where('page_key', $page)
             ->where('section_key', $key)
             ->where('status', 'published')
-            ->first()?->content_snapshot ?? []);
+            ->first()?->content_snapshot ?? []));
     }
 
     public static function project(Project $project): array
     {
+        $localized = LocalizedContent::record($project, ['title', 'location', 'description', 'short_description', 'hero_heading', 'hero_description', 'installment_information', 'seo_title', 'seo_description']);
         return [
             'id' => $project->id,
-            'title' => $project->title,
+            'title' => $localized['title'] ?? $project->title,
             'slug' => $project->slug,
-            'location' => $project->location,
+            'location' => $localized['location'] ?? $project->location,
             'status' => $project->status,
             'projectType' => $project->project_type,
-            'description' => $project->description,
-            'shortDescription' => $project->short_description,
-            'tagline' => $project->short_description,
-            'intro' => $project->description,
+            'description' => $localized['description'] ?? $project->description,
+            'shortDescription' => $localized['short_description'] ?? $project->short_description,
+            'tagline' => $localized['short_description'] ?? $project->short_description,
+            'intro' => $localized['description'] ?? $project->description,
             'highlights' => self::section('project-'.$project->slug, 'highlights')['items'] ?? [],
-            'heroHeading' => $project->hero_heading,
-            'heroDescription' => $project->hero_description,
+            'heroHeading' => $localized['hero_heading'] ?? $project->hero_heading,
+            'heroDescription' => $localized['hero_description'] ?? $project->hero_description,
             'heroImage' => self::assetUrl($project->heroImage),
             'brochure' => self::assetUrl($project->brochure),
             'virtualTourUrl' => $project->virtual_tour_url,

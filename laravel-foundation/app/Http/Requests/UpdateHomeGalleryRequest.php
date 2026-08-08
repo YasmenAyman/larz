@@ -22,6 +22,14 @@ class UpdateHomeGalleryRequest extends FormRequest
             'remove_ids.*' => ['integer', 'exists:photo_gallery_items,id'],
             'gallery_ids' => ['nullable', 'array'],
             'gallery_ids.*' => ['integer', 'exists:photo_gallery_items,id'],
+            'translations' => ['nullable', 'array'],
+            'translations.en' => ['nullable', 'array'],
+            'translations.ar' => ['nullable', 'array'],
+            'translations.*.eyebrow' => ['nullable', 'string', 'max:100'],
+            'translations.*.heading' => ['nullable', 'string', 'max:180'],
+            'translations.*.description' => ['nullable', 'string', 'max:1000'],
+            'translations.*.cta_label' => ['nullable', 'string', 'max:100'],
+            'translations.*.cta_url' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

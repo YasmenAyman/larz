@@ -1,6 +1,8 @@
 import { PillButton } from '@/components/shared/PillButton';
+import { useI18n } from '@/i18n';
 export function Hero({ hero }: { hero: { heading: string; description: string; cta_label: string; cta_url: string; heroImage: string } }) {
-    const heading = (hero.heading ?? 'Designed for\nthe Way You Live').split('\n');
+    const { t } = useI18n();
+    const heading = (t(hero.heading ?? 'Designed for\nthe Way You Live')).split('\n');
     return (
         <section className="relative min-h-[400px] overflow-hidden bg-surface bg_pattern pt-32 pb-16 lg:min-h-[850px] lg:pb-0">
             <span
@@ -16,9 +18,9 @@ export function Hero({ hero }: { hero: { heading: string; description: string; c
                         {heading.map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}
                     </h1>
                     <p className="mt-6 max-w-md text-[18px] leading-relaxed text-ink-muted">
-                        {hero.description}
+                        {t(hero.description)}
                     </p>
-                    <PillButton label={hero.cta_label} to={hero.cta_url} variant="split" className="mt-10" />
+                    <PillButton label={t(hero.cta_label)} to={hero.cta_url} variant="split" className="mt-10" />
                 </div>
 
                 <div className="relative hidden lg:block">

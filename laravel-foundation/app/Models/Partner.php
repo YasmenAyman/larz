@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Partner extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['name', 'role', 'description', 'logo_id', 'url', 'sort_order', 'is_published'];
-    protected $casts = ['is_published' => 'boolean'];
+    protected $fillable = ['name', 'role', 'description', 'logo_id', 'url', 'sort_order', 'is_published', 'translations'];
+    protected $casts = ['is_published' => 'boolean', 'translations' => 'array'];
     public function logo(): BelongsTo { return $this->belongsTo(MediaAsset::class, 'logo_id'); }
 }

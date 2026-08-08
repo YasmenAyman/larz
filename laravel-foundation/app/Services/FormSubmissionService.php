@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\GenericSubmissionReceived;
 use App\Support\FormRecipients;
+use App\Support\Honeypot;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -28,6 +29,7 @@ final class FormSubmissionService
     {
         return DB::transaction(function () use ($model, $attributes, $context) {
             $record = $model->newInstance();
+            unset($attributes[Honeypot::FIELD]);
             $record->forceFill($attributes)->save();
             $this->dispatchNotifications($record, $context);
             return $record;

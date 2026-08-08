@@ -112,13 +112,17 @@ export function FormField({ label, children, error }: { label: string; children:
     );
 }
 
-export function ImageUploadField({ label = 'Image', onChange }: { label?: string; onChange?: (file: File | null) => void }) {
+export function ImageUploadField({ label = 'Image', onChange, multiple = false }: { label?: string; onChange?: (file: File | null | File[]) => void; multiple?: boolean }) {
     return (
         <FormField label={label}>
             <input
                 type="file"
                 accept="image/*"
-                onChange={(event) => onChange?.(event.target.files?.[0] ?? null)}
+                multiple={multiple}
+                onChange={(event) => {
+                    const files = event.target.files ? Array.from(event.target.files) : [];
+                    onChange?.(multiple ? files : (files[0] ?? null));
+                }}
                 className="block w-full rounded-xl border border-white/15 bg-[#1e1e22] px-3 py-2 text-sm text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-[#C5A880]/20 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-[#C5A880]"
             />
         </FormField>

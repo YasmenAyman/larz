@@ -22,9 +22,29 @@ class TestimonialController extends Controller
     public function index(): Response
     {
         $section = PageSection::query()->where('page_key', 'home')->where('section_key', 'testimonials')->first();
+        $settings = $section?->content_snapshot ?? [];
+        $rawTranslations = $settings['translations'] ?? [];
+        $enCopy = $rawTranslations['en'] ?? [];
+        $arCopy = $rawTranslations['ar'] ?? [];
 
         return Inertia::render('Admin/Content/Testimonials/Index', [
-            'settings' => $section?->content_snapshot ?? [],
+            'settings' => [
+                'eyebrow' => $settings['eyebrow'] ?? 'Testimonials',
+                'heading' => $settings['heading'] ?? 'Built on Trust. Proven by Experience.',
+                'description' => $settings['description'] ?? '',
+                'translations' => [
+                    'en' => [
+                        'eyebrow' => $enCopy['eyebrow'] ?? ($settings['eyebrow'] ?? 'Testimonials'),
+                        'heading' => $enCopy['heading'] ?? ($settings['heading'] ?? 'Built on Trust. Proven by Experience.'),
+                        'description' => $enCopy['description'] ?? ($settings['description'] ?? ''),
+                    ],
+                    'ar' => [
+                        'eyebrow' => $arCopy['eyebrow'] ?? '',
+                        'heading' => $arCopy['heading'] ?? '',
+                        'description' => $arCopy['description'] ?? '',
+                    ],
+                ],
+            ],
             'testimonials' => Testimonial::query()->with('media')->orderBy('sort_order')->orderBy('id')->get()->map(fn (Testimonial $item) => $this->present($item))->values()->all(),
         ]);
     }
@@ -32,6 +52,12 @@ class TestimonialController extends Controller
     public function updateSettings(UpdateAdminContentRequest $request): RedirectResponse
     {
         $content = app(RichTextSanitizer::class)->sanitizeArray($request->input('section', $request->input('sections.testimonials', [])));
+        $translationsInput = $request->input('translations', []);
+        $translations = [
+            'en' => app(RichTextSanitizer::class)->sanitizeArray($translationsInput['en'] ?? []),
+            'ar' => app(RichTextSanitizer::class)->sanitizeArray($translationsInput['ar'] ?? []),
+        ];
+        $content['translations'] = $translations;
         PageSection::updateOrCreate(
             ['page_key' => 'home', 'section_key' => 'testimonials'],
             ['section_type' => 'home.testimonials', 'content_snapshot' => $content, 'status' => 'published', 'published_at' => now(), 'updated_by' => $request->user()->id],
@@ -48,8 +74,9 @@ class TestimonialController extends Controller
 
     public function store(StoreTestimonialRequest $request, MediaUploadService $uploads): RedirectResponse
     {
-        $data = $request->safe()->except('image');
+        $data = $request->safe()->except(['image', 'translations']);
         $data['is_published'] = $request->boolean('is_published');
+        $data['translations'] = $this->sanitizeTranslations($request->input('translations', []));
         $newAsset = null;
 
         try {
@@ -82,14 +109,16 @@ class TestimonialController extends Controller
                 'sort_order' => $testimonial->sort_order,
                 'is_published' => $testimonial->is_published,
                 'image' => WebsiteContent::assetUrl($testimonial->media),
+                'translations' => $testimonial->translations ?? ['en' => ['name' => '', 'role' => '', 'quote' => ''], 'ar' => ['name' => '', 'role' => '', 'quote' => '']],
             ],
         ]);
     }
 
     public function update(UpdateTestimonialRequest $request, Testimonial $testimonial, MediaUploadService $uploads): RedirectResponse
     {
-        $data = $request->safe()->except('image');
+        $data = $request->safe()->except(['image', 'translations']);
         $data['is_published'] = $request->boolean('is_published');
+        $data['translations'] = $this->sanitizeTranslations($request->input('translations', []));
         $oldAsset = $testimonial->media;
         $newAsset = null;
 
@@ -140,6 +169,26 @@ class TestimonialController extends Controller
             'sort_order' => $testimonial->sort_order,
             'is_published' => $testimonial->is_published,
             'image' => WebsiteContent::assetUrl($testimonial->media),
+            'translations' => $testimonial->translations ?? ['en' => ['name' => '', 'role' => '', 'quote' => ''], 'ar' => ['name' => '', 'role' => '', 'quote' => '']],
         ];
+    }
+
+    private function sanitizeTranslations(array $translations): array
+    {
+        $sanitizer = app(RichTextSanitizer::class);
+        $allowedKeys = ['name', 'role', 'quote'];
+        foreach (['en', 'ar'] as $locale) {
+            if (! isset($translations[$locale]) || ! is_array($translations[$locale])) {
+                $translations[$locale] = [];
+            }
+            $values = $translations[$locale];
+            $translations[$locale] = [];
+            foreach ($allowedKeys as $key) {
+                if (isset($values[$key]) && $values[$key] !== '') {
+                    $translations[$locale][$key] = $sanitizer->sanitize((string) $values[$key]);
+                }
+            }
+        }
+        return $translations;
     }
 }

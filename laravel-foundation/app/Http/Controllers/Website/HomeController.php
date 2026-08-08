@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PhotoGalleryItem;
 use App\Models\Project;
 use App\Models\Testimonial;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteContent;
 use App\Services\SeoMetadataService;
 use Inertia\Inertia;
@@ -26,7 +27,6 @@ class HomeController extends Controller
         $gallerySettings = WebsiteContent::section('home', 'gallery');
         $testimonialSettings = WebsiteContent::section('home', 'testimonials');
         $testimonials = Testimonial::query()->with('media')->where('is_published', true)->orderBy('sort_order')->get();
-        $finalCtaSettings = WebsiteContent::section('home', 'final_cta');
 
         return Inertia::render('Website/Home/Index', [
             'hero' => [...WebsiteContent::section('home', 'hero'), 'heroImage' => asset('assets/tower_img.png')],
@@ -40,7 +40,7 @@ class HomeController extends Controller
                 'slug' => $project->slug,
                 'title' => $project->title,
                 'location' => $project->location,
-                'image' => WebsiteContent::assetUrl($project->heroImage),
+                'heroImage' => WebsiteContent::assetUrl($project->heroImage),
             ])->values()->all(),
             'featuredProjectsSettings' => [
                 'eyebrow' => $featuredSettings['eyebrow'] ?? 'Featured Projects',
@@ -57,23 +57,13 @@ class HomeController extends Controller
                 'cta_label' => $gallerySettings['cta_label'] ?? 'Explore All',
                 'cta_url' => $gallerySettings['cta_url'] ?? '/projects',
             ],
-            'testimonialSettings' => [
-                'eyebrow' => $testimonialSettings['eyebrow'] ?? 'Testimonials',
-                'heading' => $testimonialSettings['heading'] ?? 'Built on Trust. Proven by Experience.',
-                'description' => $testimonialSettings['description'] ?? "Our clients' satisfaction reflects our commitment to delivering thoughtfully designed developments and exceptional service.",
-            ],
-            'testimonials' => $testimonials->map(fn ($item) => [
-                'quote' => $item->quote,
+            'testimonialSettings' => LocalizedContent::section(WebsiteContent::section('home', 'testimonials')),
+            'testimonials' => $testimonials->map(fn ($item) => array_merge([
                 'name' => $item->name,
                 'role' => $item->role,
+                'quote' => $item->quote,
                 'image' => WebsiteContent::assetUrl($item->media),
-            ])->values()->all(),
-            'finalCta' => [
-                'eyebrow' => $finalCtaSettings['eyebrow'] ?? "LET'S TALK",
-                'heading' => $finalCtaSettings['heading'] ?? "Let's Build\nThe Future Together",
-                'cta_label' => $finalCtaSettings['cta_label'] ?? 'Get In Touch',
-                'cta_url' => $finalCtaSettings['cta_url'] ?? '/contact-us',
-            ],
+            ], LocalizedContent::record($item, ['name', 'role', 'quote'])))->values()->all(),
             'seo' => $seo->forPage('home', '/', ['title' => 'LARZ Developments | Designed for the Way You Live'], [
                 $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')]]),
             ]),

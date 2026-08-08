@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\NavigationItem;
+use App\Models\Project;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -27,6 +28,8 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+            'locale' => app()->getLocale(),
+            'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
             'site' => [
                 'settings' => fn () => Cache::remember(
                     'website.settings.public',
@@ -41,6 +44,11 @@ class HandleInertiaRequests extends Middleware
                         'url' => $item->url,
                         'location' => $item->location,
                     ])->values()->all(),
+                ),
+                'projects' => fn () => Cache::remember(
+                    'website.mega_menu.projects',
+                    now()->addHour(),
+                    fn () => Project::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title', 'slug'])->values()->all(),
                 ),
             ],
             'auth' => [

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreContactInquiryRequest;
 use App\Models\ContactInquiry;
 use App\Services\FormNotificationContext;
 use App\Services\FormSubmissionService;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteContent;
 use App\Services\SeoMetadataService;
 use Inertia\Inertia;
@@ -16,18 +17,81 @@ class ContactController extends Controller
 {
     public function index(SeoMetadataService $seo): Response
     {
-        $settings = \App\Models\SiteSetting::query()->whereIn('key', ['contact.phone', 'contact.email', 'contact.address', 'social.instagram', 'social.facebook', 'social.linkedin'])->pluck('value', 'key');
+        $settings = \App\Models\SiteSetting::query()->whereIn('key', ['social.instagram', 'social.facebook', 'social.linkedin', 'social.youtube', 'contact.phone', 'contact.email'])->pluck('value', 'key');
         $social = [
             'instagram' => $settings['social.instagram'] ?? null,
             'facebook' => $settings['social.facebook'] ?? null,
             'linkedin' => $settings['social.linkedin'] ?? null,
+            'youtube' => $settings['social.youtube'] ?? null,
         ];
+        $heroRaw = WebsiteContent::section('contact', 'hero');
+        $hero = LocalizedContent::section($heroRaw);
+        $methods = WebsiteContent::section('contact', 'contact_methods');
+        $cards = $methods['items'] ?? [];
+        $locale = app()->getLocale();
+        $requestFormRaw = WebsiteContent::section('contact', 'request_form');
+        $requestFormTranslations = is_array($requestFormRaw['translations'] ?? null) ? $requestFormRaw['translations'] : ['en' => $requestFormRaw, 'ar' => []];
+        $requestForm = $requestFormTranslations[$locale] ?? $requestFormTranslations['en'] ?? [];
+
+        $locationRaw = WebsiteContent::section('contact', 'location_map');
+        $locationTranslations = is_array($locationRaw['translations'] ?? null) ? $locationRaw['translations'] : ['en' => $locationRaw, 'ar' => []];
+        $locationCopy = $locationTranslations[$locale] ?? $locationTranslations['en'] ?? [];
+        $addressSetting = \App\Models\SiteSetting::query()->where('key', 'contact.address')->value('value');
+        $locationImage = null;
+        if (! empty($locationRaw['image_id'])) {
+            $locationImage = \App\Support\WebsiteContent::assetUrl(\App\Models\MediaAsset::find($locationRaw['image_id']));
+        }
+
+        $socialMediaRaw = WebsiteContent::section('contact', 'social_media');
+        $socialMediaTranslations = is_array($socialMediaRaw['translations'] ?? null) ? $socialMediaRaw['translations'] : ['en' => $socialMediaRaw, 'ar' => []];
+        $socialMediaCopy = $socialMediaTranslations[$locale] ?? $socialMediaTranslations['en'] ?? [];
+
         return Inertia::render('Website/Contact/Index', [
-            'contact' => ['phone' => $settings['contact.phone'] ?? null, 'email' => $settings['contact.email'] ?? null, 'address' => $settings['contact.address'] ?? null],
+            'contact_methods' => [
+                'eyebrow' => $methods['eyebrow'] ?? 'Get in touch',
+                'heading' => $methods['heading'] ?? 'However suits you best.',
+                'description' => $methods['description'] ?? '',
+                'items' => $cards,
+            ],
+            'contact' => [
+                'phone' => collect($cards)->firstWhere('key', 'hotline')['value'] ?? null,
+                'whatsapp' => collect($cards)->firstWhere('key', 'whatsapp')['value'] ?? null,
+                'email' => collect($cards)->firstWhere('key', 'email')['value'] ?? null,
+                'sales_office' => collect($cards)->firstWhere('key', 'sales_office')['value'] ?? null,
+                'address' => collect($cards)->firstWhere('key', 'sales_office')['note'] ?? null,
+            ],
             'projects' => \App\Models\Project::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title'])->map(fn ($project) => ['id' => $project->id, 'title' => $project->title])->values()->all(),
-            'hero' => WebsiteContent::section('contact', 'hero'),
+            'request_form' => [
+                'eyebrow' => $requestForm['eyebrow'] ?? 'Request pricing / tour',
+                'heading' => $requestForm['heading'] ?? 'Book a visit or request pricing.',
+                'description' => $requestForm['description'] ?? '',
+            ],
+            'location_map' => [
+                'eyebrow' => $locationCopy['eyebrow'] ?? 'Location & map',
+                'heading' => $locationCopy['heading'] ?? 'Find us.',
+                'description' => $locationCopy['description'] ?? '',
+                'cta_label' => $locationCopy['cta_label'] ?? 'Get directions',
+                'cta_url' => $locationCopy['cta_url'] ?? '#directions',
+                'image' => $locationImage,
+                'address' => $addressSetting ?? '',
+            ],
+            'hero' => [
+                'eyebrow' => $hero['eyebrow'] ?? 'Contact us',
+                'heading' => $hero['heading'] ?? '',
+                'description' => $hero['description'] ?? '',
+                'primary_cta_label' => $hero['primary_cta_label'] ?? 'Request pricing & a tour',
+                'primary_cta_url' => $hero['primary_cta_url'] ?? '#request',
+                'secondary_cta_label' => $hero['secondary_cta_label'] ?? 'WhatsApp us',
+                'secondary_cta_url' => $hero['secondary_cta_url'] ?? '#whatsapp',
+            ],
             'location' => WebsiteContent::section('contact', 'location'),
             'social' => $social,
+            'social_media' => [
+                'eyebrow' => $socialMediaCopy['eyebrow'] ?? 'Social media',
+                'heading' => $socialMediaCopy['heading'] ?? 'Follow LARZ.',
+            ],
+            'contact_phone' => $settings['contact.phone'] ?? null,
+            'contact_email' => $settings['contact.email'] ?? null,
             'seo' => $seo->forPage('contact', '/contact-us', ['title' => 'Contact | LARZ Developments'], [
                 $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')], ['name' => 'Contact Us', 'url' => url('/contact-us')]]),
             ]),

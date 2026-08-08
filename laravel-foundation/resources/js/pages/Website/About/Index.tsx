@@ -4,9 +4,10 @@ import { Eyebrow } from '@/components/shared/Eyebrow';
 import WebsiteLayout from '@/layouts/WebsiteLayout';
 const awardIcons = { award: Award, star: Star, medal: Medal, crown: Crown };
 
-export default function Index({ hero, stats, story, awards, partners, promise, seo }: { hero: { heading: string; description: string; backgroundImage: string }; stats: Array<{ value: string; label: string; note: string }>; story: { heading: string; body: string; image: string }; awards: Array<{ icon: string | null; title: string; year: number | null; copy: string | null }>; partners: { settings: { eyebrow?: string; heading?: string; description?: string }; items: Array<{ name: string; role: string | null; description: string | null; url: string | null; logo: string | null }> }; promise: { heading: string }; seo: SeoMetadata }) {
+export default function Index({ hero, stats, story, awards, partners, promise, seo }: { hero: { eyebrow?: string; heading: string; description: string; backgroundImage: string; cta_label?: string; cta_url?: string; secondary_cta_label?: string; secondary_cta_url?: string }; stats: Array<{ value: string; label: string; note: string }>; story: { heading: string; body: string; image: string }; awards: { eyebrow: string; heading: string; items: Array<{ icon: string | null; title: string; year: number | null; copy: string | null }> }; partners: { settings: { eyebrow?: string; heading?: string; description?: string }; items: Array<{ name: string; role: string | null; description: string | null; url: string | null; logo: string | null }> }; promise: { eyebrow: string; heading: string; primary_cta_label: string; primary_cta_url: string; secondary_cta_label: string; secondary_cta_url: string }; seo: SeoMetadata }) {
     const heroLines = (hero.heading ?? 'You\'re not choosing\na building.').split('\n');
     const storyParagraphs = (story.body ?? '').split('\n');
+    const promiseHeading = (promise.heading ?? '').split('\n');
     return (
         <WebsiteLayout>
             <SeoHead seo={seo} />
@@ -33,7 +34,7 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
                 }}
             >
                 <div className="relative mx-auto flex min-h-[620px] max-w-[1440px] flex-col justify-center px-6 pt-36 pb-20 sm:px-10 lg:px-24">
-                    <Eyebrow className="text-ink">About LARZ</Eyebrow>
+                    <Eyebrow className="text-ink">{hero.eyebrow ?? 'About LARZ'}</Eyebrow>
                     <h1 className="mt-7 max-w-3xl text-3xl font-light leading-[1.08] tracking-[-0.03em] text-ink sm:text-4xl lg:text-[4.2rem]">
                         {heroLines.map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}
                     </h1>
@@ -41,11 +42,11 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
                         {hero.description}
                     </p>
                     <div className="mt-8 flex flex-wrap items-center gap-6">
-                        <a href="/projects" className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase transition-colors hover:bg-gold/10">
-                            Explore our projects <ArrowRight className="size-3.5" strokeWidth={1.5} />
+                        <a href={hero.cta_url ?? '/projects'} className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase transition-colors hover:bg-gold/10">
+                            {hero.cta_label ?? 'Explore our projects'} <ArrowRight className="size-3.5" strokeWidth={1.5} />
                         </a>
-                        <a href="/contact" className="text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">
-                            Contact us
+                        <a href={hero.secondary_cta_url ?? '/contact'} className="text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">
+                            {hero.secondary_cta_label ?? 'Contact us'}
                         </a>
                     </div>
                 </div>
@@ -80,10 +81,10 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
 
             <section className="bg-night py-20 sm:py-24">
                 <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-24">
-                    <Eyebrow className="text-ink">Awards &amp; achievements</Eyebrow>
-                    <h2 className="mt-5 max-w-xl text-3xl font-light leading-[1.15] text-ink sm:text-[3rem]">Recognised for building things that last.</h2>
+                    <Eyebrow className="text-ink">{awards.eyebrow ?? 'Awards & achievements'}</Eyebrow>
+                    <h2 className="mt-5 max-w-xl text-3xl font-light leading-[1.15] text-ink sm:text-[3rem]">{awards.heading ?? 'Recognised for building things that last.'}</h2>
                     <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                        {awards.map(({ icon, title, year, copy }) => {
+                        {awards.items.map(({ icon, title, year, copy }) => {
                             const Icon = awardIcons[icon as keyof typeof awardIcons] ?? Award;
                             return (
                             <article key={title + year} className="flex flex-col justify-start border border-hairline/40 p-6 transition-colors duration-300 hover:border-gold/40 sm:p-7 lg:p-8">
@@ -130,11 +131,11 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
                 }}
             >
                 <div className="relative mx-auto max-w-2xl px-6">
-                    <Eyebrow className="justify-center text-ink">Our promise</Eyebrow>
-                    <h2 className="mt-5 text-2xl font-light leading-[1.3] text-ink sm:text-3xl md:text-[2.45rem]">{promise.heading}</h2>
+                    <Eyebrow className="justify-center text-ink">{promise.eyebrow || 'Our promise'}</Eyebrow>
+                    <h2 className="mt-5 text-2xl font-light leading-[1.3] text-ink sm:text-3xl md:text-[2.45rem]">{promiseHeading.map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}</h2>
                     <div className="mt-8 flex flex-wrap justify-center gap-6">
-                        <a href="/projects" className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10">Explore our projects <ArrowRight className="size-3.5" strokeWidth={1.5} /></a>
-                        <a href="/contact" className="self-center text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">Talk to us</a>
+                        <a href={promise.primary_cta_url || '#'} className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10">{promise.primary_cta_label || 'Explore our projects'} <ArrowRight className="size-3.5" strokeWidth={1.5} /></a>
+                        <a href={promise.secondary_cta_url || '#'} className="self-center text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">{promise.secondary_cta_label || 'Talk to us'}</a>
                     </div>
                 </div>
             </section>

@@ -35,7 +35,7 @@ export function AdminHeader({ onMenu }: { onMenu: () => void }) {
                     rel="noreferrer"
                     className="hidden items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/70 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white sm:flex"
                 >
-                    <span>زيارة الموقع</span>
+                    <span>View Website</span>
                     <ExternalLink className="size-3.5 text-[#C5A880]" />
                 </a>
 
@@ -53,10 +53,10 @@ export function AdminHeader({ onMenu }: { onMenu: () => void }) {
                     method="post"
                     as="button"
                     className="flex items-center gap-1.5 rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-400 transition-all hover:border-rose-500/40 hover:bg-rose-500/20 hover:text-rose-300"
-                    title="تسجيل الخروج"
+                     title="Logout"
                 >
                     <LogOut className="size-3.5" />
-                    <span className="hidden sm:inline">خروج</span>
+                     <span className="hidden sm:inline">Logout</span>
                 </Link>
             </div>
         </header>

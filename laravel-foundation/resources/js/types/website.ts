@@ -41,6 +41,7 @@ export type WebsiteSharedProps = PageProps<{
     site: {
         settings: Record<string, string | null>;
         navigation: Array<{ label: string; url: string; location: string }>;
+        projects: Array<{ id: number; title: string; slug: string }>;
     };
 }>;
 import type { PageProps } from '@/types';

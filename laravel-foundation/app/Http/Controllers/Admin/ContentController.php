@@ -69,7 +69,7 @@ class ContentController extends Controller
         $configuration = $this->pageConfiguration($page);
         abort_unless(array_key_exists($section, $configuration['sections']), 404);
         $sectionKey = str_replace('-', '_', $section);
-        $content = app(RichTextSanitizer::class)->sanitizeArray($request->input('section', $request->input('sections.'.$sectionKey, [])));
+        $content = $this->localizedContent(app(RichTextSanitizer::class)->sanitizeArray($request->input('section', $request->input('sections.'.$sectionKey, []))));
 
         PageSection::updateOrCreate(
             ['page_key' => $page, 'section_key' => $sectionKey],
@@ -81,14 +81,20 @@ class ContentController extends Controller
         return back()->with('success', $configuration['label'].' / '.$configuration['sections'][$section].' updated.');
     }
 
+    /** Section keys that have dedicated controllers and should not appear in the generic editor. */
+    private const RESERVED_SECTIONS = [
+        'careers' => ['hero', 'values', 'internship'],
+    ];
+
     public function edit(string $page): Response
     {
         $configuration = $this->pageConfiguration($page);
+        $exclude = self::RESERVED_SECTIONS[$page] ?? [];
 
         return Inertia::render('Admin/Content/Editor', [
             'page' => $page,
             'label' => $configuration['label'],
-            'sections' => PageSection::query()->where('page_key', $page)->orderBy('sort_order')->get(['section_key', 'section_type', 'content_snapshot', 'status']),
+            'sections' => PageSection::query()->where('page_key', $page)->whereNotIn('section_key', $exclude)->orderBy('sort_order')->get(['section_key', 'section_type', 'content_snapshot', 'status']),
             'projects' => Project::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title']),
             'awards' => Award::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title', 'year']),
             'partners' => Partner::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'name']),
@@ -99,7 +105,9 @@ class ContentController extends Controller
     public function update(UpdateAdminContentRequest $request, string $page): RedirectResponse
     {
         abort_unless(in_array($page, self::PAGES, true), 404);
-        $sections = app(RichTextSanitizer::class)->sanitizeArray($request->input('sections', []));
+        $sections = collect(app(RichTextSanitizer::class)->sanitizeArray($request->input('sections', [])))
+            ->map(fn ($content) => $this->localizedContent($content))
+            ->all();
 
         DB::transaction(function () use ($sections, $page, $request) {
             foreach ($sections as $sectionKey => $content) {
@@ -119,6 +127,18 @@ class ContentController extends Controller
     {
         abort_unless(in_array($page, self::PAGES, true), 404);
         return config('admin_pages.'.$page);
+    }
+
+    private function localizedContent(array $content): array
+    {
+        if (! isset($content['translations']) || ! is_array($content['translations'])) {
+            return $content;
+        }
+
+        return ['translations' => [
+            'en' => is_array($content['translations']['en'] ?? null) ? $content['translations']['en'] : [],
+            'ar' => is_array($content['translations']['ar'] ?? null) ? $content['translations']['ar'] : [],
+        ]];
     }
 
     private function editorResponse(string $page, string $label, string $section, ?PageSection $record): Response

@@ -1,23 +1,25 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField, Notification } from '@/components/admin/AdminLayoutParts';
 
 type StatItem = { value: string; label: string };
 type SectionData = { [key: string]: string | StatItem[] | undefined };
+type LocalizedSection = { translations: { en: SectionData; ar: SectionData } };
 type Section = { section_key: string; section_type: string; content_snapshot: Record<string, unknown> | null; status: string };
 type Field = { key: string; label: string; type?: 'input' | 'textarea' };
 
 const fields: Record<string, Field[]> = {
-    hero: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Heading', type: 'textarea' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'cta_label', label: 'CTA label' }, { key: 'cta_url', label: 'CTA URL' }],
+    hero: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Heading', type: 'textarea' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'primary_cta_label', label: 'Primary CTA label' }, { key: 'primary_cta_url', label: 'Primary CTA URL' }, { key: 'secondary_cta_label', label: 'Secondary CTA label' }, { key: 'secondary_cta_url', label: 'Secondary CTA URL' }],
     about: [{ key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
     stats: [],
     featured_projects: [{ key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
     gallery: [{ key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
     testimonials: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Section heading', type: 'textarea' }, { key: 'description', label: 'Description', type: 'textarea' }],
-    final_cta: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'CTA heading', type: 'textarea' }, { key: 'cta_label', label: 'CTA label' }, { key: 'cta_url', label: 'CTA URL' }],
+    final_cta: [],
     story: [{ key: 'heading', label: 'Heading' }, { key: 'body', label: 'Body', type: 'textarea' }],
-    promise: [{ key: 'heading', label: 'Promise heading', type: 'textarea' }],
+    promise: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Promise heading', type: 'textarea' }, { key: 'primary_cta_label', label: 'Primary CTA label' }, { key: 'primary_cta_url', label: 'Primary CTA URL' }, { key: 'secondary_cta_label', label: 'Secondary CTA label' }, { key: 'secondary_cta_url', label: 'Secondary CTA URL' }],
     internship: [{ key: 'heading', label: 'Internship heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
     cta: [{ key: 'heading', label: 'CTA heading', type: 'textarea' }],
     location: [{ key: 'heading', label: 'Location heading' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'gateNote', label: 'Access note' }, { key: 'driveNote', label: 'Drive-time note' }],
@@ -29,18 +31,24 @@ const fields: Record<string, Field[]> = {
     stories: [{ key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
     newsletter: [{ key: 'heading', label: 'CTA heading', type: 'textarea' }, { key: 'description', label: 'Description', type: 'textarea' }],
     values: [{ key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
-    vacancies_settings: [{ key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
-    general_cv_cta: [{ key: 'heading', label: 'CTA heading', type: 'textarea' }, { key: 'cta_label', label: 'CTA label' }],
+    vacancies_settings: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
+    general_cv_cta: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'CTA heading', type: 'textarea' }, { key: 'cta_label', label: 'CTA label' }],
     masterplan: [{ key: 'heading', label: 'Masterplan heading' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'brochureHeading', label: 'Brochure heading' }, { key: 'brochureDescription', label: 'Brochure description' }],
     virtual_tour: [{ key: 'heading', label: 'Virtual tour heading' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'videoUrl', label: 'Video URL' }],
 };
 
 export default function Editor({ page, label, section, sections }: { page: string; label?: string; section?: string; sections: Section[] }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const sectionValues = Object.fromEntries(sections.map((record) => [record.section_key, record.content_snapshot ?? {}])) as Record<string, SectionData>;
-    const { data, setData, put, processing, errors } = useForm<{ sections: Record<string, SectionData> }>({ sections: sectionValues });
-    const update = (sectionKey: string, key: string, value: string) => setData('sections', { ...data.sections, [sectionKey]: { ...data.sections[sectionKey], [key]: value } });
-    const updateStats = (items: StatItem[]) => setData('sections', { ...data.sections, stats: { ...data.sections.stats, items } });
+    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const sectionValues = Object.fromEntries(sections.map((record) => {
+        const snapshot = record.content_snapshot ?? {};
+        const translations = (snapshot as { translations?: { en?: SectionData; ar?: SectionData } }).translations;
+        return [record.section_key, { translations: { en: translations?.en ?? snapshot, ar: translations?.ar ?? {} } }];
+    })) as Record<string, LocalizedSection>;
+    const { data, setData, put, processing, errors } = useForm<{ sections: Record<string, LocalizedSection> }>({ sections: sectionValues });
+    const current = (sectionKey: string) => data.sections[sectionKey]?.translations[language] ?? {};
+    const update = (sectionKey: string, key: string, value: unknown) => setData('sections', { ...data.sections, [sectionKey]: { translations: { ...data.sections[sectionKey].translations, [language]: { ...current(sectionKey), [key]: value } } } });
+    const updateStats = (items: StatItem[]) => update('stats', 'items', items);
     const submit = (event: React.FormEvent) => { event.preventDefault(); section ? put(`/admin/pages/${page}/${section}`) : put(`/admin/content/${page}`); };
 
     return (
@@ -53,13 +61,17 @@ export default function Editor({ page, label, section, sections }: { page: strin
                         {section ? section.replaceAll('-', ' ') : `${label ?? page} overview`}
                     </h1>
                     <p className="mt-1 text-xs text-white/50 sm:text-sm">
-                        محرر البيانات لقسم الصفحة. المحتوى العام والتصميم محدّث بنجاح.
+                         Edit the public content in separate English and Arabic tabs.
                     </p>
                 </div>
 
                 <Notification message={flash?.success} />
 
-                <form onSubmit={submit} className="space-y-6">
+                 <div className="flex gap-2 border-b border-white/10 pb-3">
+                     <button type="button" onClick={() => setLanguage('en')} className={`rounded-lg px-4 py-2 text-sm ${language === 'en' ? 'bg-[#C5A880] text-black' : 'bg-white/5 text-white/60'}`}>English</button>
+                     <button type="button" onClick={() => setLanguage('ar')} className={`rounded-lg px-4 py-2 text-sm ${language === 'ar' ? 'bg-[#C5A880] text-black' : 'bg-white/5 text-white/60'}`}>Arabic</button>
+                 </div>
+                 <form onSubmit={submit} className="space-y-6">
                     {sections.map((record) => (
                         <section key={record.section_key} className="rounded-2xl border border-white/10 bg-[#161619]/90 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl">
                             <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -77,13 +89,13 @@ export default function Editor({ page, label, section, sections }: { page: strin
                                         {field.type === 'textarea' ? (
                                             <textarea
                                                 rows={4}
-                                                value={String(data.sections[record.section_key]?.[field.key] ?? '')}
+                                                 value={String(current(record.section_key)[field.key] ?? '')}
                                                 onChange={(event) => update(record.section_key, field.key, event.target.value)}
                                                 className="w-full rounded-xl border border-white/15 bg-[#1e1e22] px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition-all focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30"
                                             />
                                         ) : (
                                             <input
-                                                value={String(data.sections[record.section_key]?.[field.key] ?? '')}
+                                                 value={String(current(record.section_key)[field.key] ?? '')}
                                                 onChange={(event) => update(record.section_key, field.key, event.target.value)}
                                                 className="h-[50px] w-full rounded-xl border border-white/15 bg-[#1e1e22] px-4 text-sm text-white placeholder-white/30 outline-none transition-all focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30"
                                             />
@@ -93,7 +105,7 @@ export default function Editor({ page, label, section, sections }: { page: strin
                             </div>
 
                             {record.section_key === 'stats' && (
-                                <StatsEditor items={(data.sections.stats?.items as StatItem[] | undefined) ?? []} errors={errors} onChange={updateStats} />
+                                <StatsEditor items={(current('stats').items as StatItem[] | undefined) ?? []} errors={errors} onChange={updateStats} />
                             )}
                         </section>
                     ))}
@@ -102,7 +114,7 @@ export default function Editor({ page, label, section, sections }: { page: strin
                         disabled={processing}
                         className="inline-flex h-[50px] items-center justify-center rounded-xl bg-gradient-to-r from-[#C5A880] via-[#D4AF37] to-[#C5A880] bg-[length:200%_auto] px-8 text-sm font-semibold uppercase tracking-wider text-black shadow-[0_4px_20px_rgba(197,168,128,0.25)] transition-all hover:shadow-[0_6px_25px_rgba(197,168,128,0.4)] active:scale-[0.99] disabled:opacity-50"
                     >
-                        حفظ التغييرات / Save {section ? section.replaceAll('-', ' ') : page} content
+                         Save {language === 'ar' ? 'Arabic' : 'English'} {section ? section.replaceAll('-', ' ') : page} content
                     </button>
                 </form>
             </div>
@@ -115,7 +127,7 @@ function StatsEditor({ items, errors, onChange }: { items: StatItem[]; errors: R
     const update = (index: number, key: keyof StatItem, value: string) => onChange(normalized.map((item, itemIndex) => itemIndex === index ? { ...item, [key]: value } : item));
     return (
         <div className="mt-6 border-t border-white/10 pt-6">
-            <h3 className="text-base font-bold text-white">إحصائيات قسم الإحصائيات (Four statistics)</h3>
+            <h3 className="text-base font-bold text-white">Statistics section (four statistics)</h3>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 {normalized.map((item, index) => (
                     <div key={index} className="rounded-xl border border-white/10 bg-[#1e1e22]/60 p-4">

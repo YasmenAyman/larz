@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\MediaCategoryController;
 use App\Http\Controllers\Admin\MediaPostController;
 use App\Http\Controllers\Admin\NearbyLocationController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
-use App\Http\Controllers\Admin\PhotoGalleryController;
+
 use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\NavigationController;
 use App\Http\Controllers\Admin\ProjectCategoryController;
@@ -27,6 +27,19 @@ use App\Http\Controllers\Admin\ProjectUpdateController;
 use App\Http\Controllers\Admin\ProjectInquiryController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\PromiseCtaController;
+use App\Http\Controllers\Admin\AboutHeroController;
+use App\Http\Controllers\Admin\AboutStoryController;
+use App\Http\Controllers\Admin\CareersHeroController;
+use App\Http\Controllers\Admin\CareersInternshipController;
+use App\Http\Controllers\Admin\CompanyValueController;
+use App\Http\Controllers\Admin\MediaNewsController;
+use App\Http\Controllers\Admin\MediaBlogController;
+use App\Http\Controllers\Admin\MediaGalleryController;
+use App\Http\Controllers\Admin\ContactMethodsController;
+use App\Http\Controllers\Admin\ContactRequestHeroController;
+use App\Http\Controllers\Admin\LocationMapController;
+use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\SeoController as AdminSeoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Website\AboutController;
@@ -41,6 +54,7 @@ use App\Http\Controllers\Website\SeoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/language/{locale}', \App\Http\Controllers\LanguageController::class)->name('language');
 Route::get('/about-us', AboutController::class)->name('about');
 Route::redirect('/about', '/about-us', 301);
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
@@ -97,9 +111,28 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
             Route::get('/pages/'.$page, [AdminPageRouteController::class, 'overview'])->middleware('permission:pages.view')->name('pages.'.$page.'.index');
             foreach (array_keys($pageConfig['sections']) as $section) {
                 $sectionName = str_replace('-', '_', $section);
-                $sectionController = $page === 'home' && $section === 'gallery' ? HomeGalleryController::class : ($page === 'home' && $section === 'featured-projects' ? HomeFeaturedProjectsController::class : ($page === 'home' && $section === 'testimonials' ? TestimonialController::class : ($page === 'about' && $section === 'partners' ? PartnerController::class : AdminPageRouteController::class)));
-                $editAction = in_array($sectionController, [HomeGalleryController::class, HomeFeaturedProjectsController::class], true) ? 'edit' : (in_array($sectionController, [TestimonialController::class, PartnerController::class], true) ? 'index' : 'section');
-                $updateAction = $sectionController === HomeGalleryController::class || $sectionController === HomeFeaturedProjectsController::class ? 'update' : (in_array($sectionController, [TestimonialController::class, PartnerController::class], true) ? 'updateSettings' : 'updateSection');
+                $sectionController = match (true) {
+                    $page === 'media' && $section === 'news' => MediaNewsController::class,
+                    $page === 'media' && $section === 'stories' => MediaBlogController::class,
+                    $page === 'media' && $section === 'gallery' => MediaGalleryController::class,
+                    $page === 'about' && $section === 'hero' => AboutHeroController::class,
+                    $page === 'about' && $section === 'story' => AboutStoryController::class,
+                    $page === 'careers' && $section === 'hero' => CareersHeroController::class,
+                    $page === 'careers' && $section === 'values' => CompanyValueController::class,
+                    $page === 'careers' && $section === 'internship' => CareersInternshipController::class,
+                    $page === 'home' && $section === 'gallery' => HomeGalleryController::class,
+                    $page === 'home' && $section === 'featured-projects' => HomeFeaturedProjectsController::class,
+                    $page === 'home' && $section === 'testimonials' => TestimonialController::class,
+                    $page === 'about' && $section === 'partners' => PartnerController::class,
+                    $page === 'about' && $section === 'promise-cta' => PromiseCtaController::class,
+                    $page === 'contact' && $section === 'contact-methods' => ContactMethodsController::class,
+                    $page === 'contact' && $section === 'request-form' => ContactRequestHeroController::class,
+                    $page === 'contact' && $section === 'location-map' => LocationMapController::class,
+                    $page === 'contact' && $section === 'social-media' => SocialMediaController::class,
+                    default => AdminPageRouteController::class,
+                };
+                $editAction = in_array($sectionController, [MediaNewsController::class, MediaBlogController::class, CompanyValueController::class], true) ? 'index' : (in_array($sectionController, [AboutHeroController::class, AboutStoryController::class, CareersHeroController::class, CareersInternshipController::class, HomeGalleryController::class, HomeFeaturedProjectsController::class, MediaGalleryController::class, ContactMethodsController::class, ContactRequestHeroController::class, LocationMapController::class, SocialMediaController::class], true) ? 'edit' : (in_array($sectionController, [TestimonialController::class, PartnerController::class, PromiseCtaController::class], true) ? 'index' : 'section'));
+                $updateAction = in_array($sectionController, [MediaNewsController::class, MediaBlogController::class, CompanyValueController::class], true) ? 'updateSettings' : (in_array($sectionController, [AboutHeroController::class, AboutStoryController::class, CareersHeroController::class, CareersInternshipController::class, HomeGalleryController::class, HomeFeaturedProjectsController::class, MediaGalleryController::class, ContactMethodsController::class, LocationMapController::class], true) ? 'update' : (in_array($sectionController, [TestimonialController::class, PartnerController::class, PromiseCtaController::class, ContactRequestHeroController::class, SocialMediaController::class], true) ? 'updateSettings' : 'updateSection'));
                 Route::get('/pages/'.$page.'/'.$section, [$sectionController, $editAction])->middleware('permission:pages.view')->name('pages.'.$page.'.'.$sectionName.'.edit');
                  Route::put('/pages/'.$page.'/'.$section, [$sectionController, $updateAction])->defaults('page', $page)->defaults('section', $section)->middleware('permission:pages.update')->name('pages.'.$page.'.'.$sectionName.'.update');
              }
@@ -110,7 +143,13 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
          Route::put('/pages/home/testimonials/{testimonial}', [TestimonialController::class, 'update'])->middleware('permission:pages.update')->name('pages.home.testimonials.item.update');
          Route::delete('/pages/home/testimonials/{testimonial}', [TestimonialController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.home.testimonials.item.destroy');
          Route::post('/pages/home/testimonials/{testimonial}/publish', [TestimonialController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.home.testimonials.item.publish');
-        Route::get('/content/{page}', [ContentController::class, 'edit'])->middleware('permission:pages.view')->name('content.edit');
+         Route::get('/pages/careers/values/create', [CompanyValueController::class, 'create'])->middleware('permission:pages.update')->name('pages.careers.values.create');
+         Route::post('/pages/careers/values', [CompanyValueController::class, 'store'])->middleware('permission:pages.update')->name('pages.careers.values.store');
+         Route::get('/pages/careers/values/{companyValue}/edit', [CompanyValueController::class, 'edit'])->middleware('permission:pages.update')->name('pages.careers.values.item.edit');
+         Route::put('/pages/careers/values/{companyValue}', [CompanyValueController::class, 'update'])->middleware('permission:pages.update')->name('pages.careers.values.item.update');
+         Route::delete('/pages/careers/values/{companyValue}', [CompanyValueController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.careers.values.item.destroy');
+         Route::post('/pages/careers/values/{companyValue}/publish', [CompanyValueController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.careers.values.item.publish');
+         Route::get('/content/{page}', [ContentController::class, 'edit'])->middleware('permission:pages.view')->name('content.edit');
         Route::put('/content/{page}', [ContentController::class, 'update'])->middleware('permission:pages.update')->name('content.update');
         Route::get('/settings', [SettingsController::class, 'edit'])->middleware('permission:settings.view')->name('settings.edit');
         Route::put('/settings', [SettingsController::class, 'update'])->middleware('permission:settings.update')->name('settings.update');
@@ -132,10 +171,6 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
         Route::post('/media/categories', [MediaCategoryController::class, 'store'])->middleware('permission:media.create')->name('media.categories.store');
         Route::put('/media/categories/{mediaCategory}', [MediaCategoryController::class, 'update'])->middleware('permission:media.update')->name('media.categories.update');
         Route::delete('/media/categories/{mediaCategory}', [MediaCategoryController::class, 'destroy'])->middleware('permission:media.delete')->name('media.categories.destroy');
-        Route::get('/photo-galleries', [PhotoGalleryController::class, 'index'])->middleware('permission:media.view')->name('photo-galleries.index');
-        Route::post('/photo-galleries', [PhotoGalleryController::class, 'store'])->middleware('permission:media.create')->name('photo-galleries.store');
-        Route::put('/photo-galleries/{photoGalleryItem}', [PhotoGalleryController::class, 'update'])->middleware('permission:media.update')->name('photo-galleries.update');
-        Route::delete('/photo-galleries/{photoGalleryItem}', [PhotoGalleryController::class, 'destroy'])->middleware('permission:media.delete')->name('photo-galleries.destroy');
         Route::get('/newsletter-subscribers', [NewsletterSubscriberController::class, 'index'])->middleware('permission:newsletter.view')->name('newsletter.index');
         Route::put('/newsletter-subscribers/{newsletterSubscriber}', [NewsletterSubscriberController::class, 'update'])->middleware('permission:newsletter.update')->name('newsletter.update');
         Route::get('/newsletter-subscribers/export', [NewsletterSubscriberController::class, 'export'])->middleware('permission:newsletter.view')->name('newsletter.export');

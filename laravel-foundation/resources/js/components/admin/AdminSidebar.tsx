@@ -31,11 +31,11 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
 
     return (
         <>
-            {open && <button type="button" aria-label="Close admin navigation" onClick={onClose} className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm lg:hidden" />}
+            {open && <button type="button" aria-label="Close menu" onClick={onClose} className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm lg:hidden" />}
             <aside className={`fixed inset-y-0 left-0 z-40 w-72 overflow-y-auto border-r border-white/10 bg-[#141417] p-4 transition-transform lg:static lg:z-auto lg:block lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-4 lg:hidden">
                     <span className="text-xs font-bold tracking-[0.2em] text-[#C5A880]">MENU</span>
-                    <button type="button" onClick={onClose} aria-label="Close navigation" className="rounded-lg p-1 text-white/50 hover:bg-white/10 hover:text-white">
+                    <button type="button" onClick={onClose} aria-label="Close menu" className="rounded-lg p-1 text-white/50 hover:bg-white/10 hover:text-white">
                         <X className="size-5" />
                     </button>
                 </div>

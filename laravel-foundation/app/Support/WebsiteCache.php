@@ -27,6 +27,7 @@ final class WebsiteCache
     public static function navigation(): void
     {
         Cache::forget(self::NAVIGATION_KEY);
+        Cache::forget('website.mega_menu.projects');
     }
 
     public static function section(string $page, string $section): void
@@ -79,7 +80,15 @@ final class WebsiteCache
         Cache::forget(self::sectionKey('home', 'testimonials'));
         Cache::forget(self::sectionKey('home', 'stats'));
         Cache::forget(self::sectionKey('home', 'hero'));
-        Cache::forget(self::sectionKey('home', 'final_cta'));
+    }
+
+    public static function careers(): void
+    {
+        self::section('careers', 'values');
+        self::section('careers', 'vacancies_settings');
+        self::section('careers', 'hero');
+        self::section('careers', 'internship');
+        self::section('careers', 'general_cv_cta');
     }
 
     public static function all(): void

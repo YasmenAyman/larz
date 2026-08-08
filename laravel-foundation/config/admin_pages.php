@@ -34,7 +34,7 @@ return [
         'label' => 'Contact Us',
         'sections' => [
             'hero' => 'Hero Section', 'contact-methods' => 'Contact Methods', 'request-form' => 'Request Form Settings',
-            'location-map' => 'Location & Map', 'social-media' => 'Social Media Section', 'final-cta' => 'Final CTA',
+            'location-map' => 'Location & Map', 'social-media' => 'Social Media Section',
         ],
     ],
 ];

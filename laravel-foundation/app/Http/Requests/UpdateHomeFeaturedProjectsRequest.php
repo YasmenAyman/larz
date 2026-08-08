@@ -17,6 +17,14 @@ class UpdateHomeFeaturedProjectsRequest extends FormRequest
             'cta_url' => ['nullable', 'string', 'max:500'],
             'project_ids' => ['required', 'array', 'max:12'],
             'project_ids.*' => ['integer', 'exists:projects,id'],
+            'translations' => ['nullable', 'array'],
+            'translations.en' => ['nullable', 'array'],
+            'translations.ar' => ['nullable', 'array'],
+            'translations.*.eyebrow' => ['nullable', 'string', 'max:100'],
+            'translations.*.heading' => ['nullable', 'string', 'max:180'],
+            'translations.*.description' => ['nullable', 'string', 'max:1000'],
+            'translations.*.cta_label' => ['nullable', 'string', 'max:100'],
+            'translations.*.cta_url' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

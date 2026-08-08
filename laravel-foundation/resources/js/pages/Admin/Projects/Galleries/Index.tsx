@@ -63,7 +63,7 @@ export default function Index({ items, projects, media, filters }: { items: { da
                                 {media?.map((m) => <option key={m.id} value={m.id}>{m.original_name}</option>)}
                             </select>
                         </label>
-                        <ImageUploadField label="Image" onChange={(file) => form.setData('image', file)} />
+                        <ImageUploadField label="Image" onChange={(file) => form.setData('image', Array.isArray(file) ? file[0] ?? null : file)} />
                         <input value={form.data.alt_text} onChange={(event) => form.setData('alt_text', event.target.value)} placeholder="Alt text" className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white" />
                         <input value={form.data.caption} onChange={(event) => form.setData('caption', event.target.value)} placeholder="Caption" className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white" />
                         <input type="number" value={form.data.sort_order} onChange={(event) => form.setData('sort_order', Number(event.target.value))} placeholder="Sort order" className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white" />
@@ -83,7 +83,7 @@ export default function Index({ items, projects, media, filters }: { items: { da
                     </label>
                 </section>
                 <section className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
-                    {items.data.length === 0 ? (
+                    {items?.data?.length === 0 ? (
                         <EmptyState title="No gallery images" message="Add an image to a project gallery." />
                     ) : (
                         <table className="w-full text-sm text-slate-200">
@@ -98,7 +98,7 @@ export default function Index({ items, projects, media, filters }: { items: { da
                                 </tr>
                             </thead>
                             <tbody>
-                                {items.data.map((item) => (
+                                {items?.data?.map((item) => (
                                     <tr key={item.id} className="border-b border-slate-900">
                                         <td className="px-4 py-3"><div className="h-12 w-16 overflow-hidden rounded bg-slate-800">{item.image && <img src={item.image} className="size-full object-cover" alt={item.alt_text ?? ''} />}</div></td>
                                         <td className="px-4 py-3 text-slate-300">{item.project}</td>
@@ -112,7 +112,7 @@ export default function Index({ items, projects, media, filters }: { items: { da
                         </table>
                     )}
                 </section>
-                <Pagination current={items.current_page} total={items.last_page} />
+                <Pagination current={items?.current_page ?? 1} total={items?.last_page ?? 1} />
             </div>
             <ConfirmationModal open={Boolean(confirmDelete)} title="Delete image?" message="Remove this image from the gallery?" onCancel={() => setConfirmDelete(null)} onConfirm={() => confirmDelete && remove(confirmDelete)} />
         </AdminLayout>

@@ -4,9 +4,11 @@ import { ArrowUpRight, MapPin } from 'lucide-react';
 import { PillButton } from '@/components/shared/PillButton';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import type { WebsiteProject } from '@/types/website';
+import { useI18n } from '@/i18n';
 
-export function FeaturedProjects({ projects, settings }: { projects: Array<Pick<WebsiteProject, 'slug' | 'title' | 'location' | 'heroImage'>>; settings: { eyebrow: string; heading: string; description: string; cta_label: string; cta_url: string } }) {
+export function FeaturedProjects({ projects, settings }: { projects: Array<Pick<WebsiteProject, 'slug' | 'title' | 'location' | 'heroImage'> & { image?: string | null }>; settings: { eyebrow: string; heading: string; description: string; cta_label: string; cta_url: string } }) {
     const [active, setActive] = useState(0);
+    const { t } = useI18n();
 
     return (
         <section className="relative overflow-hidden bg-surface-deep pt-20 lg:pt-28">
@@ -19,12 +21,12 @@ export function FeaturedProjects({ projects, settings }: { projects: Array<Pick<
 
             <div className="relative mx-auto max-w-[1440px] px-4 sm:px-8">
                 <SectionHeading
-                    eyebrow={settings.eyebrow}
-                    title={settings.heading}
-                    description={<>{settings.description}</>}
+                    eyebrow={t(settings.eyebrow)}
+                    title={t(settings.heading)}
+                    description={<>{t(settings.description)}</>}
                 />
                 <div className="mt-8 flex justify-center">
-                    <PillButton label={settings.cta_label} to={settings.cta_url} />
+                    <PillButton label={t(settings.cta_label)} to={settings.cta_url} />
                 </div>
             </div>
 
@@ -43,7 +45,7 @@ export function FeaturedProjects({ projects, settings }: { projects: Array<Pick<
                         >
                             {/* Background image */}
                             <img
-                                src={project.heroImage ?? ''}
+                                src={project.heroImage ?? project.image ?? ''}
                                 alt={project.title}
                                 className={[
                                     'absolute inset-0 size-full object-cover transition-transform duration-500 ease-in-out',
@@ -68,7 +70,7 @@ export function FeaturedProjects({ projects, settings }: { projects: Array<Pick<
                                 </p>
                                 <div className="mt-8 flex items-center justify-between">
                                     <Link href={`/projects/${project.slug}`} className="text-sm text-ink transition-colors hover:text-gold">
-                                        Explore Project
+                                        {t('Explore Project')}
                                     </Link>
                                     <Link
                                         href={`/projects/${project.slug}`}

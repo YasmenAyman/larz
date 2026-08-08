@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MediaPost;
 use App\Models\PhotoGalleryItem;
 use App\Support\WebsiteContent;
+use App\Support\LocalizedContent;
 use App\Services\SeoMetadataService;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,14 +17,14 @@ class MediaController extends Controller
     {
         $posts = MediaPost::query()->with(['category', 'featuredImage', 'author'])->where('is_published', true)->orderByDesc('published_at')->get();
         $gallery = PhotoGalleryItem::query()->with('media')->where('is_published', true)->orderBy('sort_order')->get();
-        $news = WebsiteContent::section('media', 'news');
-        $stories = WebsiteContent::section('media', 'stories');
-        $gallerySettings = WebsiteContent::section('media', 'gallery');
-        $newsletterSettings = WebsiteContent::section('media', 'newsletter');
+        $news = LocalizedContent::section(WebsiteContent::section('media', 'news'));
+        $stories = LocalizedContent::section(WebsiteContent::section('media', 'stories'));
+        $gallerySettings = LocalizedContent::section(WebsiteContent::section('media', 'gallery'));
+        $newsletterSettings = LocalizedContent::section(WebsiteContent::section('media', 'newsletter'));
 
         return Inertia::render('Website/Media/Index', [
-            'hero' => WebsiteContent::section('media', 'hero'),
-            'posts' => $posts->map(fn ($post) => ['slug' => $post->slug, 'type' => $post->type, 'category' => $post->category?->name, 'date' => $post->event_date?->format('d M Y'), 'title' => $post->title, 'excerpt' => $post->excerpt, 'image' => WebsiteContent::assetUrl($post->featuredImage)])->values()->all(),
+            'hero' => LocalizedContent::section(WebsiteContent::section('media', 'hero')),
+            'posts' => $posts->map(fn ($post) => $this->present($post))->values()->all(),
             'newsSettings' => [
                 'eyebrow' => $news['eyebrow'] ?? 'News & press releases',
                 'heading' => $news['heading'] ?? "What's happening at LARZ.",
@@ -56,9 +57,16 @@ class MediaController extends Controller
         $record = MediaPost::query()->with(['category', 'featuredImage', 'openGraphImage', 'author'])->where('slug', $post)->where('is_published', true)->firstOrFail();
         $path = '/media/'.$record->slug;
         $url = url($path);
-        return Inertia::render('Website/Media/Show', ['post' => ['slug' => $record->slug, 'type' => $record->type, 'category' => $record->category?->name, 'date' => $record->event_date?->format('d M Y'), 'title' => $record->title, 'excerpt' => $record->excerpt, 'content' => $record->content, 'image' => WebsiteContent::assetUrl($record->featuredImage)], 'seo' => $seo->forMediaPost($record, $path, [
+        $post = $this->present($record);
+        return Inertia::render('Website/Media/Show', ['post' => [...$post, 'content' => $post['content'] ?? null], 'seo' => $seo->forMediaPost($record, $path, [
             $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')], ['name' => 'Media', 'url' => url('/media')], ['name' => $record->title, 'url' => $url]]),
             $seo->article($record, $url),
         ])]);
+    }
+
+    private function present(MediaPost $post): array
+    {
+        $localized = LocalizedContent::record($post, ['title', 'excerpt', 'content']);
+        return ['slug' => $post->slug, 'type' => $post->type, 'category' => $post->category?->name, 'date' => $post->event_date?->format('d M Y'), 'title' => $localized['title'] ?? $post->title, 'excerpt' => $localized['excerpt'] ?? $post->excerpt, 'content' => $localized['content'] ?? $post->content, 'image' => WebsiteContent::assetUrl($post->featuredImage)];
     }
 }

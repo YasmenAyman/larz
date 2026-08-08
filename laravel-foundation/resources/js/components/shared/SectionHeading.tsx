@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/utils/cn';
+import { useI18n } from '@/i18n';
 
 export function SectionHeading({
     eyebrow,
@@ -12,17 +13,20 @@ export function SectionHeading({
     description?: ReactNode;
     className?: string;
 }) {
+    const { t } = useI18n();
+    const translatedTitle = typeof title === 'string' ? t(title) : title;
+    const translatedDescription = typeof description === 'string' ? t(description) : description;
     return (
         <div className={cn('text-center', className)}>
             <p className="text-[0.9rem] lg:text-[1.2rem] tracking-[0.32em] text-ink-dim uppercase">
-                {eyebrow}
+                {t(eyebrow)}
             </p>
             <h2 className="mx-auto mt-2 max-w-3xl text-2xl leading-[1.25] font-normal text-ink sm:text-3xl md:text-[3.3rem]">
-                {title}
+                {translatedTitle}
             </h2>
             {description && (
                 <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ink-muted">
-                    {description}
+                    {translatedDescription}
                 </p>
             )}
         </div>

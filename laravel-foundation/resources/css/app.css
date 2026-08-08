@@ -179,3 +179,74 @@
   background-size: cover;
   background-position: bottom center;
 }
+
+/* Arabic presentation: preserve the visual system while flipping navigation,
+   alignment, form controls, and directional borders/icons. */
+html[dir="rtl"] body {
+  direction: rtl;
+  font-family: Tahoma, Arial, sans-serif;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir="rtl"] .tracking-wider,
+html[dir="rtl"] .tracking-widest {
+  letter-spacing: 0.04em;
+}
+
+html[dir="rtl"] .lg\:static {
+  right: 0;
+  left: auto;
+  border-right: 0;
+  border-left: 1px solid rgb(255 255 255 / 10%);
+}
+
+html[dir="rtl"] .lg\:translate-x-0 {
+  transform: translateX(0);
+}
+
+html[dir="rtl"] .-translate-x-full {
+  transform: translateX(100%);
+}
+
+html[dir="rtl"] .border-l-2 {
+  border-left-width: 0;
+  border-right-width: 2px;
+}
+
+html[dir="rtl"] .border-l {
+  border-left-width: 0;
+  border-right-width: 1px;
+}
+
+/* Keep the admin palette neutral. Some older screens still use slate utility
+   classes whose default Tailwind values read blue against the warm shell. */
+.admin-shell .bg-slate-950 {
+  background-color: #161619 !important;
+}
+
+.admin-shell .bg-slate-900 {
+  background-color: #1e1e22 !important;
+}
+
+.admin-shell .bg-slate-800 {
+  background-color: #29292e !important;
+}
+
+.admin-shell .border-slate-800 {
+  border-color: #2d2d32 !important;
+}
+
+.admin-shell .border-slate-700 {
+  border-color: #3b3b42 !important;
+}
+
+.admin-shell .text-slate-400,
+.admin-shell .text-slate-500 {
+  color: #a5a5ad !important;
+}

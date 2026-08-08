@@ -33,7 +33,7 @@ class ProjectUnitTypeController extends Controller
                 'size_unit' => $item->size_unit,
                 'sort_order' => $item->sort_order,
                 'is_published' => $item->is_published,
-            ])->values(),
+            ]),
             'projects' => Project::query()->orderBy('title')->get(['id', 'title']),
             'filters' => $request->only(['project']),
         ]);

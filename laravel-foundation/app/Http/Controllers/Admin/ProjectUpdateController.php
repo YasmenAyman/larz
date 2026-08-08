@@ -36,7 +36,7 @@ class ProjectUpdateController extends Controller
                 'sort_order' => $item->sort_order,
                 'is_published' => $item->is_published,
                 'image' => WebsiteContent::assetUrl($item->media),
-            ])->values(),
+            ]),
             'projects' => Project::query()->orderBy('title')->get(['id', 'title']),
             'filters' => $request->only(['project']),
         ]);

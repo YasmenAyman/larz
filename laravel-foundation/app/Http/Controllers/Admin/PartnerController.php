@@ -12,6 +12,7 @@ use App\Services\MediaUploadService;
 use App\Services\RichTextSanitizer;
 use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
+use App\Support\LocalizedContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -23,7 +24,7 @@ class PartnerController extends Controller
     {
         $section = PageSection::query()->where('page_key', 'about')->where('section_key', 'partners')->first();
 
-        return Inertia::render('Admin/Pages/Partners/Index', [
+        return Inertia::render('Admin/Content/Partners/Index', [
             'settings' => $section?->content_snapshot ?? [],
             'partners' => Partner::query()->with('logo')->orderBy('sort_order')->orderBy('id')->get()->map(fn (Partner $item) => $this->present($item))->values()->all(),
         ]);
@@ -43,12 +44,13 @@ class PartnerController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Admin/Pages/Partners/Form', ['partner' => null]);
+        return Inertia::render('Admin/Content/Partners/Form', ['partner' => null]);
     }
 
     public function store(StorePartnerRequest $request, MediaUploadService $uploads): RedirectResponse
     {
         $data = $request->safe()->except('logo');
+        $data['translations'] = $this->sanitizeTranslations($data['translations'] ?? []);
         $data['is_published'] = $request->boolean('is_published');
         $newAsset = null;
 
@@ -76,7 +78,7 @@ class PartnerController extends Controller
     {
         $partner->load('logo');
 
-        return Inertia::render('Admin/Pages/Partners/Form', [
+        return Inertia::render('Admin/Content/Partners/Form', [
             'partner' => $this->present($partner),
         ]);
     }
@@ -84,6 +86,7 @@ class PartnerController extends Controller
     public function update(UpdatePartnerRequest $request, Partner $partner, MediaUploadService $uploads): RedirectResponse
     {
         $data = $request->safe()->except('logo');
+        $data['translations'] = $this->sanitizeTranslations($data['translations'] ?? []);
         $data['is_published'] = $request->boolean('is_published');
         $oldAsset = $partner->logo;
         $newAsset = null;
@@ -136,6 +139,17 @@ class PartnerController extends Controller
             'sort_order' => $partner->sort_order,
             'is_published' => $partner->is_published,
             'logo' => WebsiteContent::assetUrl($partner->logo),
+            'translations' => $partner->translations ?? ['en' => [], 'ar' => []],
         ];
+    }
+
+    private function sanitizeTranslations(array $translations): array
+    {
+        $sanitizer = app(RichTextSanitizer::class);
+        foreach (['en', 'ar'] as $locale) {
+            $translations[$locale] ??= [];
+            $translations[$locale]['description'] = $sanitizer->sanitize($translations[$locale]['description'] ?? '');
+        }
+        return $translations;
     }
 }

@@ -135,6 +135,13 @@ final class MediaUploadService
 
         $disk = Storage::disk(self::PUBLIC_DISK);
         if ($disk->exists($asset->path)) {
+            // Use the current request base path so XAMPP subdirectory installs
+            // resolve /storage correctly instead of pointing at localhost root.
+            if (app()->bound('request')) {
+                $request = request();
+                return rtrim($request->getSchemeAndHttpHost().$request->getBaseUrl(), '/').'/storage/'.ltrim($asset->path, '/');
+            }
+
             return $disk->url($asset->path);
         }
 
@@ -221,7 +228,7 @@ final class MediaUploadService
         return match ($profile) {
             'public_image' => [
                 'disk' => self::PUBLIC_DISK,
-                'max_size' => 5 * 1024 * 1024,
+                'max_size' => 25 * 1024 * 1024,
                 'extensions' => ['jpg', 'jpeg', 'png', 'webp', 'svg'],
                 'mimes' => ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'],
             ],
