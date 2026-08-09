@@ -11,8 +11,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: laravel-foundation
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -22,7 +20,6 @@ jobs:
 
 
       - name: Install Dependencies
-        working-directory: ./laravel-foundation
         run: |
           composer install
           composer update
@@ -34,13 +31,11 @@ jobs:
           cache: "npm"
 
       - name: Install Node Dependencies
-        working-directory: ./laravel-foundation
         run: |
           npm ci
           npm install
 
       - name: Build Frontend
-        working-directory: ./laravel-foundation
         run: npm run build
 
 
@@ -51,7 +46,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "laravel-foundation/**"
+          source: "."
           target: "/home2/${{ secrets.SSH_USER }}/releases/${{ github.sha }}"
           strip_components: 1
           # overwrite: true   # اختياري
