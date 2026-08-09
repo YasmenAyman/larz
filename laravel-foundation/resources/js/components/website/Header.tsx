@@ -9,41 +9,6 @@ function isActivePath(currentUrl: string, target: string) {
     return target === '/' ? currentUrl === '/' : currentUrl === target || currentUrl.startsWith(`${target}/`);
 }
 
-const dropdownMenus: Record<string, { label: string; hash: string }[]> = {
-    '/about': [
-        { label: 'Our Story', hash: '#story' },
-        { label: 'Awards & Achievements', hash: '#awards' },
-        { label: 'Partnerships & Affiliations', hash: '#partners' },
-    ],
-    '/media': [
-        { label: 'News & Press Releases', hash: '#news' },
-        { label: 'Blogs', hash: '#blogs' },
-        { label: 'Photo Gallery', hash: '#gallery' },
-    ],
-    '/careers': [
-        { label: 'Vacancies', hash: '#roles' },
-        { label: 'Internship Programs', hash: '#internship' },
-    ],
-    '/contact': [
-        { label: 'Hotline', hash: '#hotline' },
-        { label: 'Request Pricing/Tour', hash: '#request' },
-        { label: 'Location & Map', hash: '#location' },
-        { label: 'Social Media', hash: '#social' },
-    ],
-};
-
-const projectSections = [
-    { label: 'Overview', hash: '#overview' },
-    { label: 'Masterplan & Brochure', hash: '#brochure' },
-    { label: 'Virtual Tour', hash: '#virtual-tour' },
-    { label: '3D Gallery', hash: '#homes3d' },
-    { label: 'Gallery', hash: '#gallery' },
-    { label: 'Construction Updates', hash: '#construction' },
-    { label: 'Amenities & Services', hash: '#amenities' },
-    { label: 'Facilities', hash: '#facilities' },
-    { label: 'Location & Map', hash: '#location' },
-];
-
 export function Header() {
     const [open, setOpen] = useState(false);
     const [megaOpen, setMegaOpen] = useState(false);
@@ -53,6 +18,41 @@ export function Header() {
     const { url, props } = usePage<WebsiteSharedProps>();
     const { t, dir } = useI18n();
     const isRtl = dir === 'rtl';
+
+    const dropdownMenus: Record<string, { label: string; hash: string }[]> = {
+        '/about': [
+            { label: t('Our Story'), hash: '#story' },
+            { label: t('Awards & Achievements'), hash: '#awards' },
+            { label: t('Partnerships & Affiliations'), hash: '#partners' },
+        ],
+        '/media': [
+            { label: t('News & Press Releases'), hash: '#news' },
+            { label: t('Blogs'), hash: '#blogs' },
+            { label: t('Photo Gallery'), hash: '#gallery' },
+        ],
+        '/careers': [
+            { label: t('Vacancies'), hash: '#roles' },
+            { label: t('Internship Programs'), hash: '#internship' },
+        ],
+        '/contact': [
+            { label: t('Hotline'), hash: '#hotline' },
+            { label: t('Request Pricing/Tour'), hash: '#request' },
+            { label: t('Location & Map'), hash: '#location' },
+            { label: t('Social Media'), hash: '#social' },
+        ],
+    };
+
+    const projectSections = [
+        { label: t('Overview'), hash: '#overview' },
+        { label: t('Masterplan & Brochure'), hash: '#brochure' },
+        { label: t('Virtual Tour'), hash: '#virtual-tour' },
+        { label: t('3D Gallery'), hash: '#homes3d' },
+        { label: t('Gallery'), hash: '#gallery' },
+        { label: t('Construction Updates'), hash: '#construction' },
+        { label: t('Amenities & Services'), hash: '#amenities' },
+        { label: t('Facilities'), hash: '#facilities' },
+        { label: t('Location & Map'), hash: '#location' },
+    ];
     const settings = props.site?.settings ?? {};
     const logo = settings['brand.logo'] ?? null;
     const navLinks = (props.site?.navigation ?? []).filter((link) => link.location === 'header').map((link) => ({ label: t(link.label), to: link.url }));

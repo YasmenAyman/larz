@@ -12,7 +12,7 @@ export function Footer() {
     const settings = props.site?.settings ?? {};
     const isAr = locale === 'ar';
     const navigation = props.site?.navigation ?? [];
-    const footerMenu = navigation.filter((link) => link.location === 'footer').map((link) => ({ label: link.label, to: link.url }));
+    const footerMenu = navigation.filter((link) => link.location === 'footer').map((link) => ({ label: t(link.label), to: link.url }));
     const contact = { address: isAr ? (settings['contact.address_ar'] ?? settings['contact.address'] ?? 'New Cairo, Egypt') : (settings['contact.address'] ?? 'New Cairo, Egypt'), email: settings['contact.email'] ?? 'info@larzdevelopments.com', phone: settings['contact.phone'] ?? '15813' };
     const ctaTitleRaw = isAr ? (settings['footer.cta_title_ar'] ?? settings['footer.cta_title']) : settings['footer.cta_title'];
     const footerTitle = (ctaTitleRaw ?? "Let's Build\nThe Future Together").split('\n');

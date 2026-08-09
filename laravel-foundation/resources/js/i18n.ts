@@ -159,6 +159,22 @@ const translations: Record<string, string> = {
     'Send request': 'إرسال الطلب',
     "We'll only use your details to follow up on this request.": 'سنستخدم بياناتك فقط لمتابعة هذا الطلب.',
     'Thanks — we received your request and will reply within one business day.': 'شكراً — تلقينا طلبك وسنتواصل خلال يوم عمل واحد.',
+
+    'Our Story': 'قصتنا',
+    'Awards & Achievements': 'الجوائز والإنجازات',
+    'Partnerships & Affiliations': 'الشراكات والانتماءات',
+    'News & Press Releases': 'الأخبار والبيانات الصحفية',
+    'Photo Gallery': 'معرض الصور',
+    'Vacancies': 'الوظائف الشاغرة',
+    'Hotline': 'الخط الساخن',
+    'Request Pricing/Tour': 'طلب التسعير/جولة',
+    'Location & Map': 'الموقع والخريطة',
+    'Social Media': 'وسائل التواصل الاجتماعي',
+    'Overview': 'نظرة عامة',
+    'Masterplan & Brochure': 'المخطط الرئيسي والبروشور',
+    'Virtual Tour': 'جولة افتراضية',
+    '3D Gallery': 'معرض ثلاثي الأبعاد',
+    'Facilities': 'المرافق',
 };
 
 export function translate(value: string, locale: 'en' | 'ar'): string {
