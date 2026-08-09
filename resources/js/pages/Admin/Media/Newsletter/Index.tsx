@@ -1,0 +1,9 @@
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import type { PageProps } from '@/types';
+import AdminLayout from '@/layouts/AdminLayout';
+import { Breadcrumbs, Notification, SearchInput, StatusBadge } from '@/components/admin/AdminLayoutParts';
+
+export default function Index({ subscribers, filters }: { subscribers: { data: Array<{ id: number; email: string; status: string; subscribed_at: string | null }>; current_page: number; last_page: number }; filters: { search?: string } }) {
+    const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
+    return <AdminLayout><Head title="Newsletter Subscribers" /><div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8"><div className="flex flex-wrap items-end justify-between gap-4"><div><Breadcrumbs items={['Admin', 'Newsletter Subscribers']} /><h1 className="mt-3 text-3xl font-semibold">Newsletter subscribers</h1></div><a href="/admin/newsletter-subscribers/export" className="rounded-lg border border-slate-700 px-4 py-2 text-sm">Export CSV</a></div><Notification message={flash?.success} /><SearchInput value={filters.search ?? ''} onChange={(value) => router.get('/admin/newsletter-subscribers', { search: value }, { preserveState: true })} /><div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950"><table className="w-full text-left text-sm"><thead className="border-b border-slate-800 text-xs uppercase text-slate-500"><tr><th className="px-4 py-3">Email</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Subscribed</th></tr></thead><tbody>{subscribers.data.map((subscriber) => <tr key={subscriber.id} className="border-b border-slate-800/70"><td className="px-4 py-4">{subscriber.email}</td><td className="px-4 py-4"><StatusBadge status={subscriber.status} /></td><td className="px-4 py-4 text-slate-500">{subscriber.subscribed_at}</td></tr>)}</tbody></table></div></div></AdminLayout>;
+}

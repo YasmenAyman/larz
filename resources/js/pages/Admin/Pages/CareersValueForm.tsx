@@ -1,0 +1,21 @@
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import type { PageProps } from '@/types';
+import AdminLayout from '@/layouts/AdminLayout';
+import { Breadcrumbs, FormField, Notification } from '@/components/admin/AdminLayoutParts';
+
+type Copy = { title: string; description: string };
+type Value = { id?: number; title: string; description: string | null; icon_key: string; sort_order: number; is_published: boolean; translations?: { en?: Copy; ar?: Copy } };
+const icons = ['heart', 'growth', 'leaf', 'medal'];
+
+export default function CareersValueForm({ value }: { value: Value | null }) {
+    const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
+    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const form = useForm({ title: value?.title ?? '', description: value?.description ?? '', icon_key: value?.icon_key ?? 'heart', sort_order: value?.sort_order ?? 0, is_published: value?.is_published ?? true, translations: { en: { title: value?.translations?.en?.title ?? value?.title ?? '', description: value?.translations?.en?.description ?? value?.description ?? '' }, ar: { title: value?.translations?.ar?.title ?? '', description: value?.translations?.ar?.description ?? '' } } });
+    const copy = form.data.translations[language];
+    const update = (key: keyof Copy, text: string) => form.setData('translations', { ...form.data.translations, [language]: { ...copy, [key]: text } });
+    const submit = (event: React.FormEvent) => { event.preventDefault(); value?.id ? form.put(`/admin/pages/careers/values/${value.id}`) : form.post('/admin/pages/careers/values'); };
+    return <AdminLayout><Head title={value ? 'Edit Value' : 'Add Value'} /><div className="mx-auto max-w-3xl space-y-8"><div><Breadcrumbs items={['Dashboard', 'Website Pages', 'Careers Page', 'Why LARZ', value ? 'Edit' : 'Add']} /><h1 className="mt-2 text-2xl font-bold text-white">{value ? 'Edit value' : 'Add value'}</h1></div><Notification message={flash?.success} /><form onSubmit={submit} className="space-y-5 rounded-2xl border border-white/10 bg-[#161619]/90 p-6 shadow-xl"><div className="flex gap-2 border-b border-white/10 pb-4"><button type="button" onClick={() => setLanguage('en')} className={`rounded-xl px-5 py-2 text-xs font-semibold ${language === 'en' ? 'bg-[#C5A880] text-black' : 'border border-white/15 text-white/60'}`}>English</button><button type="button" onClick={() => setLanguage('ar')} className={`rounded-xl px-5 py-2 text-xs font-semibold ${language === 'ar' ? 'bg-[#C5A880] text-black' : 'border border-white/15 text-white/60'}`}>Arabic</button></div><div dir={language === 'ar' ? 'rtl' : 'ltr'} className="space-y-5"><FormField label="Title"><input value={copy.title} onChange={(event) => update('title', event.target.value)} className={inputClass} /></FormField><FormField label="Description"><textarea rows={5} value={copy.description} onChange={(event) => update('description', event.target.value)} className={inputClass} /></FormField></div><div className="grid gap-5 sm:grid-cols-2"><FormField label="Icon"><select value={form.data.icon_key} onChange={(event) => form.setData('icon_key', event.target.value)} className={inputClass}>{icons.map((icon) => <option key={icon} value={icon}>{icon}</option>)}</select></FormField><FormField label="Sort order"><input type="number" min="0" value={form.data.sort_order} onChange={(event) => form.setData('sort_order', Number(event.target.value))} className={inputClass} /></FormField></div><label className="flex items-center gap-3 text-sm text-white/75"><input type="checkbox" checked={form.data.is_published} onChange={(event) => form.setData('is_published', event.target.checked)} /> Published</label><div className="flex justify-end gap-3 border-t border-white/10 pt-5"><Link href="/admin/pages/careers/values" className="rounded-xl border border-white/15 px-5 py-3 text-sm text-white/75">Cancel</Link><button disabled={form.processing} className="rounded-xl bg-gradient-to-r from-[#C5A880] to-[#D4AF37] px-5 py-3 text-sm font-semibold text-black">{value ? 'Save changes' : 'Create value'}</button></div></form></div></AdminLayout>;
+}
+
+const inputClass = 'w-full rounded-xl border border-white/15 bg-[#1e1e22] px-4 py-3 text-sm text-white outline-none focus:border-[#C5A880]';
