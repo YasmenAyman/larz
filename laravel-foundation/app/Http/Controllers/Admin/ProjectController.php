@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProjectRequest;
 use App\Http\Requests\Admin\UpdateProjectRequest;
 use App\Models\MediaAsset;
+use App\Models\PageSection;
 use App\Models\Project;
 use App\Models\ProjectCategory;
 use App\Services\MediaUploadService;
@@ -45,11 +46,45 @@ class ProjectController extends Controller
 
     public function store(StoreProjectRequest $request, MediaUploadService $uploads): RedirectResponse
     {
-        $data = $request->safe()->except(['hero_image', 'logo', 'brochure', 'map_image']);
-        $data['translations'] = $this->sanitizeTranslations($data['translations'] ?? []);
-        $data['sections'] = $this->sanitizeSections($data['sections'] ?? []);
-        $data['is_published'] = $request->boolean('is_published');
-        $data['is_featured'] = $request->boolean('is_featured');
+        $rawTranslations = $request->input('translations', '[]');
+        $rawSections = $request->input('sections', '[]');
+        $translations = is_string($rawTranslations) ? json_decode($rawTranslations, true) ?? [] : $rawTranslations;
+        $sections = is_string($rawSections) ? json_decode($rawSections, true) ?? [] : $rawSections;
+
+        $data = [
+            'project_category_id' => $request->input('project_category_id'),
+            'title' => $request->input('title'),
+            'slug' => $request->input('slug'),
+            'description' => $request->input('description'),
+            'short_description' => $request->input('short_description'),
+            'location' => $request->input('location'),
+            'address' => $request->input('address'),
+            'status' => $request->input('status'),
+            'project_type' => $request->input('project_type'),
+            'completion_date' => $request->input('completion_date'),
+            'price_from' => $request->input('price_from'),
+            'price_to' => $request->input('price_to'),
+            'currency' => $request->input('currency'),
+            'installment_information' => $request->input('installment_information'),
+            'area_min' => $request->input('area_min'),
+            'area_max' => $request->input('area_max'),
+            'area_unit' => $request->input('area_unit'),
+            'hero_heading' => $request->input('hero_heading'),
+            'hero_description' => $request->input('hero_description'),
+            'video_url' => $request->input('video_url'),
+            'virtual_tour_url' => $request->input('virtual_tour_url'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'is_published' => $request->boolean('is_published'),
+            'is_featured' => $request->boolean('is_featured'),
+            'sort_order' => $request->input('sort_order'),
+            'seo_title' => $request->input('seo_title'),
+            'seo_description' => $request->input('seo_description'),
+            'canonical_url' => $request->input('canonical_url'),
+            'robots' => $request->input('robots'),
+            'translations' => $this->sanitizeTranslations($translations),
+            'sections' => $this->sanitizeSections($sections),
+        ];
         if (array_key_exists('description', $data) && $data['description'] !== null) {
             $data['description'] = app(RichTextSanitizer::class)->sanitize($data['description']);
         }
@@ -63,6 +98,11 @@ class ProjectController extends Controller
                 $data['logo_id'] = $this->uploadImage($request, $uploads, 'logo', 'projects/logos', $newAssets, $data['logo_id'] ?? null);
                 $data['brochure_id'] = $this->uploadBrochure($request, $uploads, 'brochure', 'projects/brochures', $newAssets, $data['brochure_id'] ?? null);
                 $data['map_image_id'] = $this->uploadImage($request, $uploads, 'map_image', 'projects/maps', $newAssets, $data['map_image_id'] ?? null);
+                $data['overview_image_id'] = $this->uploadImage($request, $uploads, 'overview_image', 'projects/overview', $newAssets, $data['overview_image_id'] ?? null);
+                $data['masterplan_image_id'] = $this->uploadImage($request, $uploads, 'masterplan_image', 'projects/masterplan', $newAssets, $data['masterplan_image_id'] ?? null);
+                $data['sections'] = $this->uploadConstructionImages($request, $uploads, $data['sections'], $newAssets);
+                $data['sections'] = $this->uploadAmenityIcons($request, $uploads, $data['sections'], $newAssets);
+                $data['sections'] = $this->uploadLocationImage($request, $uploads, $data['sections'], $newAssets);
                 if ($data['is_published'] && empty($data['published_at'])) {
                     $data['published_at'] = now();
                 }
@@ -81,7 +121,22 @@ class ProjectController extends Controller
 
     public function edit(Project $project): Response
     {
-        $project->load(['category', 'heroImage', 'logo', 'brochure', 'mapImage']);
+        $project->load(['category', 'heroImage', 'logo', 'brochure', 'mapImage', 'overviewImage', 'masterplanImage', 'statistics']);
+
+        $hasSavedSections = ! empty($project->sections['en'] ?? []) || ! empty($project->sections['ar'] ?? []);
+
+        if (! $hasSavedSections) {
+            $sections = $this->legacySections($project->slug);
+            $sections['stats'] = $project->statistics->map(fn ($stat) => [
+                'value' => $stat->value,
+                'label' => $stat->label,
+                'note' => $stat->note ?? '',
+            ])->values()->all();
+            $project->sections = [
+                'en' => $sections,
+                'ar' => [],
+            ];
+        }
 
         return Inertia::render('Admin/Projects/Form', [
             'project' => $this->present($project, true),
@@ -89,13 +144,43 @@ class ProjectController extends Controller
         ]);
     }
 
+    private function legacySections(string $slug): array
+    {
+        $raw = PageSection::query()
+            ->where('page_key', 'project-'.$slug)
+            ->where('status', 'published')
+            ->pluck('content_snapshot', 'section_key')
+            ->all();
+
+        return [
+            'heroSlides' => array_map(fn (array $slide) => [
+                ...$slide,
+                'cta1Label' => $slide['cta1Label'] ?? 'Request pricing & payment plan',
+                'cta1Url' => $slide['cta1Url'] ?? '#brochure',
+                'cta2Label' => $slide['cta2Label'] ?? 'Download brochure',
+                'cta2Url' => $slide['cta2Url'] ?? '#brochure',
+            ], $raw['hero_slides']['items'] ?? []),
+            'stats' => [],
+            'overview' => $raw['overview'] ?? ['heading' => '', 'body' => ''],
+            'masterplan' => $raw['masterplan'] ?? ['heading' => '', 'description' => '', 'brochureHeading' => '', 'brochureDescription' => ''],
+            'virtualTour' => $raw['virtual_tour'] ?? ['heading' => '', 'description' => '', 'videoUrl' => ''],
+            'cta' => $raw['cta'] ?? ['eyebrow' => '', 'heading' => '', 'whatsappNumber' => '', 'primaryCtaLabel' => '', 'secondaryCtaLabel' => ''],
+            'homes3d' => $raw['homes3d'] ?? ['heading' => '', 'description' => '', 'note' => '', 'items' => []],
+            'construction' => $raw['construction'] ?? ['heading' => '', 'description' => '', 'items' => []],
+            'amenities' => $raw['amenities'] ?? ['heading' => '', 'categories' => []],
+            'location' => $raw['location'] ?? ['heading' => '', 'description' => '', 'gateNote' => '', 'driveNote' => '', 'image' => null, 'nearbyLocations' => []],
+        ];
+    }
+
     public function update(UpdateProjectRequest $request, Project $project, MediaUploadService $uploads): RedirectResponse
     {
-        $data = $request->safe()->except(['hero_image', 'logo', 'brochure', 'map_image']);
+        $data = $request->validated();
+        unset($data['hero_image'], $data['logo'], $data['brochure'], $data['map_image'], $data['overview_image'], $data['masterplan_image']);
         $data['translations'] = $this->sanitizeTranslations($data['translations'] ?? []);
         $data['sections'] = $this->sanitizeSections($data['sections'] ?? []);
         $data['is_published'] = $request->boolean('is_published');
         $data['is_featured'] = $request->boolean('is_featured');
+
         if (array_key_exists('description', $data) && $data['description'] !== null) {
             $data['description'] = app(RichTextSanitizer::class)->sanitize($data['description']);
         }
@@ -106,6 +191,8 @@ class ProjectController extends Controller
         $oldLogo = $project->logo;
         $oldBrochure = $project->brochure;
         $oldMap = $project->mapImage;
+        $oldOverview = $project->overviewImage;
+        $oldMasterplan = $project->masterplanImage;
         $newAssets = [];
         try {
             DB::transaction(function () use ($request, $uploads, $project, &$data, &$newAssets) {
@@ -113,6 +200,11 @@ class ProjectController extends Controller
                 $data['logo_id'] = $this->uploadImage($request, $uploads, 'logo', 'projects/logos', $newAssets, $project->logo_id);
                 $data['brochure_id'] = $this->uploadBrochure($request, $uploads, 'brochure', 'projects/brochures', $newAssets, $project->brochure_id);
                 $data['map_image_id'] = $this->uploadImage($request, $uploads, 'map_image', 'projects/maps', $newAssets, $project->map_image_id);
+                $data['overview_image_id'] = $this->uploadImage($request, $uploads, 'overview_image', 'projects/overview', $newAssets, $project->overview_image_id);
+                $data['masterplan_image_id'] = $this->uploadImage($request, $uploads, 'masterplan_image', 'projects/masterplan', $newAssets, $project->masterplan_image_id);
+                $data['sections'] = $this->uploadConstructionImages($request, $uploads, $data['sections'], $newAssets);
+                $data['sections'] = $this->uploadAmenityIcons($request, $uploads, $data['sections'], $newAssets);
+                $data['sections'] = $this->uploadLocationImage($request, $uploads, $data['sections'], $newAssets);
                 if ($data['is_published'] && empty($project->published_at)) {
                     $data['published_at'] = now();
                 }
@@ -126,6 +218,8 @@ class ProjectController extends Controller
         if ($request->hasFile('logo') && $oldLogo) $uploads->deleteIfUnreferenced($oldLogo);
         if ($request->hasFile('brochure') && $oldBrochure) $uploads->deleteIfUnreferenced($oldBrochure);
         if ($request->hasFile('map_image') && $oldMap) $uploads->deleteIfUnreferenced($oldMap);
+        if ($request->hasFile('overview_image') && $oldOverview) $uploads->deleteIfUnreferenced($oldOverview);
+        if ($request->hasFile('masterplan_image') && $oldMasterplan) $uploads->deleteIfUnreferenced($oldMasterplan);
 
         WebsiteCache::projectTree($project->slug);
         WebsiteCache::sitemap();
@@ -208,11 +302,10 @@ class ProjectController extends Controller
                 $sections[$locale] = [];
                 continue;
             }
-            $s = &$sections[$locale];
             foreach (['overview.body', 'masterplan.description', 'virtualTour.description', 'homes3d.description', 'construction.description', 'location.description'] as $dot) {
                 $parts = explode('.', $dot);
-                if (isset($s[$parts[0]][$parts[1]]) && is_string($s[$parts[0]][$parts[1]])) {
-                    $s[$parts[0]][$parts[1]] = $sanitizer->sanitize($s[$parts[0]][$parts[1]]);
+                if (isset($sections[$locale][$parts[0]][$parts[1]]) && is_string($sections[$locale][$parts[0]][$parts[1]])) {
+                    $sections[$locale][$parts[0]][$parts[1]] = $sanitizer->sanitize($sections[$locale][$parts[0]][$parts[1]]);
                 }
             }
         }
@@ -232,6 +325,71 @@ class ProjectController extends Controller
     private function uploadBrochure(Request $request, MediaUploadService $uploads, string $field, string $folder, array &$newAssets, ?int $currentId): ?int
     {
         return $this->uploadFile($request, $uploads, $field, $folder, $newAssets, $currentId);
+    }
+
+    private function uploadConstructionImages(Request $request, MediaUploadService $uploads, ?array $sections, array &$newAssets): ?array
+    {
+        if (! is_array($sections)) {
+            return $sections;
+        }
+        foreach (['en', 'ar'] as $locale) {
+            if (! isset($sections[$locale]['construction']['items']) || ! is_array($sections[$locale]['construction']['items'])) {
+                continue;
+            }
+            foreach ($sections[$locale]['construction']['items'] as $idx => &$item) {
+                $field = "construction_image_{$idx}";
+                if ($request->hasFile($field)) {
+                    $asset = $uploads->storePublicImage($request->file($field), 'projects/construction');
+                    $newAssets[] = $asset;
+                    $item['image'] = $uploads->publicUrl($asset);
+                }
+            }
+        }
+        return $sections;
+    }
+
+    private function uploadAmenityIcons(Request $request, MediaUploadService $uploads, ?array $sections, array &$newAssets): ?array
+    {
+        if (! is_array($sections)) {
+            return $sections;
+        }
+        foreach (['en', 'ar'] as $locale) {
+            if (! isset($sections[$locale]['amenities']['categories']) || ! is_array($sections[$locale]['amenities']['categories'])) {
+                continue;
+            }
+            foreach ($sections[$locale]['amenities']['categories'] as $ci => &$cat) {
+                if (! isset($cat['items']) || ! is_array($cat['items'])) {
+                    continue;
+                }
+                foreach ($cat['items'] as $ii => &$item) {
+                    $field = "amenity_icon_{$ci}_{$ii}";
+                    if ($request->hasFile($field)) {
+                        $asset = $uploads->storePublicImage($request->file($field), 'projects/amenities');
+                        $newAssets[] = $asset;
+                        $item['icon'] = $uploads->publicUrl($asset);
+                    }
+                }
+            }
+        }
+        return $sections;
+    }
+
+    private function uploadLocationImage(Request $request, MediaUploadService $uploads, ?array $sections, array &$newAssets): ?array
+    {
+        if (! is_array($sections)) {
+            return $sections;
+        }
+        foreach (['en', 'ar'] as $locale) {
+            if (! isset($sections[$locale]['location'])) {
+                continue;
+            }
+            if ($request->hasFile('location_image')) {
+                $asset = $uploads->storePublicImage($request->file('location_image'), 'projects/location');
+                $newAssets[] = $asset;
+                $sections[$locale]['location']['image'] = $uploads->publicUrl($asset);
+            }
+        }
+        return $sections;
     }
 
     private function present(Project $project, bool $full = false): array
@@ -275,6 +433,10 @@ class ProjectController extends Controller
             $base['virtual_tour_url'] = $project->virtual_tour_url;
             $base['map_image_id'] = $project->map_image_id;
             $base['map_image'] = WebsiteContent::assetUrl($project->mapImage);
+            $base['overview_image_id'] = $project->overview_image_id;
+            $base['overview_image'] = WebsiteContent::assetUrl($project->overviewImage);
+            $base['masterplan_image_id'] = $project->masterplan_image_id;
+            $base['masterplan_image'] = WebsiteContent::assetUrl($project->masterplanImage);
             $base['latitude'] = $project->latitude;
             $base['longitude'] = $project->longitude;
             $base['seo_title'] = $project->seo_title;

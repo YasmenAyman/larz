@@ -12,7 +12,7 @@ const emptyTranslation = { name: '', role: '', quote: '' };
 export default function Form({ testimonial }: { testimonial: Testimonial | null }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
     const [language, setLanguage] = useState<Locale>('en');
-    const { data, setData, post, put, processing, errors } = useForm({
+    const { data, setData, post, transform, processing, errors } = useForm({
         name: testimonial?.name ?? '',
         role: testimonial?.role ?? '',
         quote: testimonial?.quote ?? '',
@@ -20,13 +20,17 @@ export default function Form({ testimonial }: { testimonial: Testimonial | null 
         is_published: testimonial?.is_published ?? true,
         image: null as File | null,
         translations: {
-            en: { ...emptyTranslation, ...(testimonial?.translations?.en ?? {}) },
+            en: {
+                name: testimonial?.translations?.en?.name ?? testimonial?.name ?? '',
+                role: testimonial?.translations?.en?.role ?? testimonial?.role ?? '',
+                quote: testimonial?.translations?.en?.quote ?? testimonial?.quote ?? '',
+            },
             ar: { ...emptyTranslation, ...(testimonial?.translations?.ar ?? {}) },
         },
     });
     const copy = data.translations[language] ?? emptyTranslation;
     const updateCopy = (key: keyof typeof emptyTranslation, value: string) => setData('translations', { ...data.translations, [language]: { ...copy, [key]: value } });
-    const submit = (event: React.FormEvent) => { event.preventDefault(); const options = { forceFormData: true }; testimonial?.id ? put(`/admin/pages/home/testimonials/${testimonial.id}`, options) : post('/admin/pages/home/testimonials', options); };
+    const submit = (event: React.FormEvent) => { event.preventDefault(); transform((payload) => ({ ...payload, _method: testimonial?.id ? 'put' : undefined })); const options = { forceFormData: true }; testimonial?.id ? post(`/admin/pages/home/testimonials/${testimonial.id}`, options) : post('/admin/pages/home/testimonials', options); };
 
     return (
         <AdminLayout>

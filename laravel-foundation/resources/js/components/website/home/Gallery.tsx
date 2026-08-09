@@ -114,15 +114,14 @@ export function Gallery({ gallery, settings }: { gallery: string[]; settings: { 
                         type="button"
                         aria-label="Previous slide"
                         onClick={scrollPrev}
-                        className="grid size-10 place-items-center rounded-l-2xl bg-white/20 text-white transition-colors hover:bg-neutral-800 hover:text-white"
-                    >
+                        className={`grid size-10 place-items-center bg-white/20 text-white transition-colors hover:bg-neutral-800 ${isRtl ? 'rounded-r-2xl' : 'rounded-l-2xl'}`}>
                         <PrevIcon className="size-5" strokeWidth={1.75} />
                     </button>
                     <button
                         type="button"
                         aria-label="Next slide"
                         onClick={scrollNext}
-                        className="grid size-10 place-items-center rounded-r-2xl bg-white/20 text-white transition-colors hover:bg-neutral-800 hover:text-white"
+                        className={`grid size-10 place-items-center bg-white/20 text-white transition-colors hover:bg-neutral-800 ${isRtl ? 'rounded-l-2xl' : 'rounded-r-2xl'}`}
                     >
                         <NextIcon className="size-5" strokeWidth={1.75} />
                     </button>

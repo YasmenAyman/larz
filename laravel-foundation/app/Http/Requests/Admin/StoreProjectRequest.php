@@ -6,6 +6,21 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProjectRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        foreach (['translations', 'sections'] as $field) {
+            $value = $this->input($field);
+
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $this->merge([$field => $decoded]);
+                }
+            }
+        }
+    }
+
     public function authorize(): bool
     {
         return true;
@@ -39,10 +54,12 @@ class StoreProjectRequest extends FormRequest
             'video_url' => ['nullable', 'string', 'max:500'],
             'virtual_tour_url' => ['nullable', 'string', 'max:500'],
             'map_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,svg', 'mimetypes:image/jpeg,image/png,image/webp,image/svg+xml', 'max:5120'],
+            'overview_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,svg', 'mimetypes:image/jpeg,image/png,image/webp,image/svg+xml', 'max:5120'],
+            'masterplan_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,svg', 'mimetypes:image/jpeg,image/png,image/webp,image/svg+xml', 'max:5120'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
-            'is_featured' => ['boolean'],
-            'is_published' => ['boolean'],
+            'is_featured' => ['nullable', 'boolean'],
+            'is_published' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'seo_title' => ['nullable', 'string', 'max:180'],
             'seo_description' => ['nullable', 'string', 'max:320'],

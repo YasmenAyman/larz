@@ -28,8 +28,17 @@ class HomeController extends Controller
         $testimonialSettings = WebsiteContent::section('home', 'testimonials');
         $testimonials = Testimonial::query()->with('media')->where('is_published', true)->orderBy('sort_order')->get();
 
+        $heroRaw = WebsiteContent::section('home', 'hero');
+        $hero = [
+            'heading' => $heroRaw['heading'] ?? 'Designed for\nthe Way You Live',
+            'description' => $heroRaw['description'] ?? '',
+            'cta_label' => $heroRaw['cta_label'] ?? $heroRaw['primary_cta_label'] ?? "Our Project's",
+            'cta_url' => $heroRaw['cta_url'] ?? $heroRaw['primary_cta_url'] ?? '/projects',
+            'heroImage' => asset('assets/tower_img.png'),
+        ];
+
         return Inertia::render('Website/Home/Index', [
-            'hero' => [...WebsiteContent::section('home', 'hero'), 'heroImage' => asset('assets/tower_img.png')],
+            'hero' => $hero,
             'stats' => collect(WebsiteContent::section('home', 'stats')['items'] ?? [
                 ['value' => '40+', 'label' => 'Experience'],
                 ['value' => '60+', 'label' => 'Projects'],

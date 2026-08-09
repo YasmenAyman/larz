@@ -11,7 +11,7 @@ const icons = ['heart', 'growth', 'leaf', 'medal'];
 export default function CareersValueForm({ value }: { value: Value | null }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
     const [language, setLanguage] = useState<'en' | 'ar'>('en');
-    const form = useForm({ title: value?.title ?? '', description: value?.description ?? '', icon_key: value?.icon_key ?? 'heart', sort_order: value?.sort_order ?? 0, is_published: value?.is_published ?? true, translations: { en: { title: value?.translations?.en?.title ?? '', description: value?.translations?.en?.description ?? '' }, ar: { title: value?.translations?.ar?.title ?? '', description: value?.translations?.ar?.description ?? '' } } });
+    const form = useForm({ title: value?.title ?? '', description: value?.description ?? '', icon_key: value?.icon_key ?? 'heart', sort_order: value?.sort_order ?? 0, is_published: value?.is_published ?? true, translations: { en: { title: value?.translations?.en?.title ?? value?.title ?? '', description: value?.translations?.en?.description ?? value?.description ?? '' }, ar: { title: value?.translations?.ar?.title ?? '', description: value?.translations?.ar?.description ?? '' } } });
     const copy = form.data.translations[language];
     const update = (key: keyof Copy, text: string) => form.setData('translations', { ...form.data.translations, [language]: { ...copy, [key]: text } });
     const submit = (event: React.FormEvent) => { event.preventDefault(); value?.id ? form.put(`/admin/pages/careers/values/${value.id}`) : form.post('/admin/pages/careers/values'); };

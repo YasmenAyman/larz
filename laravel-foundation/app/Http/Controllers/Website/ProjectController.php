@@ -39,8 +39,7 @@ class ProjectController extends Controller
 
     public function show(string $project, SeoMetadataService $seo): InertiaResponse
     {
-        $record = Project::query()->with(['category', 'heroImage', 'logo', 'brochure', 'mapImage', 'galleries.media', 'statistics', 'unitTypes', 'amenities', 'updates.media', 'nearbyLocations'])->where('slug', $project)->where('is_published', true)->firstOrFail();
-        $others = Project::query()->with('heroImage')->where('is_published', true)->whereKeyNot($record->id)->orderBy('sort_order')->get();
+        $record = Project::query()->with(['category', 'heroImage', 'logo', 'brochure', 'mapImage', 'overviewImage', 'masterplanImage', 'galleries.media', 'statistics', 'unitTypes', 'amenities', 'updates.media', 'nearbyLocations'])->where('slug', $project)->where('is_published', true)->firstOrFail();
         $locale = app()->getLocale();
         $sections = $this->resolveSections($record, $locale);
         $path = '/projects/'.$record->slug;
@@ -49,7 +48,6 @@ class ProjectController extends Controller
         return Inertia::render('Website/Projects/Show', [
             'project' => WebsiteContent::project($record),
             'sections' => $sections,
-            'others' => $others->map(fn ($item) => ['slug' => $item->slug, 'title' => $item->title, 'location' => $item->location, 'image' => WebsiteContent::assetUrl($item->heroImage)])->values()->all(),
             'seo' => $seo->forProject($record, $path, array_filter([
                 $seo->breadcrumbs([
                     ['name' => 'Home', 'url' => url('/')],
@@ -65,21 +63,60 @@ class ProjectController extends Controller
     {
         $projectSections = $record->sections ?? [];
         $lang = $projectSections[$locale] ?? $projectSections['en'] ?? [];
-        if (!empty($lang['heroSlides'] ?? null)) {
-            return $lang;
+        $defaults = [
+            'heroSlides' => [],
+            'stats' => [],
+            'overview' => ['heading' => '', 'body' => ''],
+            'masterplan' => ['heading' => '', 'description' => '', 'brochureHeading' => '', 'brochureDescription' => ''],
+            'virtualTour' => ['heading' => '', 'description' => '', 'videoUrl' => ''],
+            'cta' => ['eyebrow' => '', 'heading' => ''],
+            'homes3d' => ['heading' => '', 'description' => '', 'note' => '', 'items' => []],
+            'construction' => ['heading' => '', 'description' => '', 'items' => []],
+            'amenities' => ['heading' => '', 'categories' => []],
+            'location' => ['heading' => '', 'description' => '', 'gateNote' => '', 'driveNote' => '', 'image' => null, 'nearbyLocations' => []],
+        ];
+
+        if (! empty($lang)) {
+            $resolved = array_replace_recursive($defaults, $lang);
+            $resolved['heroSlides'] = $this->normalizeHeroSlides($resolved['heroSlides'], $record);
+            return $resolved;
         }
         $raw = PageSection::query()->where('page_key', 'project-'.$record->slug)->where('status', 'published')->pluck('content_snapshot', 'section_key')->all();
-        return [
+        $resolved = [
             'heroSlides' => $raw['hero_slides']['items'] ?? [],
+            'stats' => [],
             'overview' => $raw['overview'] ?? ['heading' => '', 'body' => ''],
             'masterplan' => $raw['masterplan'] ?? ['heading' => '', 'description' => '', 'brochureHeading' => '', 'brochureDescription' => ''],
             'virtualTour' => $raw['virtual_tour'] ?? ['heading' => '', 'description' => '', 'videoUrl' => ''],
             'cta' => $raw['cta'] ?? ['eyebrow' => '', 'heading' => ''],
             'homes3d' => $raw['homes3d'] ?? ['heading' => '', 'description' => '', 'note' => ''],
             'construction' => $raw['construction'] ?? ['heading' => '', 'description' => ''],
-            'amenities' => $raw['amenities'] ?? ['heading' => ''],
-            'location' => $raw['location'] ?? ['heading' => '', 'description' => '', 'gateNote' => '', 'driveNote' => ''],
+            'amenities' => $raw['amenities'] ?? ['heading' => '', 'categories' => []],
+            'location' => $raw['location'] ?? ['heading' => '', 'description' => '', 'gateNote' => '', 'driveNote' => '', 'image' => null, 'nearbyLocations' => []],
         ];
+
+        $resolved['heroSlides'] = $this->normalizeHeroSlides($resolved['heroSlides'], $record);
+        return $resolved;
+    }
+
+    private function normalizeHeroSlides(array $slides, Project $record): array
+    {
+        if (empty($slides)) {
+            $slides = [[
+                'eyebrow' => $record->title.' — '.$record->location,
+                'titleLine1' => $record->hero_heading ?: $record->title,
+                'titleLine2' => '',
+                'description' => $record->hero_description ?: $record->short_description,
+            ]];
+        }
+
+        return array_map(fn (array $slide) => [
+            ...$slide,
+            'cta1Label' => $slide['cta1Label'] ?? 'Request pricing & payment plan',
+            'cta1Url' => $slide['cta1Url'] ?? '#brochure',
+            'cta2Label' => $slide['cta2Label'] ?? 'Download brochure',
+            'cta2Url' => $slide['cta2Url'] ?? '#brochure',
+        ], $slides);
     }
 
     public function submitInquiry(StoreProjectInquiryFormRequest $request, FormSubmissionService $submissions): \Illuminate\Http\RedirectResponse

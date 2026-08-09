@@ -11,6 +11,8 @@ class UpdateAdminSettingsRequest extends FormRequest
     {
         return [
             'settings' => ['required', 'array'],
+            'logo' => ['nullable', 'file', 'image', 'max:10240'],
+            'favicon' => ['nullable', 'file', 'image', 'max:10240'],
         ];
     }
 }

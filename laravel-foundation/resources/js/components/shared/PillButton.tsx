@@ -24,7 +24,7 @@ export function PillButton({ label, to = '/', className, variant = 'pill' }: Pro
                     aria-label={label}
                     className="grid w-[70px] h-[50px] place-items-center rounded-full border border-hairline bg-surface-card/70 text-ink transition-colors hover:bg-surface-card"
                 >
-                    <ArrowUpRight className="size-5" strokeWidth={2} />
+                    <ArrowUpRight className="size-5 rtl:rotate-180" strokeWidth={2} />
                 </Link>
             </div>
         );
@@ -39,7 +39,7 @@ export function PillButton({ label, to = '/', className, variant = 'pill' }: Pro
             )}
         >
             {label}
-            <ArrowUpRight className="size-4" strokeWidth={1.5} />
+            <ArrowUpRight className="size-4 rtl:rotate-180" strokeWidth={1.5} />
         </Link>
     );
 }

@@ -77,7 +77,7 @@ export function FeaturedProjects({ projects, settings }: { projects: Array<Pick<
                                         aria-label={`Explore ${project.title}`}
                                         className="grid size-9 place-items-center rounded-full bg-[#7C6C65] text-ink transition-colors hover:bg-gold/80"
                                     >
-                                        <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                                        <ArrowUpRight className="size-4 rtl:rotate-180" strokeWidth={1.5} />
                                     </Link>
                                 </div>
                             </div>

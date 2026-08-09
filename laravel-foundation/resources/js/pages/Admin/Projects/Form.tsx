@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FileUploadField, FormField, ImageUploadField, Notification } from '@/components/admin/AdminLayoutParts';
@@ -32,6 +32,8 @@ type Project = {
     video_url: string | null;
     virtual_tour_url: string | null;
     map_image: string | null;
+    overview_image: string | null;
+    masterplan_image: string | null;
     latitude: string | number | null;
     longitude: string | number | null;
     is_featured: boolean;
@@ -47,29 +49,31 @@ type Project = {
 
 type Category = { id: number; name: string };
 
-type HeroSlide = { eyebrow: string; titleLine1: string; titleLine2: string; description: string };
+type HeroSlide = { eyebrow: string; titleLine1: string; titleLine2: string; description: string; cta1Label: string; cta1Url: string; cta2Label: string; cta2Url: string };
 type SectionData = {
     heroSlides: HeroSlide[];
+    stats: Array<{ value: string; label: string; note: string }>;
     overview: { heading: string; body: string };
     masterplan: { heading: string; description: string; brochureHeading: string; brochureDescription: string };
     virtualTour: { heading: string; description: string; videoUrl: string };
-    homes3d: { heading: string; description: string; note: string };
-    construction: { heading: string; description: string };
-    amenities: { heading: string };
-    location: { heading: string; description: string; gateNote: string; driveNote: string };
-    cta: { eyebrow: string; heading: string };
+    homes3d: { heading: string; description: string; note: string; items: Array<{ tag: string; name: string; size: string; url: string }> };
+    construction: { heading: string; description: string; items: Array<{ tag: string; title: string; image: string | null }> };
+    amenities: { heading: string; categories: Array<{ title: string; items: Array<{ icon: string | null; title: string; description: string }> }> };
+    location: { heading: string; description: string; gateNote: string; driveNote: string; image: string | null; nearbyLocations: Array<{ place: string; time: string }> };
+    cta: { eyebrow: string; heading: string; whatsappNumber: string; primaryCtaLabel: string; secondaryCtaLabel: string };
 };
 
 const emptySections: SectionData = {
-    heroSlides: [{ eyebrow: '', titleLine1: '', titleLine2: '', description: '' }],
+    heroSlides: [{ eyebrow: '', titleLine1: '', titleLine2: '', description: '', cta1Label: '', cta1Url: '#brochure', cta2Label: '', cta2Url: '#brochure' }],
+    stats: [],
     overview: { heading: '', body: '' },
     masterplan: { heading: '', description: '', brochureHeading: '', brochureDescription: '' },
     virtualTour: { heading: '', description: '', videoUrl: '' },
-    homes3d: { heading: '', description: '', note: '' },
-    construction: { heading: '', description: '' },
-    amenities: { heading: '' },
-    location: { heading: '', description: '', gateNote: '', driveNote: '' },
-    cta: { eyebrow: '', heading: '' },
+    homes3d: { heading: '', description: '', note: '', items: [] },
+    construction: { heading: '', description: '', items: [] },
+    amenities: { heading: '', categories: [] },
+    location: { heading: '', description: '', gateNote: '', driveNote: '', image: null, nearbyLocations: [] },
+    cta: { eyebrow: '', heading: '', whatsappNumber: '', primaryCtaLabel: '', secondaryCtaLabel: '' },
 };
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -111,6 +115,8 @@ export default function Form({ project, categories }: { project: Project | null;
         video_url: project?.video_url ?? '',
         virtual_tour_url: project?.virtual_tour_url ?? '',
         map_image: project?.map_image ?? null,
+        overview_image: project?.overview_image ?? null,
+        masterplan_image: project?.masterplan_image ?? null,
         latitude: project?.latitude ?? '',
         longitude: project?.longitude ?? '',
         is_featured: project?.is_featured ?? false,
@@ -122,8 +128,8 @@ export default function Form({ project, categories }: { project: Project | null;
         robots: project?.robots ?? '',
         translations: { en: project?.translations?.en ?? {}, ar: project?.translations?.ar ?? {} },
         sections: {
-            en: { ...emptySections, ...(project?.sections?.en ?? {}) },
-            ar: { ...emptySections, ...(project?.sections?.ar ?? {}) },
+            en: { ...emptySections, ...(project?.sections?.en ?? {}), amenities: { ...emptySections.amenities, ...((project?.sections?.en as any)?.amenities ?? {}), categories: ((project?.sections?.en as any)?.amenities?.categories ?? emptySections.amenities.categories) }, location: { ...emptySections.location, ...((project?.sections?.en as any)?.location ?? {}), nearbyLocations: ((project?.sections?.en as any)?.location?.nearbyLocations ?? emptySections.location.nearbyLocations) } },
+            ar: { ...emptySections, ...(project?.sections?.ar ?? {}), amenities: { ...emptySections.amenities, ...((project?.sections?.ar as any)?.amenities ?? {}), categories: ((project?.sections?.ar as any)?.amenities?.categories ?? emptySections.amenities.categories) }, location: { ...emptySections.location, ...((project?.sections?.ar as any)?.location ?? {}), nearbyLocations: ((project?.sections?.ar as any)?.location?.nearbyLocations ?? emptySections.location.nearbyLocations) } },
         },
     });
 
@@ -152,7 +158,63 @@ export default function Form({ project, categories }: { project: Project | null;
                     <button type="button" onClick={() => setLanguage('ar')} className={`rounded-lg px-4 py-2 text-sm ${language === 'ar' ? 'bg-gold text-black' : 'bg-white/5 text-white/60'}`}>Arabic</button>
                 </div>
 
-                <form onSubmit={(e) => { e.preventDefault(); project?.id ? form.put(`/admin/projects/${project.id}`, { forceFormData: true, preserveScroll: true }) : form.post('/admin/projects', { forceFormData: true, preserveScroll: true }); }} encType="multipart/form-data" className="space-y-6">
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const fd = new FormData();
+                    const d = form.data;
+                    const flat: Record<string, any> = {
+                        project_category_id: d.project_category_id ?? '', title: d.title, slug: d.slug, description: d.description ?? '',
+                        short_description: d.short_description ?? '', location: d.location ?? '', address: d.address ?? '', status: d.status ?? '',
+                        project_type: d.project_type ?? '', completion_date: d.completion_date ?? '', price_from: d.price_from ?? '',
+                        price_to: d.price_to ?? '', currency: d.currency ?? 'EGP', installment_information: d.installment_information ?? '',
+                        area_min: d.area_min ?? '', area_max: d.area_max ?? '', area_unit: d.area_unit ?? 'm2',
+                        hero_heading: d.hero_heading ?? '', hero_description: d.hero_description ?? '',
+                        video_url: d.video_url ?? '', virtual_tour_url: d.virtual_tour_url ?? '',
+                        latitude: d.latitude ?? '', longitude: d.longitude ?? '',
+                        is_published: d.is_published ? '1' : '0', is_featured: d.is_featured ? '1' : '0',
+                        sort_order: d.sort_order ?? 0, seo_title: d.seo_title ?? '', seo_description: d.seo_description ?? '',
+                        canonical_url: d.canonical_url ?? '', robots: d.robots ?? '',
+                    };
+                    Object.entries(flat).forEach(([k, v]) => fd.append(k, String(v)));
+                    fd.append('translations', JSON.stringify(d.translations));
+                    fd.append('sections', JSON.stringify(d.sections));
+                    const heroImage = d.hero_image as unknown;
+                    const logo = d.logo as unknown;
+                    const brochure = d.brochure as unknown;
+                    const mapImage = d.map_image as unknown;
+                    if (heroImage instanceof File) fd.append('hero_image', heroImage);
+                    if (logo instanceof File) fd.append('logo', logo);
+                    if (brochure instanceof File) fd.append('brochure', brochure);
+                    if (mapImage instanceof File) fd.append('map_image', mapImage);
+                    const overviewImage = d.overview_image as unknown;
+                    if (overviewImage instanceof File) fd.append('overview_image', overviewImage);
+                    const masterplanImage = d.masterplan_image as unknown;
+                    if (masterplanImage instanceof File) fd.append('masterplan_image', masterplanImage);
+                    const constructionItems = d.sections[lang]?.construction?.items ?? [];
+                    constructionItems.forEach((item: { tag: string; title: string; image: unknown }, idx: number) => {
+                        if (item.image instanceof File) fd.append(`construction_image_${idx}`, item.image);
+                    });
+                    const amenityCategories = d.sections[lang]?.amenities?.categories ?? [];
+                    amenityCategories.forEach((cat: { title: string; items: Array<{ icon: unknown; title: string; description: string }> }, ci: number) => {
+                        cat.items.forEach((item: { icon: unknown; title: string; description: string }, ii: number) => {
+                            if (item.icon instanceof File) fd.append(`amenity_icon_${ci}_${ii}`, item.icon);
+                        });
+                    });
+                    const locationImage = d.sections[lang]?.location?.image as unknown;
+                    if (locationImage instanceof File) fd.append('location_image', locationImage);
+                    if (project?.id) {
+                        fd.append('_method', 'PUT');
+                        router.post(`/admin/projects/${project.id}`, fd, {
+                            preserveScroll: true,
+                            onError: (errors) => console.error('Project update validation errors', errors),
+                        });
+                    } else {
+                        router.post('/admin/projects', fd, {
+                            preserveScroll: true,
+                            onError: (errors) => console.error('Project create validation errors', errors),
+                        });
+                    }
+                }} encType="multipart/form-data" className="space-y-6">
 
                     {/* ===== BASICS (shared fields, not per-language) ===== */}
                     {!isArabic && (
@@ -168,8 +230,7 @@ export default function Form({ project, categories }: { project: Project | null;
                                 <FormField label="Address"><input value={form.data.address ?? ''} onChange={(e) => form.setData('address', e.target.value)} className={textFieldClass} /></FormField>
                                 <FormField label="Completion date"><input type="date" value={form.data.completion_date ?? ''} onChange={(e) => form.setData('completion_date', e.target.value)} className={textFieldClass} /></FormField>
                             </div>
-                            <div className="mt-5"><FormField label="Short description"><textarea rows={3} value={form.data.short_description ?? ''} onChange={(e) => form.setData('short_description', e.target.value)} className={textFieldClass} /></FormField></div>
-                            <div className="mt-5"><FormField label="Long description"><textarea rows={6} value={form.data.description ?? ''} onChange={(e) => form.setData('description', e.target.value)} className={textFieldClass} /></FormField></div>
+                            <div className="mt-5"><ImageUploadField label="Feature image" current={(form.data.hero_image as unknown instanceof File) ? (form.data.hero_image as unknown as File) : (typeof form.data.hero_image === 'string' ? form.data.hero_image : project?.hero_image)} onChange={(file) => form.setData('hero_image' as keyof Project, file as never)} /></div>
                         </SectionCard>
                     )}
 
@@ -188,18 +249,6 @@ export default function Form({ project, categories }: { project: Project | null;
                         </SectionCard>
                     )}
 
-                    {/* ===== TRANSLATIONS (per-language basic fields) ===== */}
-                    <SectionCard title={isArabic ? 'Arabic Content' : 'English Content'}>
-                        <div className="grid gap-5" dir={isArabic ? 'rtl' : 'ltr'}>
-                            <FormField label="Title (translated)"><input value={form.data.translations[lang].title ?? ''} onChange={(e) => form.setData('translations', { ...form.data.translations, [lang]: { ...form.data.translations[lang], title: e.target.value } })} className={textFieldClass} /></FormField>
-                            <FormField label="Short description (translated)"><textarea rows={3} value={form.data.translations[lang].short_description ?? ''} onChange={(e) => form.setData('translations', { ...form.data.translations, [lang]: { ...form.data.translations[lang], short_description: e.target.value } })} className={textFieldClass} /></FormField>
-                            <FormField label="Description (translated)"><textarea rows={5} value={form.data.translations[lang].description ?? ''} onChange={(e) => form.setData('translations', { ...form.data.translations, [lang]: { ...form.data.translations[lang], description: e.target.value } })} className={textFieldClass} /></FormField>
-                            <FormField label="Hero heading (translated)"><input value={form.data.translations[lang].hero_heading ?? ''} onChange={(e) => form.setData('translations', { ...form.data.translations, [lang]: { ...form.data.translations[lang], hero_heading: e.target.value } })} className={textFieldClass} /></FormField>
-                            <FormField label="Hero description (translated)"><textarea rows={3} value={form.data.translations[lang].hero_description ?? ''} onChange={(e) => form.setData('translations', { ...form.data.translations, [lang]: { ...form.data.translations[lang], hero_description: e.target.value } })} className={textFieldClass} /></FormField>
-                            <FormField label="Installment information (translated)"><textarea rows={3} value={form.data.translations[lang].installment_information ?? ''} onChange={(e) => form.setData('translations', { ...form.data.translations, [lang]: { ...form.data.translations[lang], installment_information: e.target.value } })} className={textFieldClass} /></FormField>
-                        </div>
-                    </SectionCard>
-
                     {/* ===== HERO SLIDES (per-language) ===== */}
                     <SectionCard title="Hero Slides">
                         <div dir={isArabic ? 'rtl' : 'ltr'}>
@@ -215,9 +264,40 @@ export default function Form({ project, categories }: { project: Project | null;
                                         <FormField label="Title Line 2"><input value={slide.titleLine2} onChange={(e) => { const updated = [...sections.heroSlides]; updated[i] = { ...updated[i], titleLine2: e.target.value }; setSection('heroSlides', updated); }} className={textFieldClass} /></FormField>
                                         <FormField label="Description"><textarea rows={2} value={slide.description} onChange={(e) => { const updated = [...sections.heroSlides]; updated[i] = { ...updated[i], description: e.target.value }; setSection('heroSlides', updated); }} className={textFieldClass} /></FormField>
                                     </div>
+                                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                                        <div className="rounded-lg border border-slate-800/50 bg-slate-950/50 p-3">
+                                            <p className="mb-2 text-[0.65rem] tracking-wider text-white/40 uppercase">CTA 1 (Primary)</p>
+                                            <div className="grid gap-2 md:grid-cols-2">
+                                                <FormField label="Label"><input value={slide.cta1Label} onChange={(e) => { const updated = [...sections.heroSlides]; updated[i] = { ...updated[i], cta1Label: e.target.value }; setSection('heroSlides', updated); }} placeholder="Request pricing & payment plan" className={textFieldClass} /></FormField>
+                                                <FormField label="URL"><input value={slide.cta1Url} onChange={(e) => { const updated = [...sections.heroSlides]; updated[i] = { ...updated[i], cta1Url: e.target.value }; setSection('heroSlides', updated); }} placeholder="#brochure or /contact" className={textFieldClass} /></FormField>
+                                            </div>
+                                        </div>
+                                        <div className="rounded-lg border border-slate-800/50 bg-slate-950/50 p-3">
+                                            <p className="mb-2 text-[0.65rem] tracking-wider text-white/40 uppercase">CTA 2 (Secondary)</p>
+                                            <div className="grid gap-2 md:grid-cols-2">
+                                                <FormField label="Label"><input value={slide.cta2Label} onChange={(e) => { const updated = [...sections.heroSlides]; updated[i] = { ...updated[i], cta2Label: e.target.value }; setSection('heroSlides', updated); }} placeholder="Download brochure" className={textFieldClass} /></FormField>
+                                                <FormField label="URL"><input value={slide.cta2Url} onChange={(e) => { const updated = [...sections.heroSlides]; updated[i] = { ...updated[i], cta2Url: e.target.value }; setSection('heroSlides', updated); }} placeholder="#brochure or /contact" className={textFieldClass} /></FormField>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
-                            <button type="button" onClick={() => setSection('heroSlides', [...sections.heroSlides, { eyebrow: '', titleLine1: '', titleLine2: '', description: '' }])} className="mt-2 flex items-center gap-2 text-xs text-gold hover:text-gold/80"><Plus className="size-3" /> Add slide</button>
+                            <button type="button" onClick={() => setSection('heroSlides', [...sections.heroSlides, { eyebrow: '', titleLine1: '', titleLine2: '', description: '', cta1Label: '', cta1Url: '#brochure', cta2Label: '', cta2Url: '#brochure' }])} className="mt-2 flex items-center gap-2 text-xs text-gold hover:text-gold/80"><Plus className="size-3" /> Add slide</button>
+                        </div>
+                    </SectionCard>
+
+                    {/* ===== STATS (per-language) ===== */}
+                    <SectionCard title="Stats">
+                        <div dir={isArabic ? 'rtl' : 'ltr'}>
+                            {sections.stats.map((stat, i) => (
+                                <div key={i} className="mb-3 grid gap-3 rounded-lg border border-slate-800 bg-slate-900/50 p-3 md:grid-cols-[1fr_1fr_1fr_auto]">
+                                    <FormField label="Value"><input value={stat.value} onChange={(e) => { const updated = [...sections.stats]; updated[i] = { ...updated[i], value: e.target.value }; setSection('stats', updated); }} className={textFieldClass} /></FormField>
+                                    <FormField label="Label"><input value={stat.label} onChange={(e) => { const updated = [...sections.stats]; updated[i] = { ...updated[i], label: e.target.value }; setSection('stats', updated); }} className={textFieldClass} /></FormField>
+                                    <FormField label="Note"><input value={stat.note} onChange={(e) => { const updated = [...sections.stats]; updated[i] = { ...updated[i], note: e.target.value }; setSection('stats', updated); }} className={textFieldClass} /></FormField>
+                                    <button type="button" onClick={() => setSection('stats', sections.stats.filter((_, index) => index !== i))} className="self-end p-2 text-red-400"><Trash2 className="size-4" /></button>
+                                </div>
+                            ))}
+                            <button type="button" onClick={() => setSection('stats', [...sections.stats, { value: '', label: '', note: '' }])} className="mt-2 flex items-center gap-2 text-xs text-gold"><Plus className="size-3" /> Add stat</button>
                         </div>
                     </SectionCard>
 
@@ -226,6 +306,7 @@ export default function Form({ project, categories }: { project: Project | null;
                         <div dir={isArabic ? 'rtl' : 'ltr'}>
                             <FormField label="Heading"><input value={sections.overview.heading} onChange={(e) => setSection('overview', { ...sections.overview, heading: e.target.value })} className={textFieldClass} /></FormField>
                             <div className="mt-4"><FormField label="Body"><textarea rows={5} value={sections.overview.body} onChange={(e) => setSection('overview', { ...sections.overview, body: e.target.value })} className={textFieldClass} /></FormField></div>
+                            {!isArabic && <div className="mt-4"><ImageUploadField label="Overview image" current={(form.data.overview_image as unknown instanceof File) ? (form.data.overview_image as unknown as File) : (typeof form.data.overview_image === 'string' ? form.data.overview_image : project?.overview_image)} onChange={(file) => form.setData('overview_image' as keyof Project, file as never)} /></div>}
                         </div>
                     </SectionCard>
 
@@ -238,6 +319,8 @@ export default function Form({ project, categories }: { project: Project | null;
                             </div>
                             <div className="mt-4"><FormField label="Description"><textarea rows={3} value={sections.masterplan.description} onChange={(e) => setSection('masterplan', { ...sections.masterplan, description: e.target.value })} className={textFieldClass} /></FormField></div>
                             <div className="mt-4"><FormField label="Brochure description"><textarea rows={2} value={sections.masterplan.brochureDescription} onChange={(e) => setSection('masterplan', { ...sections.masterplan, brochureDescription: e.target.value })} className={textFieldClass} /></FormField></div>
+                            {!isArabic && <div className="mt-4"><ImageUploadField label="Masterplan image" current={(form.data.masterplan_image as unknown instanceof File) ? (form.data.masterplan_image as unknown as File) : (typeof form.data.masterplan_image === 'string' ? form.data.masterplan_image : project?.masterplan_image)} onChange={(file) => form.setData('masterplan_image' as keyof Project, file as never)} /></div>}
+                            {!isArabic && <div className="mt-4"><FileUploadField label="Brochure (PDF)" onChange={(file) => form.setData('brochure' as keyof Project, file as never)} /></div>}
                         </div>
                     </SectionCard>
 
@@ -260,6 +343,25 @@ export default function Form({ project, categories }: { project: Project | null;
                                 <FormField label="Note"><input value={sections.homes3d.note} onChange={(e) => setSection('homes3d', { ...sections.homes3d, note: e.target.value })} className={textFieldClass} /></FormField>
                             </div>
                             <div className="mt-4"><FormField label="Description"><textarea rows={3} value={sections.homes3d.description} onChange={(e) => setSection('homes3d', { ...sections.homes3d, description: e.target.value })} className={textFieldClass} /></FormField></div>
+
+                            <div className="mt-6">
+                                <p className="mb-3 text-xs font-semibold tracking-wider text-white/50 uppercase">Homes</p>
+                                {sections.homes3d.items.map((item, i) => (
+                                    <div key={i} className="mb-3 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+                                        <div className="mb-2 flex items-center justify-between">
+                                            <span className="text-xs text-white/40">Home {i + 1}</span>
+                                            {sections.homes3d.items.length > 0 && <button type="button" onClick={() => setSection('homes3d', { ...sections.homes3d, items: sections.homes3d.items.filter((_, idx) => idx !== i) })} className="text-red-400 hover:text-red-300"><Trash2 className="size-4" /></button>}
+                                        </div>
+                                        <div className="grid gap-3 md:grid-cols-4">
+                                            <FormField label="Tag"><input value={item.tag} onChange={(e) => { const updated = [...sections.homes3d.items]; updated[i] = { ...updated[i], tag: e.target.value }; setSection('homes3d', { ...sections.homes3d, items: updated }); }} placeholder="Studio" className={textFieldClass} /></FormField>
+                                            <FormField label="Name"><input value={item.name} onChange={(e) => { const updated = [...sections.homes3d.items]; updated[i] = { ...updated[i], name: e.target.value }; setSection('homes3d', { ...sections.homes3d, items: updated }); }} placeholder="The Studio" className={textFieldClass} /></FormField>
+                                            <FormField label="Size (e.g. 50-54)"><input value={item.size} onChange={(e) => { const updated = [...sections.homes3d.items]; updated[i] = { ...updated[i], size: e.target.value }; setSection('homes3d', { ...sections.homes3d, items: updated }); }} placeholder="50-54" className={textFieldClass} /></FormField>
+                                            <FormField label="3D URL"><input value={item.url} onChange={(e) => { const updated = [...sections.homes3d.items]; updated[i] = { ...updated[i], url: e.target.value }; setSection('homes3d', { ...sections.homes3d, items: updated }); }} placeholder="https://..." className={textFieldClass} /></FormField>
+                                        </div>
+                                    </div>
+                                ))}
+                                <button type="button" onClick={() => setSection('homes3d', { ...sections.homes3d, items: [...sections.homes3d.items, { tag: '', name: '', size: '', url: '' }] })} className="mt-2 flex items-center gap-2 text-xs text-gold hover:text-gold/80"><Plus className="size-3" /> Add home</button>
+                            </div>
                         </div>
                     </SectionCard>
 
@@ -270,6 +372,24 @@ export default function Form({ project, categories }: { project: Project | null;
                                 <FormField label="Heading"><input value={sections.construction.heading} onChange={(e) => setSection('construction', { ...sections.construction, heading: e.target.value })} className={textFieldClass} /></FormField>
                             </div>
                             <div className="mt-4"><FormField label="Description"><textarea rows={3} value={sections.construction.description} onChange={(e) => setSection('construction', { ...sections.construction, description: e.target.value })} className={textFieldClass} /></FormField></div>
+
+                            <div className="mt-6">
+                                <p className="mb-3 text-xs font-semibold tracking-wider text-white/50 uppercase">Updates</p>
+                                {sections.construction.items.map((item, i) => (
+                                    <div key={i} className="mb-3 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+                                        <div className="mb-2 flex items-center justify-between">
+                                            <span className="text-xs text-white/40">Update {i + 1}</span>
+                                            <button type="button" onClick={() => setSection('construction', { ...sections.construction, items: sections.construction.items.filter((_, idx) => idx !== i) })} className="text-red-400 hover:text-red-300"><Trash2 className="size-4" /></button>
+                                        </div>
+                                        <div className="grid gap-3 md:grid-cols-2">
+                                            <FormField label="Tag"><input value={item.tag} onChange={(e) => { const updated = [...sections.construction.items]; updated[i] = { ...updated[i], tag: e.target.value }; setSection('construction', { ...sections.construction, items: updated }); }} placeholder="Latest update" className={textFieldClass} /></FormField>
+                                            <FormField label="Title"><input value={item.title} onChange={(e) => { const updated = [...sections.construction.items]; updated[i] = { ...updated[i], title: e.target.value }; setSection('construction', { ...sections.construction, items: updated }); }} placeholder="Structure & landscaping progress" className={textFieldClass} /></FormField>
+                                        </div>
+                                        {!isArabic && <div className="mt-3"><ImageUploadField label="Image" current={(item.image as unknown instanceof File) ? (item.image as unknown as File) : (typeof item.image === 'string' ? item.image : null)} onChange={(file) => { const updated = [...sections.construction.items]; updated[i] = { ...updated[i], image: file as unknown as string }; setSection('construction', { ...sections.construction, items: updated }); }} /></div>}
+                                    </div>
+                                ))}
+                                <button type="button" onClick={() => setSection('construction', { ...sections.construction, items: [...sections.construction.items, { tag: '', title: '', image: null }] })} className="mt-2 flex items-center gap-2 text-xs text-gold hover:text-gold/80"><Plus className="size-3" /> Add update</button>
+                            </div>
                         </div>
                     </SectionCard>
 
@@ -277,6 +397,44 @@ export default function Form({ project, categories }: { project: Project | null;
                     <SectionCard title="Amenities & Services">
                         <div dir={isArabic ? 'rtl' : 'ltr'}>
                             <FormField label="Heading"><input value={sections.amenities.heading} onChange={(e) => setSection('amenities', { ...sections.amenities, heading: e.target.value })} className={textFieldClass} /></FormField>
+
+                            <div className="mt-6 space-y-6">
+                                {(sections.amenities.categories ?? []).map((cat, ci) => (
+                                    <div key={ci} className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
+                                        <div className="mb-3 flex items-center justify-between">
+                                            <span className="text-xs text-white/40">Category {ci + 1}</span>
+                                            <button type="button" onClick={() => setSection('amenities', { ...sections.amenities, categories: sections.amenities.categories.filter((_, idx) => idx !== ci) })} className="text-red-400 hover:text-red-300"><Trash2 className="size-4" /></button>
+                                        </div>
+                                        <FormField label="Category title">
+                                            <input value={cat.title} onChange={(e) => { const updated = [...sections.amenities.categories]; updated[ci] = { ...updated[ci], title: e.target.value }; setSection('amenities', { ...sections.amenities, categories: updated }); }} placeholder="WELLNESS & MOVEMENT" className={textFieldClass} />
+                                        </FormField>
+
+                                        <div className="mt-4 space-y-3">
+                                            {cat.items.map((item, ii) => (
+                                                <div key={ii} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+                                                    <div className="mb-2 flex items-center justify-between">
+                                                        <span className="text-[0.65rem] text-white/30">Item {ii + 1}</span>
+                                                        <button type="button" onClick={() => { const updated = [...sections.amenities.categories]; updated[ci] = { ...updated[ci], items: updated[ci].items.filter((_, idx) => idx !== ii) }; setSection('amenities', { ...sections.amenities, categories: updated }); }} className="text-red-400 hover:text-red-300"><Trash2 className="size-3" /></button>
+                                                    </div>
+                                                    <div className="grid gap-3 md:grid-cols-3">
+                                                        <FormField label="Title">
+                                                            <input value={item.title} onChange={(e) => { const updated = [...sections.amenities.categories]; updated[ci] = { ...updated[ci], items: updated[ci].items.map((it, idx) => idx === ii ? { ...it, title: e.target.value } : it) }; setSection('amenities', { ...sections.amenities, categories: updated }); }} placeholder="Yoga deck" className={textFieldClass} />
+                                                        </FormField>
+                                                        <FormField label="Description">
+                                                            <input value={item.description} onChange={(e) => { const updated = [...sections.amenities.categories]; updated[ci] = { ...updated[ci], items: updated[ci].items.map((it, idx) => idx === ii ? { ...it, description: e.target.value } : it) }; setSection('amenities', { ...sections.amenities, categories: updated }); }} placeholder="Mornings that start calm" className={textFieldClass} />
+                                                        </FormField>
+                                                        <FormField label="Icon (PNG/SVG)">
+                                                            <ImageUploadField label="Icon" current={(item.icon as unknown instanceof File) ? (item.icon as unknown as File) : (typeof item.icon === 'string' ? item.icon : null)} onChange={(file) => { const updated = [...sections.amenities.categories]; updated[ci] = { ...updated[ci], items: updated[ci].items.map((it, idx) => idx === ii ? { ...it, icon: file as unknown as string } : it) }; setSection('amenities', { ...sections.amenities, categories: updated }); }} />
+                                                        </FormField>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            <button type="button" onClick={() => { const updated = [...sections.amenities.categories]; updated[ci] = { ...updated[ci], items: [...updated[ci].items, { icon: null, title: '', description: '' }] }; setSection('amenities', { ...sections.amenities, categories: updated }); }} className="flex items-center gap-2 text-xs text-gold hover:text-gold/80"><Plus className="size-3" /> Add item</button>
+                                        </div>
+                                    </div>
+                                ))}
+                                <button type="button" onClick={() => setSection('amenities', { ...sections.amenities, categories: [...sections.amenities.categories, { title: '', items: [] }] })} className="flex items-center gap-2 text-xs text-gold hover:text-gold/80"><Plus className="size-3" /> Add category</button>
+                            </div>
                         </div>
                     </SectionCard>
 
@@ -291,6 +449,19 @@ export default function Form({ project, categories }: { project: Project | null;
                                 <FormField label="Gate note"><input value={sections.location.gateNote} onChange={(e) => setSection('location', { ...sections.location, gateNote: e.target.value })} className={textFieldClass} /></FormField>
                                 <FormField label="Drive note"><input value={sections.location.driveNote} onChange={(e) => setSection('location', { ...sections.location, driveNote: e.target.value })} className={textFieldClass} /></FormField>
                             </div>
+                            {!isArabic && <div className="mt-4"><ImageUploadField label="Section image" current={(sections.location.image as unknown instanceof File) ? (sections.location.image as unknown as File) : (typeof sections.location.image === 'string' ? sections.location.image : null)} onChange={(file) => setSection('location', { ...sections.location, image: file as unknown as string })} /></div>}
+
+                            <div className="mt-6">
+                                <p className="mb-3 text-xs font-semibold tracking-wider text-white/50 uppercase">Nearby locations</p>
+                                {(sections.location.nearbyLocations ?? []).map((item, i) => (
+                                    <div key={i} className="mb-3 grid gap-3 rounded-lg border border-slate-800 bg-slate-900/50 p-3 md:grid-cols-[1fr_1fr_auto]">
+                                        <FormField label="Place"><input value={item.place} onChange={(e) => { const updated = [...(sections.location.nearbyLocations ?? [])]; updated[i] = { ...updated[i], place: e.target.value }; setSection('location', { ...sections.location, nearbyLocations: updated }); }} placeholder="North Teseen Road" className={textFieldClass} /></FormField>
+                                        <FormField label="Time"><input value={item.time} onChange={(e) => { const updated = [...(sections.location.nearbyLocations ?? [])]; updated[i] = { ...updated[i], time: e.target.value }; setSection('location', { ...sections.location, nearbyLocations: updated }); }} placeholder="1 min" className={textFieldClass} /></FormField>
+                                        <button type="button" onClick={() => setSection('location', { ...sections.location, nearbyLocations: (sections.location.nearbyLocations ?? []).filter((_, idx) => idx !== i) })} className="self-end p-2 text-red-400"><Trash2 className="size-4" /></button>
+                                    </div>
+                                ))}
+                                <button type="button" onClick={() => setSection('location', { ...sections.location, nearbyLocations: [...(sections.location.nearbyLocations ?? []), { place: '', time: '' }] })} className="mt-2 flex items-center gap-2 text-xs text-gold"><Plus className="size-3" /> Add location</button>
+                            </div>
                         </div>
                     </SectionCard>
 
@@ -303,26 +474,6 @@ export default function Form({ project, categories }: { project: Project | null;
                             </div>
                         </div>
                     </SectionCard>
-
-                    {/* ===== MEDIA (shared) ===== */}
-                    {!isArabic && (
-                        <SectionCard title="Hero & Media">
-                            <div className="grid gap-5 md:grid-cols-2">
-                                <FormField label="Hero heading"><input value={form.data.hero_heading ?? ''} onChange={(e) => form.setData('hero_heading', e.target.value)} className={textFieldClass} /></FormField>
-                                <FormField label="Video URL"><input value={form.data.video_url ?? ''} onChange={(e) => form.setData('video_url', e.target.value)} className={textFieldClass} /></FormField>
-                                <FormField label="Virtual tour URL"><input value={form.data.virtual_tour_url ?? ''} onChange={(e) => form.setData('virtual_tour_url', e.target.value)} className={textFieldClass} /></FormField>
-                                <FormField label="Latitude"><input value={form.data.latitude ?? ''} onChange={(e) => form.setData('latitude', e.target.value)} className={textFieldClass} /></FormField>
-                                <FormField label="Longitude"><input value={form.data.longitude ?? ''} onChange={(e) => form.setData('longitude', e.target.value)} className={textFieldClass} /></FormField>
-                            </div>
-                            <div className="mt-5"><FormField label="Hero description"><textarea rows={3} value={form.data.hero_description ?? ''} onChange={(e) => form.setData('hero_description', e.target.value)} className={textFieldClass} /></FormField></div>
-                            <div className="mt-5 grid gap-5 md:grid-cols-3">
-                                <ImageUploadField label="Hero image" onChange={(file) => form.setData('hero_image' as keyof Project, file as never)} />
-                                <ImageUploadField label="Logo" onChange={(file) => form.setData('logo' as keyof Project, file as never)} />
-                                <ImageUploadField label="Map image" onChange={(file) => form.setData('map_image' as keyof Project, file as never)} />
-                            </div>
-                            <div className="mt-5"><FileUploadField label="Brochure (PDF)" onChange={(file) => form.setData('brochure' as keyof Project, file as never)} /></div>
-                        </SectionCard>
-                    )}
 
                     {/* ===== SEO (shared) ===== */}
                     {!isArabic && (

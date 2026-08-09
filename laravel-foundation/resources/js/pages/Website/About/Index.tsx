@@ -43,7 +43,7 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
                     </p>
                     <div className="mt-8 flex flex-wrap items-center gap-6">
                         <a href={hero.cta_url ?? '/projects'} className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase transition-colors hover:bg-gold/10">
-                            {hero.cta_label ?? 'Explore our projects'} <ArrowRight className="size-3.5" strokeWidth={1.5} />
+                            {hero.cta_label ?? 'Explore our projects'} <ArrowRight className="size-3.5 rtl:rotate-180" strokeWidth={1.5} />
                         </a>
                         <a href={hero.secondary_cta_url ?? '/contact'} className="text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">
                             {hero.secondary_cta_label ?? 'Contact us'}
@@ -64,7 +64,7 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
                 </div>
             </section>
 
-            <section className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
+            <section id="story" className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
                 <div className="mx-auto grid max-w-[1440px] gap-14 px-6 sm:px-10 md:grid-cols-2 lg:items-center">
                     <div className="max-w-xl">
                         <Eyebrow tone="light">Our story</Eyebrow>
@@ -79,7 +79,7 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
                 </div>
             </section>
 
-            <section className="bg-night py-20 sm:py-24">
+            <section id="awards" className="bg-night py-20 sm:py-24">
                 <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-24">
                     <Eyebrow className="text-ink">{awards.eyebrow ?? 'Awards & achievements'}</Eyebrow>
                     <h2 className="mt-5 max-w-xl text-3xl font-light leading-[1.15] text-ink sm:text-[3rem]">{awards.heading ?? 'Recognised for building things that last.'}</h2>
@@ -99,7 +99,7 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
                 </div>
             </section>
 
-            <section className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
+            <section id="partners" className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
                 <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-24">
                     <Eyebrow tone="light">{partners.settings.eyebrow ?? 'Partnerships & affiliations'}</Eyebrow>
                     <h2 className="mt-5 max-w-xl text-3xl font-light leading-[1.15] sm:text-[3rem]">{partners.settings.heading ?? 'The names behind our work.'}</h2>
@@ -134,7 +134,7 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
                     <Eyebrow className="justify-center text-ink">{promise.eyebrow || 'Our promise'}</Eyebrow>
                     <h2 className="mt-5 text-2xl font-light leading-[1.3] text-ink sm:text-3xl md:text-[2.45rem]">{promiseHeading.map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}</h2>
                     <div className="mt-8 flex flex-wrap justify-center gap-6">
-                        <a href={promise.primary_cta_url || '#'} className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10">{promise.primary_cta_label || 'Explore our projects'} <ArrowRight className="size-3.5" strokeWidth={1.5} /></a>
+                        <a href={promise.primary_cta_url || '#'} className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10">{promise.primary_cta_label || 'Explore our projects'} <ArrowRight className="size-3.5 rtl:rotate-180" strokeWidth={1.5} /></a>
                         <a href={promise.secondary_cta_url || '#'} className="self-center text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">{promise.secondary_cta_label || 'Talk to us'}</a>
                     </div>
                 </div>

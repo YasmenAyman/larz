@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
-import { FolderKanban, BriefcaseBusiness, FileText, Inbox, Mail, Newspaper, Users, UserRoundCheck } from 'lucide-react';
+import { FolderKanban, BriefcaseBusiness, FileText, Inbox, Mail, Newspaper, UserRoundCheck } from 'lucide-react';
 import AdminLayout from '@/layouts/AdminLayout';
-import { Breadcrumbs, EmptyState, FilterSelect, Notification, Pagination, SearchInput, StatusBadge } from '@/components/admin/AdminLayoutParts';
+import { Breadcrumbs, Notification, StatusBadge } from '@/components/admin/AdminLayoutParts';
 
 const icons = [FolderKanban, FolderKanban, Newspaper, BriefcaseBusiness, Inbox, Inbox, UserRoundCheck, Mail];
 
@@ -57,39 +57,6 @@ export default function Dashboard({ cards }: { cards: Array<{ label: string; val
                         );
                     })}
                 </div>
-
-                {/* Table Section Card */}
-                <section className="rounded-2xl border border-white/10 bg-[#161619]/90 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <h2 className="text-lg font-bold text-white">سجل النشاطات والأحداث</h2>
-                            <p className="mt-1 text-xs text-white/50">
-                                أدوات تصفية وبحث المحتوى لجميع الوحدات البرمجية.
-                            </p>
-                        </div>
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                            <div className="w-full sm:w-64">
-                                <SearchInput value="" onChange={() => undefined} placeholder="بحث في النشاطات..." />
-                            </div>
-                            <FilterSelect
-                                value="جميع الحالات"
-                                onChange={() => undefined}
-                                options={['جميع الحالات', 'منشور', 'مسودة']}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="mt-8">
-                        <EmptyState
-                            title="لا توجد نشاطات مسجلة حالياً"
-                            message="سيتم عرض جميع التغييرات والتحديثات التي تجريها على البيانات هنا فور حدوثها."
-                        />
-                    </div>
-
-                    <div className="mt-6 border-t border-white/10 pt-4">
-                        <Pagination />
-                    </div>
-                </section>
             </div>
         </AdminLayout>
     );

@@ -36,7 +36,10 @@ class ContactController extends Controller
         $locationRaw = WebsiteContent::section('contact', 'location_map');
         $locationTranslations = is_array($locationRaw['translations'] ?? null) ? $locationRaw['translations'] : ['en' => $locationRaw, 'ar' => []];
         $locationCopy = $locationTranslations[$locale] ?? $locationTranslations['en'] ?? [];
-        $addressSetting = \App\Models\SiteSetting::query()->where('key', 'contact.address')->value('value');
+        $addressSetting = \App\Models\SiteSetting::query()->where('key', $locale === 'ar' ? 'contact.address_ar' : 'contact.address')->value('value');
+        if (! $addressSetting) {
+            $addressSetting = \App\Models\SiteSetting::query()->where('key', 'contact.address')->value('value');
+        }
         $locationImage = null;
         if (! empty($locationRaw['image_id'])) {
             $locationImage = \App\Support\WebsiteContent::assetUrl(\App\Models\MediaAsset::find($locationRaw['image_id']));

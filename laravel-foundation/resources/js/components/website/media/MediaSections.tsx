@@ -16,7 +16,7 @@ export function MediaHero({ hero }: { hero: { eyebrow: string; heading: string; 
                 <Eyebrow className="text-ink">{t(hero.eyebrow ?? 'Media')}</Eyebrow>
                 <h1 className="mt-7 max-w-xl text-5xl font-light leading-[1.08] tracking-[-0.03em] sm:text-6xl lg:text-[5rem]">{(hero.heading ?? 'The latest from\nLARZ.').split('\n').map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}</h1>
                 <p className="mt-6 text-sm text-ink-muted">{hero.description}</p>
-                <a href="#newsletter" className="mt-8 inline-flex w-fit items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10">{t('Subscribe')} <ArrowRight className="size-3.5" strokeWidth={1.5} /></a>
+                <a href="#newsletter" className="mt-8 inline-flex w-fit items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10">{t('Subscribe')} <ArrowRight className="size-3.5 rtl:rotate-180" strokeWidth={1.5} /></a>
             </div>
         </section>
     );
@@ -25,7 +25,7 @@ export function MediaHero({ hero }: { hero: { eyebrow: string; heading: string; 
 export function MediaPress({ posts, settings }: { posts: MediaPost[]; settings: SectionSettings }) {
     const { t } = useI18n();
     return (
-        <section className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
+        <section id="news" className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
             <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-24">
                 <Eyebrow tone="light">{t(settings.eyebrow ?? 'News & press releases')}</Eyebrow>
                 <h2 className="mt-5 text-4xl font-light sm:text-[2.5rem]">{t(settings.heading ?? "What's happening at LARZ.")}</h2>
@@ -40,7 +40,7 @@ export function MediaPress({ posts, settings }: { posts: MediaPost[]; settings: 
                                 <p className="text-[0.9rem] tracking-[0.16em] text-ink-muted/60">{post.date}</p>
                                 <h3 className="mt-3 text-md leading-tight text-paper-ink">{post.title}</h3>
                                 <p className="mt-2 text-sm leading-relaxed text-paper-muted">{post.excerpt}</p>
-                                <a href={`/media/${post.slug}`} className="mt-4 inline-flex items-center gap-1 text-[0.8rem] tracking-[0.18em] text-paper-muted uppercase">{t('Read more')} <ArrowRight className="size-3" strokeWidth={1.5} /></a>
+                                <a href={`/media/${post.slug}`} className="mt-4 inline-flex items-center gap-1 text-[0.8rem] tracking-[0.18em] text-paper-muted uppercase">{t('Read more')} <ArrowRight className="size-3 rtl:rotate-180" strokeWidth={1.5} /></a>
                             </div>
                         </article>
                     ))}
@@ -53,7 +53,7 @@ export function MediaPress({ posts, settings }: { posts: MediaPost[]; settings: 
 export function MediaStories({ posts, settings }: { posts: MediaPost[]; settings: SectionSettings }) {
     const { t } = useI18n();
     return (
-        <section className="bg-night py-20 sm:py-24">
+        <section id="blogs" className="bg-night py-20 sm:py-24">
             <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-24">
                 <Eyebrow className="text-ink">{t(settings.eyebrow ?? 'Blogs')}</Eyebrow>
                 <h2 className="mt-5 text-4xl font-light text-ink sm:text-[2.5rem]">{t(settings.heading ?? 'Stories & insight.')}</h2>
@@ -69,7 +69,7 @@ export function MediaStories({ posts, settings }: { posts: MediaPost[]; settings
                                 <p className="text-[0.9rem] tracking-[0.16em] text-ink-muted/60 uppercase">{post.category}</p>
                                 <h3 className="mt-3 text-lg leading-tight text-ink">{post.title}</h3>
                                 <p className="mt-2 text-xs text-ink-muted">{post.excerpt}</p>
-                                <a href={`/media/${post.slug}`} className="mt-4 inline-flex items-center gap-1 text-[0.9rem] tracking-[0.18em] text-ink-muted uppercase">{t('Read article')} <ArrowRight className="size-3" strokeWidth={1.5} /></a>
+                                <a href={`/media/${post.slug}`} className="mt-4 inline-flex items-center gap-1 text-[0.9rem] tracking-[0.18em] text-ink-muted uppercase">{t('Read article')} <ArrowRight className="size-3 rtl:rotate-180" strokeWidth={1.5} /></a>
                             </div>
                         </article>
                     ))}
@@ -84,7 +84,7 @@ export function MediaGallery({ gallery, settings }: { gallery: string[]; setting
     const items = gallery.map((src, index) => ({ src, label: 'PHOTO', col: [1, 2, 3, 4, 1, 3, 4, 2][index], row: [1, 1, 1, 1, 2, 2, 2, 3][index], colSpan: 1, rowSpan: index === 1 || index === 5 ? 2 : 1 }));
 
     return (
-        <section className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
+        <section id="gallery" className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
             <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-24">
                 <Eyebrow tone="light">{t(settings.eyebrow ?? 'Photo gallery')}</Eyebrow>
                 <h2 className="mt-5 text-4xl font-light sm:text-[2.5rem]">{t(settings.heading ?? 'Inside our communities.')}</h2>
@@ -123,7 +123,7 @@ export function MediaNewsletter({ settings }: { settings: SectionSettings }) {
                     <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
                         <label>Do not fill<input type="text" tabIndex={-1} autoComplete="off" value={data._hp_website} onChange={(event) => setData('_hp_website', event.target.value)} /></label>
                     </div>
-                    <button type="submit" disabled={processing} className="inline-flex items-center justify-center gap-3 border border-gold px-6 py-3 text-[0.8rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10 disabled:opacity-60">{processing ? t('Subscribing...') : t('Subscribe')} <ArrowRight className="size-3" strokeWidth={1.5} /></button>
+                    <button type="submit" disabled={processing} className="inline-flex items-center justify-center gap-3 border border-gold px-6 py-3 text-[0.8rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10 disabled:opacity-60">{processing ? t('Subscribing...') : t('Subscribe')} <ArrowRight className="size-3 rtl:rotate-180" strokeWidth={1.5} /></button>
                 </form>
             </div>
         </section>

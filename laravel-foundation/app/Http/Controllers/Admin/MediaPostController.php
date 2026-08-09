@@ -55,6 +55,7 @@ class MediaPostController extends Controller
         $data = $request->safe()->except(['featured_image', 'open_graph_image']);
         $data['translations'] = $this->sanitizeTranslations($data['translations'] ?? []);
         if (array_key_exists('content', $data)) $data['content'] = app(RichTextSanitizer::class)->sanitize($data['content']);
+        $data = $this->syncColumnsFromEnglish($data);
         $newAssets = [];
         try {
             DB::transaction(function () use ($request, $uploads, $data, &$newAssets) {
@@ -73,13 +74,14 @@ class MediaPostController extends Controller
         return to_route($request->routeIs('admin.pages.media.news.store') ? 'admin.pages.media.news.edit' : ($request->routeIs('admin.pages.media.blog.store') ? 'admin.pages.media.stories.edit' : 'admin.media.posts.index'))->with('success', 'Media post created.');
     }
 
-    public function edit(MediaPost $mediaPost): Response { $mediaPost->load(['category', 'featuredImage', 'openGraphImage']); return Inertia::render('Admin/Media/Posts/Form', ['post' => ['id' => $mediaPost->id, 'type' => $mediaPost->type, 'media_category_id' => $mediaPost->media_category_id, 'title' => $mediaPost->title, 'slug' => $mediaPost->slug, 'excerpt' => $mediaPost->excerpt, 'content' => $mediaPost->content, 'event_date' => $mediaPost->event_date?->format('Y-m-d'), 'published_at' => $mediaPost->published_at?->format('Y-m-d\\TH:i'), 'is_featured' => $mediaPost->is_featured, 'is_published' => $mediaPost->is_published, 'sort_order' => $mediaPost->sort_order, 'seo_title' => $mediaPost->seo_title, 'seo_description' => $mediaPost->seo_description, 'featured_image' => WebsiteContent::assetUrl($mediaPost->featuredImage), 'open_graph_image' => WebsiteContent::assetUrl($mediaPost->openGraphImage), 'translations' => $mediaPost->translations ?? ['en' => [], 'ar' => []]], 'categories' => MediaCategory::query()->orderBy('name')->get(['id', 'name'])]); }
+    public function edit(MediaPost $mediaPost): Response { $mediaPost->load(['category', 'featuredImage', 'openGraphImage']); $translations = $mediaPost->translations ?? []; $translations['en'] = array_replace(['title' => $mediaPost->title, 'excerpt' => $mediaPost->excerpt ?? '', 'content' => $mediaPost->content ?? ''], $translations['en'] ?? []); $translations['ar'] = $translations['ar'] ?? []; return Inertia::render('Admin/Media/Posts/Form', ['post' => ['id' => $mediaPost->id, 'type' => $mediaPost->type, 'media_category_id' => $mediaPost->media_category_id, 'title' => $mediaPost->title, 'slug' => $mediaPost->slug, 'excerpt' => $mediaPost->excerpt, 'content' => $mediaPost->content, 'event_date' => $mediaPost->event_date?->format('Y-m-d'), 'published_at' => $mediaPost->published_at?->format('Y-m-d\\TH:i'), 'is_featured' => $mediaPost->is_featured, 'is_published' => $mediaPost->is_published, 'sort_order' => $mediaPost->sort_order, 'seo_title' => $mediaPost->seo_title, 'seo_description' => $mediaPost->seo_description, 'featured_image' => WebsiteContent::assetUrl($mediaPost->featuredImage), 'open_graph_image' => WebsiteContent::assetUrl($mediaPost->openGraphImage), 'translations' => $translations], 'categories' => MediaCategory::query()->orderBy('name')->get(['id', 'name'])]); }
 
     public function update(UpdateMediaPostRequest $request, MediaPost $mediaPost, MediaUploadService $uploads): RedirectResponse
     {
         $data = $request->safe()->except(['featured_image', 'open_graph_image']);
         $data['translations'] = $this->sanitizeTranslations($data['translations'] ?? []);
         if (array_key_exists('content', $data)) $data['content'] = app(RichTextSanitizer::class)->sanitize($data['content']);
+        $data = $this->syncColumnsFromEnglish($data);
         $oldFeaturedImage = $mediaPost->featuredImage;
         $oldOpenGraphImage = $mediaPost->openGraphImage;
         $newAssets = [];
@@ -123,5 +125,16 @@ class MediaPostController extends Controller
             }
         }
         return $translations;
+    }
+
+    private function syncColumnsFromEnglish(array $data): array
+    {
+        $en = $data['translations']['en'] ?? [];
+        foreach (['title', 'excerpt', 'content'] as $key) {
+            if (array_key_exists($key, $en) && is_string($en[$key])) {
+                $data[$key] = $en[$key];
+            }
+        }
+        return $data;
     }
 }

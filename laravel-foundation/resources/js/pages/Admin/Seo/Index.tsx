@@ -44,7 +44,7 @@ export default function Index({ entries }: { entries: Entry[] }) {
 }
 
 function SeoEntry({ entry }: { entry: Entry }) {
-    const { data, setData, put, processing, errors } = useForm<SeoForm>({
+    const { data, setData, post, transform, processing, errors } = useForm<SeoForm>({
         seo_title: entry.seo_title ?? '',
         meta_description: entry.meta_description ?? '',
         canonical_url: entry.canonical_url ?? '',
@@ -55,7 +55,7 @@ function SeoEntry({ entry }: { entry: Entry }) {
         followable: entry.followable,
     });
 
-    const submit = (event: React.FormEvent) => { event.preventDefault(); put(`/admin/seo/${entry.target}`, { forceFormData: true, preserveScroll: true }); };
+    const submit = (event: React.FormEvent) => { event.preventDefault(); transform((payload) => ({ ...payload, _method: 'put' })); post(`/admin/seo/${entry.target}`, { forceFormData: true, preserveScroll: true }); };
 
     return (
         <form onSubmit={submit} className="space-y-5 rounded-xl border border-slate-800 bg-slate-950 p-6">

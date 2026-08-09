@@ -7,6 +7,21 @@ use Illuminate\Validation\Rule;
 
 class UpdateProjectRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        foreach (['translations', 'sections'] as $field) {
+            $value = $this->input($field);
+
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $this->merge([$field => $decoded]);
+                }
+            }
+        }
+    }
+
     public function authorize(): bool
     {
         return true;
@@ -18,8 +33,8 @@ class UpdateProjectRequest extends FormRequest
 
         return [
             'project_category_id' => ['nullable', 'integer', 'exists:project_categories,id'],
-            'title' => ['sometimes', 'required', 'string', 'max:180'],
-            'slug' => ['sometimes', 'required', 'string', 'max:180', Rule::unique('projects', 'slug')->ignore($projectId)],
+            'title' => ['required', 'string', 'max:180'],
+            'slug' => ['required', 'string', 'max:180', Rule::unique('projects', 'slug')->ignore($projectId)],
             'description' => ['nullable', 'string'],
             'short_description' => ['nullable', 'string', 'max:500'],
             'location' => ['nullable', 'string', 'max:180'],
@@ -42,10 +57,12 @@ class UpdateProjectRequest extends FormRequest
             'video_url' => ['nullable', 'string', 'max:500'],
             'virtual_tour_url' => ['nullable', 'string', 'max:500'],
             'map_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,svg', 'mimetypes:image/jpeg,image/png,image/webp,image/svg+xml', 'max:5120'],
+            'overview_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,svg', 'mimetypes:image/jpeg,image/png,image/webp,image/svg+xml', 'max:5120'],
+            'masterplan_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,svg', 'mimetypes:image/jpeg,image/png,image/webp,image/svg+xml', 'max:5120'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
-            'is_featured' => ['boolean'],
-            'is_published' => ['boolean'],
+            'is_featured' => ['nullable', 'boolean'],
+            'is_published' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'seo_title' => ['nullable', 'string', 'max:180'],
             'seo_description' => ['nullable', 'string', 'max:320'],

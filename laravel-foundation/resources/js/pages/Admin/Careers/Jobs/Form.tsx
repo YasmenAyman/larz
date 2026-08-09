@@ -5,11 +5,12 @@ import { useState } from 'react';
 
 type TranslationFields = { title: string; department: string; location: string; employment_type: string; experience_level: string; summary: string; description: string; requirements: string; responsibilities: string; benefits: string };
 type JobForm = { slug: string; deadline: string; is_published: boolean; is_featured: boolean; sort_order: number; translations: { en: TranslationFields; ar: TranslationFields } };
+type JobRecord = Partial<JobForm> & { id?: number; translations?: { en?: Partial<TranslationFields>; ar?: Partial<TranslationFields> } } & Partial<TranslationFields>;
 
 const tabs = ['English', 'العربية'] as const;
 type Tab = typeof tabs[number];
 
-export default function Form({ job }: { job: (Partial<JobForm> & { id?: number; translations?: { en?: Partial<TranslationFields>; ar?: Partial<TranslationFields> } }) | null }) {
+export default function Form({ job }: { job: JobRecord | null }) {
   const [activeTab, setActiveTab] = useState<Tab>('English');
   const { data, setData, post, put, processing } = useForm<JobForm>({
     slug: job?.slug ?? '',

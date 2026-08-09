@@ -7,28 +7,35 @@ import footerBackground from '@assets/Footer_bg.png';
 import type { WebsiteSharedProps } from '@/types/website';
 
 export function Footer() {
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
     const { props } = usePage<WebsiteSharedProps>();
     const settings = props.site?.settings ?? {};
+    const isAr = locale === 'ar';
     const navigation = props.site?.navigation ?? [];
     const footerMenu = navigation.filter((link) => link.location === 'footer').map((link) => ({ label: link.label, to: link.url }));
-    const contact = { address: settings['contact.address'] ?? 'New Cairo, Egypt', email: settings['contact.email'] ?? 'info@larzdevelopments.com', phone: settings['contact.phone'] ?? '15813' };
-    const footerTitle = (settings['footer.cta_title'] ?? "Let's Build\nThe Future Together").split('\n');
+    const contact = { address: isAr ? (settings['contact.address_ar'] ?? settings['contact.address'] ?? 'New Cairo, Egypt') : (settings['contact.address'] ?? 'New Cairo, Egypt'), email: settings['contact.email'] ?? 'info@larzdevelopments.com', phone: settings['contact.phone'] ?? '15813' };
+    const ctaTitleRaw = isAr ? (settings['footer.cta_title_ar'] ?? settings['footer.cta_title']) : settings['footer.cta_title'];
+    const footerTitle = (ctaTitleRaw ?? "Let's Build\nThe Future Together").split('\n');
+    const ctaLabel = isAr ? (settings['footer.cta_button_ar'] ?? settings['footer.cta_button']) : settings['footer.cta_button'];
+    const logo = settings['brand.logo'] ?? null;
     return (
         <footer className="relative overflow-hidden rounded-t-[2.5rem]" style={{ backgroundImage: `url(${footerBackground})`, backgroundSize: 'cover' }}>
             <div className="relative mx-auto max-w-[1440px] px-4 py-12 !pb-5 sm:px-8 sm:py-20">
                 <h2 className="text-center text-2xl leading-[1.3] font-bold text-ink sm:text-4xl md:text-[55px]">
-                    {footerTitle[0]}
-                    <br />
-                    {footerTitle[1]}
+                    {footerTitle.map((line, index) => (
+                        <span key={index}>
+                            {index > 0 && <br />}
+                            {line}
+                        </span>
+                    ))}
                 </h2>
                 <div className="mt-8 flex justify-center">
-                    <PillButton label={settings['footer.cta_button'] ?? 'Get In Touch'} to="/contact" />
+                    <PillButton label={ctaLabel ?? 'Get In Touch'} to="/contact" />
                 </div>
 
                 <div className="mt-14 grid gap-10 rounded-2xl border border-hairline/90 bg-surface/30 p-8 backdrop-blur-sm md:grid-cols-3 md:p-12">
                     <div className="flex items-center md:justify-center">
-                        <Logo size="lg" withTagline />
+                        <Logo size="lg" withTagline src={logo} />
                     </div>
 
                     <nav aria-label="Footer">
@@ -68,8 +75,10 @@ export function Footer() {
                 </div>
 
                 <div className="mt-8 flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
-                    <p className="text-sm text-ink">
-                        {t('Developed by')} <span className="font-semibold text-ink">TQNIA</span> {t('All Rights reserved')}
+                    <p className="flex items-center gap-2 text-sm text-ink">
+                        {t('Developed by')}
+                        <img src="/assets/tqnia_logo.png" alt="TQNIA" className="h-[18px] w-auto object-contain" />
+                        {t('All Rights reserved')}
                     </p>
                     <ul className="flex items-center gap-3">
                         {[

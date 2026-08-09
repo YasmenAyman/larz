@@ -3,10 +3,23 @@ import { Link } from '@inertiajs/react';
 export function Logo({
     size = 'sm',
     withTagline = false,
+    src,
 }: {
     size?: 'sm' | 'lg';
     withTagline?: boolean;
+    src?: string | null;
 }) {
+    if (src) {
+        return (
+            <Link href="/" aria-label="LARZ Developments — home" className="inline-block">
+                <img
+                    src={src}
+                    alt="LARZ"
+                    className={size === 'lg' ? 'h-20 w-auto max-w-[240px] object-contain' : 'h-10 w-auto max-w-[160px] object-contain'}
+                />
+            </Link>
+        );
+    }
     return (
         <Link href="/" aria-label="LARZ Developments — home" className="inline-block">
             <span

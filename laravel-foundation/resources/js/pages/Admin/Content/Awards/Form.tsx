@@ -37,7 +37,10 @@ export default function Form({ award }: { award: AwardRecord | null }) {
         sort_order: award?.sort_order ?? 0,
         is_published: award?.is_published ?? true,
         translations: {
-            en: { ...emptyTranslation, ...(award?.translations?.en ?? {}) },
+            en: {
+                title: award?.translations?.en?.title ?? award?.title ?? '',
+                description: award?.translations?.en?.description ?? award?.description ?? '',
+            },
             ar: { ...emptyTranslation, ...(award?.translations?.ar ?? {}) },
         },
     });

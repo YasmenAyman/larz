@@ -6,6 +6,13 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
+        @php
+            $favicon = \Illuminate\Support\Facades\Cache::remember('website.settings.public', now()->addHour(), fn () => \App\Models\SiteSetting::query()->whereIn('group_name', ['brand', 'contact', 'footer', 'social', 'whatsapp'])->pluck('value', 'key')->all())['brand.favicon'] ?? null;
+        @endphp
+        @if ($favicon)
+            <link rel="icon" type="image/x-icon" href="{{ $favicon }}">
+        @endif
+
         <!-- LARZ fonts copied from the approved frontend. -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

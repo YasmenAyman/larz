@@ -76,7 +76,12 @@ class TestimonialController extends Controller
     {
         $data = $request->safe()->except(['image', 'translations']);
         $data['is_published'] = $request->boolean('is_published');
-        $data['translations'] = $this->sanitizeTranslations($request->input('translations', []));
+        $translations = $this->sanitizeTranslations($request->input('translations', []));
+        $en = $translations['en'] ?? [];
+        $data['translations'] = $translations;
+        $data['name'] = $en['name'] ?? $data['name'] ?? '';
+        $data['role'] = $en['role'] ?? $data['role'] ?? null;
+        $data['quote'] = $en['quote'] ?? $data['quote'] ?? '';
         $newAsset = null;
 
         try {
@@ -118,7 +123,14 @@ class TestimonialController extends Controller
     {
         $data = $request->safe()->except(['image', 'translations']);
         $data['is_published'] = $request->boolean('is_published');
-        $data['translations'] = $this->sanitizeTranslations($request->input('translations', []));
+        $translations = $this->sanitizeTranslations($request->input('translations', []));
+        $en = $translations['en'] ?? [];
+        $data['translations'] = $translations;
+        if ($en) {
+            $data['name'] = $en['name'] ?? $testimonial->name;
+            $data['role'] = $en['role'] ?? $testimonial->role;
+            $data['quote'] = $en['quote'] ?? $testimonial->quote;
+        }
         $oldAsset = $testimonial->media;
         $newAsset = null;
 

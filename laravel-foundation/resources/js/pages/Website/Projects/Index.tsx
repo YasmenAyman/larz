@@ -34,7 +34,7 @@ export default function Index({ projects, seo }: { projects: ProjectItem[]; seo:
                                         {project.shortDescription && <p className="mt-2 max-w-xs text-xs leading-relaxed text-ink-muted/70 line-clamp-2">{project.shortDescription}</p>}
                                     </div>
                                     <span className="grid size-10 shrink-0 place-items-center rounded-full bg-surface-card text-ink transition-colors group-hover:bg-gold/20">
-                                        <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                                        <ArrowUpRight className="size-4 rtl:rotate-180" strokeWidth={1.5} />
                                     </span>
                                 </div>
                             </a>

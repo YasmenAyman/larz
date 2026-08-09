@@ -63,7 +63,7 @@ function InquiryRow({ inquiry, onView }: { inquiry: Inquiry; onView: (i: Inquiry
 
     const onStatusChange = (value: string) => {
         setData('status', value);
-        put(`/admin/contact-inquiries/${inquiry.id}`, { preserveScroll: true, data: { status: value } });
+        put(`/admin/contact-inquiries/${inquiry.id}`, { preserveScroll: true });
     };
 
     return (

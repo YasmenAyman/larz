@@ -27,6 +27,9 @@ final class WebsiteContent
     public static function project(Project $project): array
     {
         $localized = LocalizedContent::record($project, ['title', 'location', 'description', 'short_description', 'hero_heading', 'hero_description', 'installment_information', 'seo_title', 'seo_description']);
+        $projectSections = $project->sections ?? [];
+        $localizedSections = $projectSections[app()->getLocale()] ?? $projectSections['en'] ?? [];
+        $sectionStats = $localizedSections['stats'] ?? [];
         return [
             'id' => $project->id,
             'title' => $localized['title'] ?? $project->title,
@@ -45,7 +48,13 @@ final class WebsiteContent
             'brochure' => self::assetUrl($project->brochure),
             'virtualTourUrl' => $project->virtual_tour_url,
             'mapImage' => self::assetUrl($project->mapImage),
-            'facts' => $project->statistics->map(fn ($item) => [
+            'overviewImage' => self::assetUrl($project->overviewImage),
+            'masterplanImage' => self::assetUrl($project->masterplanImage),
+            'facts' => ! empty($sectionStats) ? collect($sectionStats)->map(fn ($item) => [
+                'value' => $item['value'] ?? '',
+                'label' => $item['label'] ?? '',
+                'note' => $item['note'] ?? null,
+            ])->values()->all() : $project->statistics->map(fn ($item) => [
                 'value' => $item->value,
                 'label' => $item->label,
                 'note' => $item->note,

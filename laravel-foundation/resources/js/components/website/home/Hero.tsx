@@ -12,7 +12,7 @@ export function Hero({ hero }: { hero: { heading: string; description: string; c
                 LARZ
             </span>
 
-            <div className="relative mx-auto grid items-center gap-12 px-4 !pr-0 sm:px-8 md:grid-cols-[1fr_52%]">
+            <div className="relative mx-auto grid items-center gap-12 ps-4 pe-0 sm:ps-8 sm:pe-0 md:grid-cols-[1fr_52%]">
                 <div>
                     <h1 className="text-3xl font-bold leading-[1.15] text-ink sm:text-4xl lg:text-[88px]">
                         {heading.map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}
@@ -24,7 +24,7 @@ export function Hero({ hero }: { hero: { heading: string; description: string; c
                 </div>
 
                 <div className="relative hidden lg:block">
-                    <img src={hero.heroImage} alt="LARZ tower exterior" className="ml-auto w-full object-cover" />
+                    <img src={hero.heroImage} alt="LARZ tower exterior" className="ms-auto w-full object-cover" />
                 </div>
             </div>
         </section>
