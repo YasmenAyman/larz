@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useI18n } from '@/i18n';
-import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } from 'lucide-react';
 import { Logo } from '@/components/shared/Logo';
 import { PillButton } from '@/components/shared/PillButton';
 import footerBackground from '@assets/Footer_bg.webp';
@@ -18,6 +18,12 @@ export function Footer() {
     const footerTitle = (ctaTitleRaw ?? "Let's Build\nThe Future Together").split('\n');
     const ctaLabel = isAr ? (settings['footer.cta_button_ar'] ?? settings['footer.cta_button']) : settings['footer.cta_button'];
     const logo = settings['brand.logo'] ?? null;
+    const socialLinks = [
+        { Icon: Facebook, label: 'Facebook', href: settings['social.facebook'] },
+        { Icon: Instagram, label: 'Instagram', href: settings['social.instagram'] },
+        { Icon: Linkedin, label: 'LinkedIn', href: settings['social.linkedin'] },
+        { Icon: Youtube, label: 'YouTube', href: settings['social.youtube'] },
+    ].flatMap((social) => social.href && social.href !== '#' ? [{ ...social, href: social.href }] : []);
     return (
         <footer className="relative overflow-hidden rounded-t-[2.5rem]" style={{ backgroundImage: `url(${footerBackground})`, backgroundSize: 'cover' }}>
             <div className="relative mx-auto max-w-[1440px] px-4 py-12 !pb-5 sm:px-8 sm:py-20">
@@ -56,7 +62,14 @@ export function Footer() {
                         <ul className="mt-6 space-y-5 text-sm text-ink/90">
                             <li className="flex gap-3">
                                 <MapPin className="mt-0.5 size-5 shrink-0" strokeWidth={2} />
-                                <span className="leading-relaxed">{contact.address}</span>
+                                <a
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contact.address)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="leading-relaxed hover:text-ink"
+                                >
+                                    {contact.address}
+                                </a>
                             </li>
                             <li className="flex gap-3">
                                 <Mail className="size-5 shrink-0" strokeWidth={2} />
@@ -81,13 +94,9 @@ export function Footer() {
                         {t('All Rights reserved')}
                     </p>
                     <ul className="flex items-center gap-3">
-                        {[
-                            { Icon: Facebook, label: 'Facebook' },
-                            { Icon: Instagram, label: 'Instagram' },
-                            { Icon: Linkedin, label: 'LinkedIn' },
-                        ].map(({ Icon, label }) => (
+                        {socialLinks.map(({ Icon, label, href }) => (
                             <li key={label}>
-                                <a href="#" aria-label={label} className="grid size-11 place-items-center rounded-full border border-hairline text-ink">
+                                <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="grid size-11 place-items-center rounded-full border border-hairline text-ink">
                                     <Icon className="size-5" strokeWidth={2} />
                                 </a>
                             </li>

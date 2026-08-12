@@ -40,7 +40,9 @@ export function Header() {
 
     const scheduleClose = (close: () => void) => {
         cancelScheduledClose();
-        closeTimer.current = setTimeout(close, 250);
+        // Give users enough time to move from a navigation label into its
+        // floating panel, including on trackpads with less precise movement.
+        closeTimer.current = setTimeout(close, 700);
     };
 
     useEffect(() => () => cancelScheduledClose(), []);
@@ -150,7 +152,7 @@ export function Header() {
 
                                     {/* Projects dropdown */}
                                     {megaOpen && projects.length > 0 && (
-                                        <div className="absolute left-1/2 top-full z-50 min-w-[180px] -translate-x-1/2 pt-2">
+                                        <div className="absolute left-1/2 top-full z-50 min-w-[220px] -translate-x-1/2 px-5 pt-3">
                                             <div className="rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 shadow-2xl backdrop-blur-md">
                                                 <ul className="space-y-2">
                                                 {projects.map((project) => (
@@ -212,7 +214,7 @@ export function Header() {
 
                                     {/* Dropdown */}
                                     {activeDropdown === link.to && (
-                                        <div className="absolute left-1/2 top-full z-50 min-w-[200px] -translate-x-1/2 pt-2">
+                                        <div className="absolute left-1/2 top-full z-50 min-w-[240px] -translate-x-1/2 px-5 pt-3">
                                             <div className="rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 shadow-2xl backdrop-blur-md">
                                                 <ul className="space-y-2">
                                                 {hasDropdown.map((item) => (

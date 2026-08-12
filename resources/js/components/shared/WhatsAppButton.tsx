@@ -13,7 +13,7 @@ export function WhatsAppButton() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Chat on WhatsApp with LARZ Developments"
-            className="fixed bottom-6 right-6 z-50 flex size-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl shadow-[#25D366]/40 transition-all duration-300 hover:scale-110 hover:shadow-[#25D366]/60 active:scale-95 group"
+            className="fixed bottom-20 right-6 z-50 flex size-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl shadow-[#25D366]/40 transition-all duration-300 hover:scale-110 hover:shadow-[#25D366]/60 active:scale-95 group"
         >
             <svg
                 className="relative size-7 fill-current"
