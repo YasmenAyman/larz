@@ -72,10 +72,10 @@ class AwardController extends Controller
         $data = $request->safe()->except(['translations']);
         $data['is_published'] = $request->boolean('is_published');
         $data['translations'] = $this->sanitizeTranslations($request->input('translations', []));
-        Award::create($data);
+        $award = Award::create($data);
         WebsiteCache::section('about', 'awards');
 
-        return to_route('admin.pages.about.awards.edit')->with('success', 'Award created.');
+        return to_route('admin.pages.about.awards.edit', $award)->with('success', 'Award created.');
     }
 
     public function edit(Award $award): Response
@@ -93,7 +93,7 @@ class AwardController extends Controller
         $award->update($data);
         WebsiteCache::section('about', 'awards');
 
-        return to_route('admin.pages.about.awards.edit')->with('success', 'Award updated.');
+        return to_route('admin.pages.about.awards.edit', $award)->with('success', 'Award updated.');
     }
 
     public function destroy(Award $award): RedirectResponse

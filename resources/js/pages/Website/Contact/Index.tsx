@@ -24,6 +24,7 @@ type ContactForm = { name: string; phone: string; project_id: string; email: str
 
 export default function Index({ contact, projects, contact_methods, request_form, hero, location_map, social, social_media, contact_phone, contact_email, seo }: ContactProps) {
     const { t } = useI18n();
+    const mapQuery = location_map.address || 'New Cairo, Egypt';
     const iconMap: Record<string, typeof Phone> = { 'phone': Phone, 'message-circle': MessageCircle, 'mail': Mail, 'map-pin': MapPin };
     const cards = (contact_methods?.items ?? []).map((item) => ({
         icon: iconMap[item.icon] ?? Phone,
@@ -144,7 +145,13 @@ export default function Index({ contact, projects, contact_methods, request_form
                         {location_map.image ? (
                             <img src={location_map.image} alt={location_map.heading} className="size-full object-cover" />
                         ) : (
-                            <div className="size-full bg-slate-200" />
+                            <iframe
+                                title={location_map.heading || t('Location & Map')}
+                                src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
+                                className="size-full border-0"
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            />
                         )}
                     </figure>
                 </div>

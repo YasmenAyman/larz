@@ -2,6 +2,7 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, EmptyState, FormField, Notification, StatusBadge } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 import { useState } from 'react';
 
 type Settings = { eyebrow?: string; heading?: string; description?: string; translations?: { en?: { eyebrow?: string; heading?: string; description?: string }; ar?: { eyebrow?: string; heading?: string; description?: string } } };
@@ -18,7 +19,8 @@ type Partner = {
 
 export default function Index({ settings, partners }: { settings: Settings; partners: Partner[] }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const { locale } = useI18n();
+    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const { data, setData, put, processing, errors } = useForm({
         sections: {
             partners: {
@@ -39,7 +41,7 @@ export default function Index({ settings, partners }: { settings: Settings; part
     return (
         <AdminLayout>
             <Head title="About Us / Partners" />
-            <div className="mx-auto max-w-6xl space-y-8">
+            <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div className="flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <Breadcrumbs items={['Dashboard', 'Website Pages', 'About Us', 'Partners']} />

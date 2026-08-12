@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField, Notification } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type Copy = { title: string; description: string };
 type Value = { id?: number; title: string; description: string | null; icon_key: string; sort_order: number; is_published: boolean; translations?: { en?: Copy; ar?: Copy } };
@@ -10,7 +11,8 @@ const icons = ['heart', 'growth', 'leaf', 'medal'];
 
 export default function CareersValueForm({ value }: { value: Value | null }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const { locale } = useI18n();
+    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const form = useForm({ title: value?.title ?? '', description: value?.description ?? '', icon_key: value?.icon_key ?? 'heart', sort_order: value?.sort_order ?? 0, is_published: value?.is_published ?? true, translations: { en: { title: value?.translations?.en?.title ?? value?.title ?? '', description: value?.translations?.en?.description ?? value?.description ?? '' }, ar: { title: value?.translations?.ar?.title ?? '', description: value?.translations?.ar?.description ?? '' } } });
     const copy = form.data.translations[language];
     const update = (key: keyof Copy, text: string) => form.setData('translations', { ...form.data.translations, [language]: { ...copy, [key]: text } });

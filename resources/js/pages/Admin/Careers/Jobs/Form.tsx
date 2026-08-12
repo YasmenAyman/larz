@@ -1,7 +1,8 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField } from '@/components/admin/AdminLayoutParts';
 import { useState } from 'react';
+import { useI18n } from '@/i18n';
 
 type TranslationFields = { title: string; department: string; location: string; employment_type: string; experience_level: string; summary: string; description: string; requirements: string; responsibilities: string; benefits: string };
 type JobForm = { slug: string; deadline: string; is_published: boolean; is_featured: boolean; sort_order: number; translations: { en: TranslationFields; ar: TranslationFields } };
@@ -11,6 +12,9 @@ const tabs = ['English', 'العربية'] as const;
 type Tab = typeof tabs[number];
 
 export default function Form({ job }: { job: JobRecord | null }) {
+  const { locale } = useI18n();
+  const ar = locale === 'ar';
+  const tr = (v: string) => ar ? ({ Dashboard: 'لوحة التحكم', Jobs: 'الوظائف', Edit: 'تعديل', Create: 'إنشاء', 'Edit Job': 'تعديل وظيفة', 'Create Job': 'إنشاء وظيفة', 'Edit job': 'تعديل الوظيفة', 'Create job': 'إنشاء وظيفة', Slug: 'الرابط المختصر', Deadline: 'الموعد النهائي', English: 'الإنجليزية', Arabic: 'العربية', Title: 'العنوان', Department: 'القسم', Location: 'الموقع', 'Employment type': 'نوع التوظيف', 'Experience level': 'مستوى الخبرة', Summary: 'الملخص', Description: 'الوصف', Requirements: 'المتطلبات', Responsibilities: 'المسؤوليات', Benefits: 'المزايا', 'Sort order': 'ترتيب العرض', Published: 'منشور', Draft: 'مسودة', Featured: 'مميز', 'Not featured': 'غير مميز', 'Update job': 'تحديث الوظيفة', 'Create job': 'إنشاء الوظيفة', Cancel: 'إلغاء' } as Record<string, string>)[v] ?? v : v;
   const [activeTab, setActiveTab] = useState<Tab>('English');
   const { data, setData, post, put, processing } = useForm<JobForm>({
     slug: job?.slug ?? '',
@@ -48,7 +52,7 @@ export default function Form({ job }: { job: JobRecord | null }) {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    job?.id ? put(`/admin/jobs/${job.id}`) : post('/admin/jobs');
+    job?.id ? put(`/admin/jobs/${job.id}`, { onSuccess: () => router.visit('/admin/jobs') }) : post('/admin/jobs');
   };
 
   const setTranslation = (locale: 'en' | 'ar', field: keyof TranslationFields, value: string) => {
@@ -62,18 +66,18 @@ export default function Form({ job }: { job: JobRecord | null }) {
 
   return (
     <AdminLayout>
-      <Head title={job ? 'Edit Job' : 'Create Job'} />
+      <Head title={tr(job ? 'Edit Job' : 'Create Job')} />
       <div className="mx-auto max-w-4xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-        <Breadcrumbs items={['Admin', 'Jobs', job ? 'Edit' : 'Create']} />
-        <h1 className="text-3xl font-semibold">{job ? 'Edit job' : 'Create job'}</h1>
+        <Breadcrumbs items={['Dashboard', 'Jobs', job ? 'Edit' : 'Create'].map(tr)} />
+        <h1 className="text-3xl font-semibold">{tr(job ? 'Edit job' : 'Create job')}</h1>
 
         <form onSubmit={submit} className="space-y-6">
           <div className="rounded-xl border border-slate-800 bg-slate-950 p-6">
             <div className="grid gap-5 sm:grid-cols-2">
-              <FormField label="Slug">
+              <FormField label={tr('Slug')}>
                 <input value={data.slug} onChange={(e) => setData('slug', e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" />
               </FormField>
-              <FormField label="Deadline">
+              <FormField label={tr('Deadline')}>
                 <input type="date" value={data.deadline} onChange={(e) => setData('deadline', e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" />
               </FormField>
             </div>
@@ -96,7 +100,7 @@ export default function Form({ job }: { job: JobRecord | null }) {
             <div className="space-y-4">
               <div className="grid gap-5 sm:grid-cols-2">
                 {tabInputFields.map(([key, label]) => (
-                  <FormField key={`${activeLocale}-${key}`} label={label}>
+                  <FormField key={`${activeLocale}-${key}`} label={tr(label)}>
                     <input
                       value={data.translations[activeLocale][key]}
                       onChange={(e) => setTranslation(activeLocale, key, e.target.value)}
@@ -108,7 +112,7 @@ export default function Form({ job }: { job: JobRecord | null }) {
               </div>
 
               {tabTextareaFields.map(([key, label, rows]) => (
-                <FormField key={`${activeLocale}-${key}`} label={label}>
+                <FormField key={`${activeLocale}-${key}`} label={tr(label)}>
                   <textarea
                     value={data.translations[activeLocale][key]}
                     onChange={(e) => setTranslation(activeLocale, key, e.target.value)}
@@ -123,17 +127,17 @@ export default function Form({ job }: { job: JobRecord | null }) {
 
           <div className="rounded-xl border border-slate-800 bg-slate-950 p-6">
             <div className="grid gap-5 sm:grid-cols-3">
-              <FormField label="Sort order">
+              <FormField label={tr('Sort order')}>
                 <input type="number" value={data.sort_order} onChange={(e) => setData('sort_order', parseInt(e.target.value) || 0)} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" />
               </FormField>
-              <FormField label="Published">
+              <FormField label={tr('Published')}>
                 <button type="button" onClick={() => setData('is_published', !data.is_published)} className={`mt-1 rounded-lg px-4 py-2 text-sm font-medium transition ${data.is_published ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
-                  {data.is_published ? 'Published' : 'Draft'}
+                  {tr(data.is_published ? 'Published' : 'Draft')}
                 </button>
               </FormField>
-              <FormField label="Featured">
+              <FormField label={tr('Featured')}>
                 <button type="button" onClick={() => setData('is_featured', !data.is_featured)} className={`mt-1 rounded-lg px-4 py-2 text-sm font-medium transition ${data.is_featured ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
-                  {data.is_featured ? 'Featured' : 'Not featured'}
+                  {tr(data.is_featured ? 'Featured' : 'Not featured')}
                 </button>
               </FormField>
             </div>
@@ -141,9 +145,9 @@ export default function Form({ job }: { job: JobRecord | null }) {
 
           <div className="flex items-center gap-3">
             <button type="submit" disabled={processing} className="rounded-lg bg-emerald-600 px-6 py-2 text-sm font-medium hover:bg-emerald-500 disabled:opacity-50">
-              {job?.id ? 'Update job' : 'Create job'}
+              {tr(job?.id ? 'Update job' : 'Create job')}
             </button>
-            <a href="/admin/jobs" className="rounded-lg bg-slate-800 px-6 py-2 text-sm text-slate-300 hover:bg-slate-700">Cancel</a>
+            <a href="/admin/jobs" className="rounded-lg bg-slate-800 px-6 py-2 text-sm text-slate-300 hover:bg-slate-700">{tr('Cancel')}</a>
           </div>
         </form>
       </div>

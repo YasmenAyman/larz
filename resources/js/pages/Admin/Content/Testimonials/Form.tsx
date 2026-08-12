@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField, Notification } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type Testimonial = { id?: number; name: string; role: string; quote: string; sort_order: number; is_published: boolean; image?: string | null; translations?: { en?: { name?: string; role?: string; quote?: string }; ar?: { name?: string; role?: string; quote?: string } } };
 type Locale = 'en' | 'ar';
@@ -11,7 +12,10 @@ const emptyTranslation = { name: '', role: '', quote: '' };
 
 export default function Form({ testimonial }: { testimonial: Testimonial | null }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<Locale>('en');
+    const { locale } = useI18n();
+    const isArabic = locale === 'ar';
+    const [language, setLanguage] = useState<Locale>(isArabic ? 'ar' : 'en');
+    const label = (english: string, arabic: string) => isArabic ? arabic : english;
     const { data, setData, post, transform, processing, errors } = useForm({
         name: testimonial?.name ?? '',
         role: testimonial?.role ?? '',
@@ -30,40 +34,40 @@ export default function Form({ testimonial }: { testimonial: Testimonial | null 
     });
     const copy = data.translations[language] ?? emptyTranslation;
     const updateCopy = (key: keyof typeof emptyTranslation, value: string) => setData('translations', { ...data.translations, [language]: { ...copy, [key]: value } });
-    const submit = (event: React.FormEvent) => { event.preventDefault(); transform((payload) => ({ ...payload, _method: testimonial?.id ? 'put' : undefined })); const options = { forceFormData: true }; testimonial?.id ? post(`/admin/pages/home/testimonials/${testimonial.id}`, options) : post('/admin/pages/home/testimonials', options); };
+    const submit = (event: React.FormEvent) => { event.preventDefault(); transform((payload) => { const primary = payload.translations.en.name ? payload.translations.en : payload.translations.ar; return { ...payload, name: primary.name, role: primary.role, quote: primary.quote, _method: testimonial?.id ? 'put' : undefined }; }); const options = { forceFormData: true }; testimonial?.id ? post(`/admin/pages/home/testimonials/${testimonial.id}`, options) : post('/admin/pages/home/testimonials', options); };
 
     return (
         <AdminLayout>
-            <Head title={testimonial ? 'Edit Testimonial' : 'Add Testimonial'} />
+            <Head title={label(testimonial ? 'Edit Testimonial' : 'Add Testimonial', testimonial ? 'تعديل رأي عميل' : 'إضافة رأي عميل')} />
             <div className="mx-auto max-w-3xl space-y-8">
                 <div>
-                    <Breadcrumbs items={['Dashboard', 'Website Pages', 'Home Page', 'Testimonials', testimonial ? 'Edit' : 'Add']} />
-                    <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">{testimonial ? 'Edit testimonial' : 'Add testimonial'}</h1>
+                    <Breadcrumbs items={isArabic ? ['لوحة التحكم', 'صفحات الموقع', 'الصفحة الرئيسية', 'آراء العملاء', testimonial ? 'تعديل' : 'إضافة'] : ['Dashboard', 'Website Pages', 'Home Page', 'Testimonials', testimonial ? 'Edit' : 'Add']} />
+                    <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">{label(testimonial ? 'Edit testimonial' : 'Add testimonial', testimonial ? 'تعديل رأي عميل' : 'إضافة رأي عميل')}</h1>
                 </div>
                 <Notification message={flash?.success} />
                 <form onSubmit={submit} encType="multipart/form-data" className="space-y-5 rounded-2xl border border-white/10 bg-[#161619]/90 p-6 shadow-xl">
                     <div className="flex gap-2 border-b border-white/10 pb-4">
-                        <button type="button" onClick={() => setLanguage('en')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'en' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>English</button>
-                        <button type="button" onClick={() => setLanguage('ar')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'ar' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>العربية / Arabic</button>
+                        <button type="button" onClick={() => setLanguage('en')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'en' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>{label('English', 'الإنجليزية')}</button>
+                        <button type="button" onClick={() => setLanguage('ar')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'ar' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>{label('Arabic', 'العربية')}</button>
                     </div>
                     <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="grid gap-5 sm:grid-cols-2">
-                        <FormField label="Name" error={errors[`translations.${language}.name`]}>
+                        <FormField label={label('Name', 'الاسم')} error={errors[`translations.${language}.name`]}>
                             <input value={copy.name ?? ''} onChange={(event) => updateCopy('name', event.target.value)} className={inputClass} placeholder={language === 'ar' ? 'الاسم بالعربية' : 'English name'} />
                         </FormField>
-                        <FormField label="Role" error={errors[`translations.${language}.role`]}>
+                        <FormField label={label('Role', 'الدور')} error={errors[`translations.${language}.role`]}>
                             <input value={copy.role ?? ''} onChange={(event) => updateCopy('role', event.target.value)} className={inputClass} placeholder={language === 'ar' ? 'الدور بالعربية' : 'English role'} />
                         </FormField>
                     </div>
                     <div dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                        <FormField label="Quote" error={errors[`translations.${language}.quote`]}>
+                        <FormField label={label('Quote', 'الرأي')} error={errors[`translations.${language}.quote`]}>
                             <textarea rows={7} value={copy.quote ?? ''} onChange={(event) => updateCopy('quote', event.target.value)} className={inputClass} placeholder={language === 'ar' ? 'الاقتباس بالعربية' : 'English quote'} />
                         </FormField>
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2">
-                        <FormField label="Sort order" error={errors.sort_order}>
+                        <FormField label={label('Sort order', 'ترتيب العرض')} error={errors.sort_order}>
                             <input type="number" min="0" value={data.sort_order} onChange={(event) => setData('sort_order', Number(event.target.value))} className={inputClass} />
                         </FormField>
-                        <FormField label="Profile image" error={errors.image}>
+                        <FormField label={label('Profile image', 'صورة العميل')} error={errors.image}>
                             <input type="file" accept="image/*" onChange={(event) => setData('image', event.target.files?.[0] ?? null)} className={fileClass} />
                             {testimonial?.image && <img src={testimonial.image} alt="Current testimonial" className="mt-3 h-24 w-24 rounded-lg object-cover grayscale" />}
                         </FormField>

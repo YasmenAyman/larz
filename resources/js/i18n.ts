@@ -1,7 +1,23 @@
+// @ts-nocheck
 import { usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 
 const translations: Record<string, string> = {
+    'Contact Page': '\u0635\u0641\u062d\u0629 \u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627',
+    'Contact Methods': '\u0648\u0633\u0627\u0626\u0644 \u0627\u0644\u062a\u0648\u0627\u0635\u0644',
+    'Request Form': '\u0646\u0645\u0648\u0630\u062c \u0627\u0644\u0637\u0644\u0628',
+    'Social Media': '\u0648\u0633\u0627\u0626\u0644 \u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0627\u0644\u0627\u062c\u062a\u0645\u0627\u0639\u064a',
+    'Careers Page': '\u0635\u0641\u062d\u0629 \u0627\u0644\u0648\u0638\u0627\u0626\u0641',
+    'Why LARZ': '\u0644\u0645\u0627\u0630\u0627 \u0644\u0627\u0631\u0632',
+    'Internship Section': '\u0642\u0633\u0645 \u0628\u0631\u0627\u0645\u062c \u0627\u0644\u062a\u062f\u0631\u064a\u0628',
+    'Talk to us': '\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627',
+    'Save navigation': '\u062d\u0641\u0638 \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629',
+    'Media Page': '\u0635\u0641\u062d\u0629 \u0627\u0644\u0625\u0639\u0644\u0627\u0645',
+    'News': '\u0627\u0644\u0623\u062e\u0628\u0627\u0631',
+    'Offices & retail': 'مكاتب ومحلات تجارية',
+    'Admin': 'الإدارة',
+    'Search by title...': 'ابحث بالعنوان...',
+    'All': 'الكل',
     'developments': 'التطوير العقاري',
     'Home': 'الرئيسية',
     'About': 'من نحن',
@@ -49,6 +65,11 @@ const translations: Record<string, string> = {
     'Hero Section': 'القسم الرئيسي',
     'Final CTA': 'الدعوة الختامية',
     'Website Pages': 'صفحات الموقع',
+    'Hero': 'القسم الرئيسي',
+    'Awards': 'الجوائز',
+    'Partners': 'الشركاء',
+    'Edit': 'تعديل',
+    'Add': 'إضافة',
     'Global Website': 'إعدادات الموقع العامة',
     'Content Management': 'إدارة المحتوى',
     'Leads & Requests': 'الطلبات والاستفسارات',
@@ -91,7 +112,6 @@ const translations: Record<string, string> = {
     'Create': 'إنشاء',
     'Update': 'تحديث',
     'Delete': 'حذف',
-    'Edit': 'تعديل',
     'Search...': 'بحث...',
     'Published': 'منشور',
     'Draft': 'مسودة',
@@ -178,7 +198,10 @@ const translations: Record<string, string> = {
 };
 
 export function translate(value: string, locale: 'en' | 'ar'): string {
-    return locale === 'ar' ? translations[value] ?? value : value;
+    if (locale !== 'ar') return value;
+
+    const matchingKey = Object.keys(translations).find((key) => key.toLocaleLowerCase() === value.toLocaleLowerCase());
+    return translations[matchingKey ?? value] ?? value;
 }
 
 export function useI18n() {

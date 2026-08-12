@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@500&display=swap");
 @import "tailwindcss" source(none);
 @source "../js";
 @source "../../app";
@@ -182,9 +183,12 @@
 
 /* Arabic presentation: preserve the visual system while flipping navigation,
    alignment, form controls, and directional borders/icons. */
-html[dir="rtl"] body {
+html[dir="rtl"] body,
+[dir="rtl"],
+[dir="rtl"] * {
   direction: rtl;
-  font-family: Tahoma, Arial, sans-serif;
+  font-family: "Cairo", sans-serif;
+  font-weight: 500;
 }
 
 html[dir="rtl"] input,
@@ -249,4 +253,65 @@ html[dir="rtl"] .border-l {
 .admin-shell .text-slate-400,
 .admin-shell .text-slate-500 {
   color: #a5a5ad !important;
+}
+
+.website-nav-link.active {
+  color: #c5a880;
+  text-decoration: underline;
+  text-decoration-color: #c5a880;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
+}
+
+.website-nav-link.active:hover {
+  color: #fff;
+}
+
+table.w-full.text-center th:first-child,
+table.w-full.text-center td:first-child {
+  text-align: left;
+}
+
+html[dir="rtl"] table.w-full.text-center th:first-child,
+html[dir="rtl"] table.w-full.text-center td:first-child {
+  text-align: right;
+}
+
+.bg-gold {
+  background-color: #C5A880;
+}
+
+.border-b.border-slate-800.pb-3 button.bg-emerald-600 {
+  background-color: #C5A880;
+  color: #000;
+}
+
+.admin-shell aside {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(197, 168, 128, 0.45) transparent;
+}
+
+.admin-shell aside::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-shell aside::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-shell aside::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: rgba(197, 168, 128, 0.45);
+}
+
+/* Media posts filters fill the available row width on desktop. */
+@media (min-width: 640px) {
+  .flex.flex-col.gap-3.sm\:flex-row > input,
+  .flex.flex-col.gap-3.sm\:flex-row > select {
+    flex: 1 1 0%;
+    width: auto;
+  }
+  .flex.flex-col.gap-3.sm\:flex-row > input {
+    flex-grow: 2.5;
+  }
 }

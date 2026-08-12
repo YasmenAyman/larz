@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Trash2 } from 'lucide-react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, EmptyState, FormField, ImageUploadField, Notification } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type Copy = { eyebrow: string; heading: string; description: string };
 type GalleryItem = {
@@ -24,7 +25,8 @@ const emptyCopy: Copy = { eyebrow: '', heading: '', description: '' };
 
 export default function MediaGallery({ settings, items }: { settings: Settings; items: GalleryItem[] }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const { locale } = useI18n();
+    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const [uploadError, setUploadError] = useState('');
     const [selectedPreviews, setSelectedPreviews] = useState<string[]>([]);
     const initial = settings.translations ?? { en: { eyebrow: settings.eyebrow, heading: settings.heading, description: settings.description }, ar: emptyCopy };
@@ -85,7 +87,7 @@ export default function MediaGallery({ settings, items }: { settings: Settings; 
     return (
         <AdminLayout>
             <Head title="Media Gallery" />
-            <div className="mx-auto max-w-6xl space-y-8">
+            <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div>
                     <Breadcrumbs items={['Dashboard', 'Website Pages', 'Media Page', 'Gallery']} />
                     <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">Photo gallery</h1>

@@ -116,7 +116,7 @@ export function MediaNewsletter({ settings }: { settings: SectionSettings }) {
                 {settings.description && <p className="mt-4 text-sm text-ink-muted">{settings.description}</p>}
                 {(flash?.success || recentlySuccessful) && <p className="mx-auto mt-6 max-w-[600px] rounded border border-emerald-700/40 bg-emerald-950/50 px-3 py-2 text-xs text-emerald-300">{flash?.success ?? 'You are subscribed.'}</p>}
                 <form className="mx-auto mt-8 flex max-w-[600px] flex-col gap-2 sm:flex-row" onSubmit={submit} noValidate>
-                    <input type="email" required value={data.email} onChange={(event) => setData('email', event.target.value)} placeholder="Your email address" className="min-w-0 flex-1 border border-hairline/60 bg-night px-4 py-5 text-sm text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
+                    <input type="email" required value={data.email} onChange={(event) => setData('email', event.target.value)} placeholder={t('Your email address')} className="min-w-0 flex-1 border border-hairline/60 bg-night px-4 py-5 text-sm text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
                     {errors.email && <span className="mt-1 block text-xs text-rose-400">{errors.email}</span>}
                     <input type="hidden" value={data.consent_at} onChange={() => undefined} />
                     <input type="hidden" value={data.source_url} onChange={() => undefined} />

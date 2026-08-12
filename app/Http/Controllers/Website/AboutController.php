@@ -17,11 +17,13 @@ class AboutController extends Controller
     public function __invoke(SeoMetadataService $seo): Response
     {
         $hero = WebsiteContent::section('about', 'hero');
+        $legacyHeroBackground = $hero['background_image'] ?? null;
         $heroBackground = ! empty($hero['background_image_id'])
             ? WebsiteContent::assetUrl(MediaAsset::find($hero['background_image_id']))
-            : asset($hero['background_image'] ?? 'assets/TYPE-B-IMAGE-01.png');
+            : asset($legacyHeroBackground === 'assets/TYPE-B-IMAGE-01.png' ? 'assets/about-hero-optimized.jpg' : ($legacyHeroBackground ?? 'assets/about-hero-optimized.jpg'));
         $story = WebsiteContent::section('about', 'story');
         $awardsSection = LocalizedContent::section(WebsiteContent::section('about', 'awards'));
+        $promiseSection = LocalizedContent::section(WebsiteContent::section('about', 'promise'));
         return Inertia::render('Website/About/Index', [
             'hero' => [...$hero, 'backgroundImage' => $heroBackground],
             'stats' => WebsiteContent::section('about', 'stats')['items'] ?? [],
@@ -40,12 +42,12 @@ class AboutController extends Controller
                 ])->values()->all(),
             ],
             'promise' => [
-                'eyebrow' => WebsiteContent::section('about', 'promise')['eyebrow'] ?? 'Our promise',
-                'heading' => WebsiteContent::section('about', 'promise')['heading'] ?? '',
-                'primary_cta_label' => WebsiteContent::section('about', 'promise')['primary_cta_label'] ?? 'Explore our projects',
-                'primary_cta_url' => WebsiteContent::section('about', 'promise')['primary_cta_url'] ?? '/projects',
-                'secondary_cta_label' => WebsiteContent::section('about', 'promise')['secondary_cta_label'] ?? 'Talk to us',
-                'secondary_cta_url' => WebsiteContent::section('about', 'promise')['secondary_cta_url'] ?? '/contact-us',
+                'eyebrow' => $promiseSection['eyebrow'] ?? 'Our promise',
+                'heading' => $promiseSection['heading'] ?? '',
+                'primary_cta_label' => $promiseSection['primary_cta_label'] ?? 'Explore our projects',
+                'primary_cta_url' => $promiseSection['primary_cta_url'] ?? '/projects',
+                'secondary_cta_label' => $promiseSection['secondary_cta_label'] ?? 'Talk to us',
+                'secondary_cta_url' => $promiseSection['secondary_cta_url'] ?? '/contact-us',
             ],
             'seo' => $seo->forPage('about', '/about-us', ['title' => 'About Us | LARZ Developments'], [
                 $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')], ['name' => 'About Us', 'url' => url('/about-us')]]),

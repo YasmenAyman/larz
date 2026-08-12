@@ -53,9 +53,10 @@ class PartnerController extends Controller
         $data['translations'] = $this->sanitizeTranslations($data['translations'] ?? []);
         $data['is_published'] = $request->boolean('is_published');
         $newAsset = null;
+        $partner = null;
 
         try {
-            DB::transaction(function () use ($request, $uploads, &$newAsset, &$data): void {
+            DB::transaction(function () use ($request, $uploads, &$newAsset, &$data, &$partner): void {
                 if ($request->hasFile('logo')) {
                     $newAsset = $uploads->storePublicImage($request->file('logo'), 'media/partners');
                     $data['logo_id'] = $newAsset->id;
@@ -63,7 +64,7 @@ class PartnerController extends Controller
                 if (!isset($data['sort_order']) || $data['sort_order'] === null) {
                     $data['sort_order'] = (int) Partner::query()->max('sort_order') + 1;
                 }
-                Partner::create($data);
+                $partner = Partner::create($data);
             });
         } catch (\Throwable $exception) {
             if ($newAsset) $uploads->delete($newAsset);
@@ -71,7 +72,7 @@ class PartnerController extends Controller
         }
         WebsiteCache::section('about', 'partners');
 
-        return to_route('admin.pages.about.partners.edit')->with('success', 'Partner created.');
+        return to_route('admin.pages.about.partners.edit', $partner)->with('success', 'Partner created.');
     }
 
     public function edit(Partner $partner): Response
@@ -107,7 +108,7 @@ class PartnerController extends Controller
         if ($request->hasFile('logo') && $oldAsset) $uploads->deleteIfUnreferenced($oldAsset);
         WebsiteCache::section('about', 'partners');
 
-        return to_route('admin.pages.about.partners.edit')->with('success', 'Partner updated.');
+        return to_route('admin.pages.about.partners.edit', $partner)->with('success', 'Partner updated.');
     }
 
     public function destroy(Partner $partner, MediaUploadService $uploads): RedirectResponse

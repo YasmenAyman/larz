@@ -4,6 +4,7 @@ import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FileUploadField, FormField, ImageUploadField, Notification } from '@/components/admin/AdminLayoutParts';
 import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
+import { useI18n } from '@/i18n';
 
 type Project = {
     id?: number;
@@ -87,7 +88,9 @@ function SectionCard({ title, children }: { title: string; children: React.React
 
 export default function Form({ project, categories }: { project: Project | null; categories: Category[] }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } | null }>>().props;
-    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const { locale } = useI18n();
+    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
+    const [submitting, setSubmitting] = useState(false);
 
     const form = useForm<Project & { translations: { en: Record<string, string>; ar: Record<string, string> }; sections: { en: SectionData; ar: SectionData } }>({
         project_category_id: project?.project_category_id ?? null,
@@ -140,6 +143,7 @@ export default function Form({ project, categories }: { project: Project | null;
     };
 
     const isArabic = lang === 'ar';
+    const ui = (english: string, arabic: string) => locale === 'ar' ? arabic : english;
     const textFieldClass = "w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm";
 
     return (
@@ -147,15 +151,15 @@ export default function Form({ project, categories }: { project: Project | null;
             <Head title={project ? 'Edit Project' : 'Create Project'} />
             <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
                 <div>
-                    <Breadcrumbs items={['Admin', 'Projects', project ? 'Edit' : 'Create']} />
+                    <Breadcrumbs items={['Dashboard', 'Projects', project ? 'Edit' : 'Create']} />
                     <h1 className="mt-3 text-3xl font-semibold">{project ? 'Edit project' : 'Create project'}</h1>
                 </div>
                 <Notification message={flash?.success ?? null} />
 
                 {/* Language tabs */}
                 <div className="flex gap-2 border-b border-slate-800 pb-3">
-                    <button type="button" onClick={() => setLanguage('en')} className={`rounded-lg px-4 py-2 text-sm ${language === 'en' ? 'bg-gold text-black' : 'bg-white/5 text-white/60'}`}>English</button>
-                    <button type="button" onClick={() => setLanguage('ar')} className={`rounded-lg px-4 py-2 text-sm ${language === 'ar' ? 'bg-gold text-black' : 'bg-white/5 text-white/60'}`}>Arabic</button>
+                    <button type="button" onClick={() => setLanguage('en')} className={`rounded-lg px-4 py-2 text-sm ${language === 'en' ? 'bg-[#C5A880] text-black' : 'bg-white/5 text-white/60'}`}>English</button>
+                    <button type="button" onClick={() => setLanguage('ar')} className={`rounded-lg px-4 py-2 text-sm ${language === 'ar' ? 'bg-[#C5A880] text-black' : 'bg-white/5 text-white/60'}`}>Arabic</button>
                 </div>
 
                 <form onSubmit={(e) => {
@@ -204,13 +208,20 @@ export default function Form({ project, categories }: { project: Project | null;
                     if (locationImage instanceof File) fd.append('location_image', locationImage);
                     if (project?.id) {
                         fd.append('_method', 'PUT');
+                        setSubmitting(true);
                         router.post(`/admin/projects/${project.id}`, fd, {
+                            forceFormData: true,
                             preserveScroll: true,
+                            onSuccess: () => router.visit('/admin/projects'),
+                            onFinish: () => setSubmitting(false),
                             onError: (errors) => console.error('Project update validation errors', errors),
                         });
                     } else {
+                        setSubmitting(true);
                         router.post('/admin/projects', fd, {
+                            forceFormData: true,
                             preserveScroll: true,
+                            onFinish: () => setSubmitting(false),
                             onError: (errors) => console.error('Project create validation errors', errors),
                         });
                     }
@@ -222,12 +233,12 @@ export default function Form({ project, categories }: { project: Project | null;
                             <div className="grid gap-5 md:grid-cols-2">
                                 <FormField label="Title" error={form.errors.title}><input value={form.data.title} onChange={(e) => form.setData('title', e.target.value)} className={textFieldClass} /></FormField>
                                 <FormField label="Slug" error={form.errors.slug}><input value={form.data.slug} onChange={(e) => form.setData('slug', e.target.value)} className={textFieldClass} /></FormField>
-                                <FormField label="Category"><select value={form.data.project_category_id ?? ''} onChange={(e) => form.setData('project_category_id', e.target.value ? Number(e.target.value) : null)} className={textFieldClass}><option value="">No category</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></FormField>
+                                <FormField label={ui('Category', 'التصنيف')}><select value={form.data.project_category_id ?? ''} onChange={(e) => form.setData('project_category_id', e.target.value ? Number(e.target.value) : null)} className={textFieldClass}><option value="">{ui('No category', 'بدون تصنيف')}</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></FormField>
                                 <FormField label="Project type"><select value={form.data.project_type ?? ''} onChange={(e) => form.setData('project_type', e.target.value)} className={textFieldClass}><option value="residential">Residential</option><option value="commercial">Commercial</option><option value="mixed-use">Mixed-use</option><option value="medical">Medical</option><option value="office">Office</option></select></FormField>
-                                <FormField label="Status"><select value={form.data.status ?? ''} onChange={(e) => form.setData('status', e.target.value)} className={textFieldClass}><option value="available">Available</option><option value="selling">Selling</option><option value="sold">Sold out</option><option value="upcoming">Upcoming</option></select></FormField>
+                                <FormField label={ui('Status', 'الحالة')}><select value={form.data.status ?? ''} onChange={(e) => form.setData('status', e.target.value)} className={textFieldClass}><option value="available">{ui('Available', 'متاح')}</option><option value="selling">{ui('Selling', 'قيد البيع')}</option><option value="sold">{ui('Sold out', 'تم البيع')}</option><option value="upcoming">{ui('Upcoming', 'قريباً')}</option></select></FormField>
                                 <FormField label="Sort order"><input type="number" value={form.data.sort_order} onChange={(e) => form.setData('sort_order', Number(e.target.value))} className={textFieldClass} /></FormField>
-                                <FormField label="Location"><input value={form.data.location ?? ''} onChange={(e) => form.setData('location', e.target.value)} className={textFieldClass} /></FormField>
-                                <FormField label="Address"><input value={form.data.address ?? ''} onChange={(e) => form.setData('address', e.target.value)} className={textFieldClass} /></FormField>
+                                <FormField label={ui('Location', 'الموقع')}><input value={form.data.location ?? ''} onChange={(e) => form.setData('location', e.target.value)} className={textFieldClass} /></FormField>
+                                <FormField label={ui('Address', 'العنوان')}><input value={form.data.address ?? ''} onChange={(e) => form.setData('address', e.target.value)} className={textFieldClass} /></FormField>
                                 <FormField label="Completion date"><input type="date" value={form.data.completion_date ?? ''} onChange={(e) => form.setData('completion_date', e.target.value)} className={textFieldClass} /></FormField>
                             </div>
                             <div className="mt-5"><ImageUploadField label="Feature image" current={(form.data.hero_image as unknown instanceof File) ? (form.data.hero_image as unknown as File) : (typeof form.data.hero_image === 'string' ? form.data.hero_image : project?.hero_image)} onChange={(file) => form.setData('hero_image' as keyof Project, file as never)} /></div>
@@ -255,7 +266,7 @@ export default function Form({ project, categories }: { project: Project | null;
                             {sections.heroSlides.map((slide, i) => (
                                 <div key={i} className="mb-4 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
                                     <div className="mb-2 flex items-center justify-between">
-                                        <span className="text-xs text-white/40">Slide {i + 1}</span>
+                                        <span className="text-xs text-white/40">{ui(`Slide ${i + 1}`, `شريحة ${i + 1}`)}</span>
                                         {sections.heroSlides.length > 1 && <button type="button" onClick={() => setSection('heroSlides', sections.heroSlides.filter((_, idx) => idx !== i))} className="text-red-400 hover:text-red-300"><Trash2 className="size-4" /></button>}
                                     </div>
                                     <div className="grid gap-3 md:grid-cols-2">
@@ -349,7 +360,7 @@ export default function Form({ project, categories }: { project: Project | null;
                                 {sections.homes3d.items.map((item, i) => (
                                     <div key={i} className="mb-3 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
                                         <div className="mb-2 flex items-center justify-between">
-                                            <span className="text-xs text-white/40">Home {i + 1}</span>
+                                            <span className="text-xs text-white/40">{ui(`Home ${i + 1}`, `وحدة ${i + 1}`)}</span>
                                             {sections.homes3d.items.length > 0 && <button type="button" onClick={() => setSection('homes3d', { ...sections.homes3d, items: sections.homes3d.items.filter((_, idx) => idx !== i) })} className="text-red-400 hover:text-red-300"><Trash2 className="size-4" /></button>}
                                         </div>
                                         <div className="grid gap-3 md:grid-cols-4">
@@ -378,7 +389,7 @@ export default function Form({ project, categories }: { project: Project | null;
                                 {sections.construction.items.map((item, i) => (
                                     <div key={i} className="mb-3 rounded-lg border border-slate-800 bg-slate-900/50 p-4">
                                         <div className="mb-2 flex items-center justify-between">
-                                            <span className="text-xs text-white/40">Update {i + 1}</span>
+                                            <span className="text-xs text-white/40">{ui(`Update ${i + 1}`, `تحديث ${i + 1}`)}</span>
                                             <button type="button" onClick={() => setSection('construction', { ...sections.construction, items: sections.construction.items.filter((_, idx) => idx !== i) })} className="text-red-400 hover:text-red-300"><Trash2 className="size-4" /></button>
                                         </div>
                                         <div className="grid gap-3 md:grid-cols-2">
@@ -402,7 +413,7 @@ export default function Form({ project, categories }: { project: Project | null;
                                 {(sections.amenities.categories ?? []).map((cat, ci) => (
                                     <div key={ci} className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
                                         <div className="mb-3 flex items-center justify-between">
-                                            <span className="text-xs text-white/40">Category {ci + 1}</span>
+                                            <span className="text-xs text-white/40">{ui(`Category ${ci + 1}`, `تصنيف ${ci + 1}`)}</span>
                                             <button type="button" onClick={() => setSection('amenities', { ...sections.amenities, categories: sections.amenities.categories.filter((_, idx) => idx !== ci) })} className="text-red-400 hover:text-red-300"><Trash2 className="size-4" /></button>
                                         </div>
                                         <FormField label="Category title">
@@ -492,14 +503,14 @@ export default function Form({ project, categories }: { project: Project | null;
                         <SectionCard title="Visibility">
                             <div className="grid gap-5 md:grid-cols-2">
                                 <label className="flex items-center gap-3 text-sm text-white/80"><input type="checkbox" checked={form.data.is_published} onChange={(e) => form.setData('is_published', e.target.checked)} className="size-4 rounded border-slate-700 bg-slate-900" /> Published</label>
-                                <label className="flex items-center gap-3 text-sm text-white/80"><input type="checkbox" checked={form.data.is_featured} onChange={(e) => form.setData('is_featured', e.target.checked)} className="size-4 rounded border-slate-700 bg-slate-900" /> Featured</label>
+                                <label className="flex items-center gap-3 text-sm text-white/80"><input type="checkbox" checked={form.data.is_featured} onChange={(e) => form.setData('is_featured', e.target.checked)} className="size-4 rounded border-slate-700 bg-slate-900" /> {ui('Featured', 'مميز')}</label>
                             </div>
                         </SectionCard>
                     )}
 
                     <div className="flex justify-end gap-3">
-                        <button type="submit" disabled={form.processing} className="inline-flex items-center justify-center gap-2 rounded-xl border border-gold bg-gold/10 px-6 py-2 text-xs font-semibold tracking-wider text-gold uppercase hover:bg-gold/20 disabled:opacity-50">
-                            {form.processing ? 'Saving...' : (project ? 'Update project' : 'Create project')}
+                        <button type="submit" disabled={submitting} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#C5A880] px-6 py-2 text-xs font-semibold tracking-wider text-black uppercase transition hover:bg-[#D4AF37] disabled:opacity-50">
+                            {submitting ? ui('Saving...', 'جارٍ الحفظ...') : project ? ui('Update project', 'تحديث المشروع') : ui('Create project', 'إنشاء المشروع')}
                         </button>
                     </div>
                 </form>

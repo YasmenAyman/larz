@@ -95,6 +95,7 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
         Route::redirect('/', '/admin/dashboard')->name('index');
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
         Route::get('/pages/about/awards', [AwardController::class, 'index'])->middleware('permission:pages.view')->name('pages.about.awards.index');
+        Route::put('/pages/about/awards', [AwardController::class, 'updateSettings'])->middleware('permission:pages.update')->name('pages.about.awards.settings.update');
         Route::get('/pages/about/awards/create', [AwardController::class, 'create'])->middleware('permission:pages.update')->name('pages.about.awards.create');
         Route::post('/pages/about/awards', [AwardController::class, 'store'])->middleware('permission:pages.update')->name('pages.about.awards.store');
         Route::get('/pages/about/awards/{award}/edit', [AwardController::class, 'edit'])->middleware('permission:pages.update')->name('pages.about.awards.edit');
@@ -107,7 +108,7 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
         Route::put('/pages/about/partners/{partner}', [PartnerController::class, 'update'])->middleware('permission:pages.update')->name('pages.about.partners.item.update');
         Route::delete('/pages/about/partners/{partner}', [PartnerController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.about.partners.item.destroy');
         Route::post('/pages/about/partners/{partner}/publish', [PartnerController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.about.partners.item.publish');
-        foreach (config('admin_pages', []) as $page => $pageConfig) {
+         foreach (config('admin_pages', []) as $page => $pageConfig) {
             Route::get('/pages/'.$page, [AdminPageRouteController::class, 'overview'])->middleware('permission:pages.view')->name('pages.'.$page.'.index');
             foreach (array_keys($pageConfig['sections']) as $section) {
                 $sectionName = str_replace('-', '_', $section);
@@ -137,6 +138,18 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
                  Route::put('/pages/'.$page.'/'.$section, [$sectionController, $updateAction])->defaults('page', $page)->defaults('section', $section)->middleware('permission:pages.update')->name('pages.'.$page.'.'.$sectionName.'.update');
              }
          }
+         Route::get('/pages/media/news/create', [MediaPostController::class, 'newsCreate'])->middleware('permission:pages.update')->name('pages.media.news.create');
+         Route::post('/pages/media/news', [MediaPostController::class, 'store'])->middleware('permission:pages.update')->name('pages.media.news.store');
+         Route::get('/pages/media/news/{mediaPost}/edit', [MediaPostController::class, 'newsEdit'])->middleware('permission:pages.update')->name('pages.media.news.post.edit');
+         Route::put('/pages/media/news/{mediaPost}', [MediaPostController::class, 'update'])->middleware('permission:pages.update')->name('pages.media.news.post.update');
+         Route::delete('/pages/media/news/{mediaPost}', [MediaPostController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.media.news.post.destroy');
+         Route::post('/pages/media/news/{mediaPost}/publish', [MediaPostController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.media.news.post.publish');
+         Route::get('/pages/media/stories/create', [MediaPostController::class, 'blogCreate'])->middleware('permission:pages.update')->name('pages.media.stories.create');
+         Route::post('/pages/media/stories', [MediaPostController::class, 'store'])->middleware('permission:pages.update')->name('pages.media.blog.store');
+         Route::get('/pages/media/stories/{mediaPost}/edit', [MediaPostController::class, 'blogEdit'])->middleware('permission:pages.update')->name('pages.media.stories.post.edit');
+         Route::put('/pages/media/stories/{mediaPost}', [MediaPostController::class, 'update'])->middleware('permission:pages.update')->name('pages.media.stories.post.update');
+         Route::delete('/pages/media/stories/{mediaPost}', [MediaPostController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.media.stories.post.destroy');
+         Route::post('/pages/media/stories/{mediaPost}/publish', [MediaPostController::class, 'togglePublished'])->middleware('permission:pages.update')->name('pages.media.stories.post.publish');
          Route::get('/pages/home/testimonials/create', [TestimonialController::class, 'create'])->middleware('permission:pages.update')->name('pages.home.testimonials.create');
          Route::post('/pages/home/testimonials', [TestimonialController::class, 'store'])->middleware('permission:pages.update')->name('pages.home.testimonials.store');
          Route::get('/pages/home/testimonials/{testimonial}/edit', [TestimonialController::class, 'edit'])->middleware('permission:pages.update')->name('pages.home.testimonials.item.edit');

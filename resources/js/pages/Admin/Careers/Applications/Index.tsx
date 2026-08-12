@@ -1,6 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, StatusBadge } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type ApplicationType = 'job' | 'internship' | 'cv';
 type StaffUser = { id: number; name: string };
@@ -21,17 +22,21 @@ const statuses = ['new', 'reviewing', 'shortlisted', 'interviewed', 'accepted', 
 
 export default function Index({ type, applications, users }: { type: ApplicationType; applications: { data: ApplicationItem[] }; users: StaffUser[] }) {
     const base = type === 'job' ? 'job-applications' : type === 'internship' ? 'internship-applications' : 'general-cv-submissions';
+    const { locale } = useI18n();
+    const ar = locale === 'ar';
+    const tr = (v: string) => ar ? ({ Applications: 'الطلبات', Dashboard: 'لوحة التحكم', 'General CV Submissions': 'طلبات السير الذاتية العامة', 'General CV submissions': 'طلبات السير الذاتية العامة', 'job Applications': 'طلبات التوظيف', 'internship Applications': 'طلبات التدريب', Applicant: 'المتقدم', 'Job/program': 'الوظيفة/البرنامج', Status: 'الحالة', Assigned: 'المسؤول', Notes: 'ملاحظات', CV: 'السيرة الذاتية', Download: 'تحميل', None: 'لا يوجد', Save: 'حفظ', 'Select status': 'اختر الحالة', Unassigned: 'غير معين', 'Internal notes': 'ملاحظات داخلية' } as Record<string, string>)[v] ?? v : v;
+    const title = type === 'cv' ? tr('General CV submissions') : tr(`${type} Applications`);
 
     return (
         <AdminLayout>
-            <Head title="Applications" />
+            <Head title={tr('Applications')} />
             <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-                <Breadcrumbs items={['Admin', type === 'cv' ? 'General CV Submissions' : `${type} Applications`]} />
-                <h1 className="text-3xl font-semibold">{type === 'cv' ? 'General CV submissions' : `${type} applications`}</h1>
+                <Breadcrumbs items={['Dashboard', type === 'cv' ? 'General CV Submissions' : `${type} Applications`].map(tr)} />
+                <h1 className="text-3xl font-semibold">{title}</h1>
                 <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
-                    <table className="w-full min-w-[900px] text-left text-sm">
+                    <table dir={ar ? 'rtl' : 'ltr'} className="w-full min-w-[900px] text-sm">
                         <thead className="border-b border-slate-800 text-xs uppercase text-slate-500">
-                            <tr><th className="px-4 py-3">Applicant</th><th className="px-4 py-3">Job/program</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Assigned</th><th className="px-4 py-3">Notes</th><th className="px-4 py-3">CV</th><th className="px-4 py-3" /></tr>
+                            <tr><th className="px-4 py-3 text-start">{tr('Applicant')}</th><th className="px-4 py-3 text-center">{tr('Job/program')}</th><th className="px-4 py-3 text-center">{tr('Status')}</th><th className="px-4 py-3 text-center">{tr('Assigned')}</th><th className="px-4 py-3 text-center">{tr('Notes')}</th><th className="px-4 py-3 text-center">{tr('CV')}</th><th className="px-4 py-3 text-center" /></tr>
                         </thead>
                         <tbody>
                             {applications.data.map((item) => <ApplicationRow key={item.id} item={item} users={users} base={base} />)}

@@ -8,6 +8,7 @@ import type { ProjectSections, WebsiteProject } from '@/types/website';
 import type { PageProps } from '@/types';
 
 const icons = { user: User, book: BookOpen, bike: Bike, dumbbell: Dumbbell, waves: Waves, moon: Moon, droplet: Droplet, users: Users, baby: Baby, dog: Dog, leaf: Leaf, flame: Flame } as const;
+const imageSource = (...sources: Array<string | null | undefined>) => sources.find((source) => Boolean(source)) ?? '';
 
 type InquiryForm = { name: string; phone: string; email: string; project_id: string; project_unit_type_id: string; preferred_contact_method: string; message: string; consent_at: string; source_url: string; _hp_website: string };
 type BrochureForm = { name: string; phone: string; email: string; project_id: string; source_url: string; _hp_website: string };
@@ -27,7 +28,8 @@ export function ProjectStats({ project }: { project: WebsiteProject }) {
 }
 
 export function ProjectOverview({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
-    return <section id="overview" className="bg-white py-20 text-paper-ink sm:py-24"><div className="mx-auto grid max-w-[1440px] gap-14 px-6 sm:px-10 md:grid-cols-2 lg:items-center"><div><Eyebrow tone="light">Overview</Eyebrow><h2 className="mt-5 text-3xl font-light leading-[1.1] sm:text-[3rem]">{sections.overview.heading}</h2><p className="mt-6 text-sm font-light leading-relaxed text-ink-muted md:text-lg">{sections.overview.body}</p></div><figure className="relative h-[360px] max-w-xl overflow-hidden border border-paper-muted/30 bg-[#e4e4e7] sm:h-[500px]"><img src={project.overviewImage ?? project.gallery[0] ?? ''} alt="Courtyard and greenery" className="size-full object-cover" /></figure></div></section>;
+    const overviewImage = imageSource(project.overviewImage, project.gallery[0], project.heroImage);
+    return <section id="overview" className="bg-white py-20 text-paper-ink sm:py-24"><div className="mx-auto grid max-w-[1440px] gap-14 px-6 sm:px-10 md:grid-cols-2 lg:items-center"><div><Eyebrow tone="light">Overview</Eyebrow><h2 className="mt-5 text-3xl font-light leading-[1.1] sm:text-[3rem]">{sections.overview.heading}</h2><p className="mt-6 text-sm font-light leading-relaxed text-ink-muted md:text-lg">{sections.overview.body}</p></div><figure className="relative h-[360px] max-w-xl overflow-hidden border border-paper-muted/30 bg-[#e4e4e7] sm:h-[500px]">{overviewImage && <img src={overviewImage} alt="Courtyard and greenery" className="size-full object-cover" />}</figure></div></section>;
 }
 
 export function ProjectGallery({ project }: { project: WebsiteProject }) {
@@ -87,9 +89,10 @@ export function Masterplan({ project, sections }: { project: WebsiteProject; sec
         _hp_website: '',
     });
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
+    const masterplanImage = imageSource(project.masterplanImage, project.gallery[1], project.gallery[0], project.heroImage);
     const submit = (event: React.FormEvent) => { event.preventDefault(); post('/brochure-requests', { preserveScroll: true }); };
 
-    return <section id="brochure" className="bg-night py-24 sm:py-28"><div className="mx-auto grid max-w-[1440px] gap-12 px-6 sm:px-10 md:grid-cols-[1fr_40%]"><div><Eyebrow className="text-ink">{t('Masterplan & brochure')}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-ink sm:text-[2.9rem]">{sections.masterplan.heading}</h2><p className="mt-6 text-sm leading-relaxed text-ink-muted">{sections.masterplan.description}</p><figure className="relative mt-8"><img src={project.masterplanImage ?? project.brochure ?? ''} alt="KLOVE masterplan render" className="h-[320px] w-full border-2 border-hairline/80 object-cover sm:h-[450px]" /></figure></div>
+    return <section id="brochure" className="bg-night py-24 sm:py-28"><div className="mx-auto grid max-w-[1440px] gap-12 px-6 sm:px-10 md:grid-cols-[1fr_40%]"><div><Eyebrow className="text-ink">{t('Masterplan & brochure')}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-ink sm:text-[2.9rem]">{sections.masterplan.heading}</h2><p className="mt-6 text-sm leading-relaxed text-ink-muted">{sections.masterplan.description}</p><figure className="relative mt-8">{masterplanImage && <img src={masterplanImage} alt="KLOVE masterplan render" className="h-[320px] w-full border-2 border-hairline/80 object-cover sm:h-[450px]" />}</figure></div>
         <div className="bg-surface-card/70 p-7"><h3 className="text-lg font-light text-ink">{sections.masterplan.brochureHeading}</h3><p className="mt-1 text-xs text-ink-muted">{sections.masterplan.brochureDescription}</p>
             <form className="mt-6 space-y-5" onSubmit={submit} noValidate>
                 {(flash?.success || recentlySuccessful) && <p className="rounded border border-emerald-700/40 bg-emerald-950/50 px-3 py-2 text-xs text-emerald-300">{flash?.success ?? t('Brochure request received.')}</p>}
@@ -123,7 +126,7 @@ export function ConstructionUpdates({ project, sections }: { project: WebsitePro
                         {items.map((item, i) => (
                             <article key={i}>
                                 <div className="aspect-[16/10] overflow-hidden bg-[#e8e7e5]">
-                                    <img src={item.image ?? ''} alt={item.title} className="size-full object-cover" loading="lazy" />
+                                    {imageSource(item.image, project.gallery[i], project.gallery[0], project.heroImage) && <img src={imageSource(item.image, project.gallery[i], project.gallery[0], project.heroImage)} alt={item.title} className="size-full object-cover" loading="lazy" />}
                                 </div>
                                 <p className="mt-4 text-[0.62rem] font-light tracking-[0.2em] text-[#858283] uppercase">{item.tag}</p>
                                 <h3 className="mt-2 text-[0.95rem] font-light text-paper-ink">{item.title}</h3>
@@ -171,8 +174,9 @@ export function LocationMap({ project, sections }: { project: WebsiteProject; se
     const { t } = useI18n();
     const nearby = sections.location.nearbyLocations ?? [];
     const whatsappUrl = sections.cta.whatsappNumber ? `https://wa.me/${sections.cta.whatsappNumber.replace(/[^0-9]/g, '')}` : '#';
+    const locationImage = imageSource(sections.location.image, project.mapImage, project.gallery[2], project.gallery[0], project.heroImage);
 
-    return <><section id="location" className="bg-paper py-24"><div className="mx-auto grid max-w-[1440px] gap-12 px-6 sm:px-10 md:grid-cols-2 md:items-center md:grid-cols-[1fr_50%]"><div><Eyebrow tone="light">{t('Location & map')}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-paper-ink sm:text-[3rem]">{sections.location.heading}</h2><p className="mt-6 text-sm leading-relaxed text-paper-muted">{sections.location.description}</p>{nearby.length > 0 && <ul className="mt-8">{nearby.map((drive, i) => <li key={i} className="flex items-baseline justify-between border-b border-paper-muted/25 py-4"><span className="text-md text-paper-ink/80">{drive.place}</span><span className="text-lg font-light text-paper-muted">{drive.time}</span></li>)}</ul>}<p className="mt-5 text-xs text-paper-muted">{sections.location.gateNote}</p><p className="mt-2 text-[0.7rem] text-paper-muted/70">{sections.location.driveNote}</p></div><figure className="relative"><img src={sections.location.image ?? project.mapImage ?? ''} alt={t('Interactive map')} className="h-full max-h-[600px] w-full object-cover" loading="lazy" /></figure></div></section>
+    return <><section id="location" className="bg-paper py-24"><div className="mx-auto grid max-w-[1440px] gap-12 px-6 sm:px-10 md:grid-cols-2 md:items-center md:grid-cols-[1fr_50%]"><div><Eyebrow tone="light">{t('Location & map')}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-paper-ink sm:text-[3rem]">{sections.location.heading}</h2><p className="mt-6 text-sm leading-relaxed text-paper-muted">{sections.location.description}</p>{nearby.length > 0 && <ul className="mt-8">{nearby.map((drive, i) => <li key={i} className="flex items-baseline justify-between border-b border-paper-muted/25 py-4"><span className="text-md text-paper-ink/80">{drive.place}</span><span className="text-lg font-light text-paper-muted">{drive.time}</span></li>)}</ul>}<p className="mt-5 text-xs text-paper-muted">{sections.location.gateNote}</p><p className="mt-2 text-[0.7rem] text-paper-muted/70">{sections.location.driveNote}</p></div><figure className="relative">{locationImage && <img src={locationImage} alt={t('Interactive map')} className="h-full max-h-[600px] w-full object-cover" loading="lazy" />}</figure></div></section>
         <section className="bg-gradient-to-b from-surface-deep to-night py-24 text-center" style={{ backgroundImage: 'radial-gradient(ellipse 100% 100% at 55% 10%, rgba(164, 121, 43, 0.30) 0%, rgba(115, 79, 27, 0.2) 55%, transparent 72%)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}><div className="mx-auto max-w-2xl px-6"><Eyebrow className="justify-center text-ink">{sections.cta.eyebrow}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.3] text-ink sm:text-[3rem]">{sections.cta.heading}</h2>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
                 <a href="#brochure" className="inline-flex items-center gap-3 border border-gold px-6 py-4 text-[0.7rem] tracking-[0.18em] text-ink uppercase transition-colors hover:bg-gold/10">{sections.cta.primaryCtaLabel || t('Request pricing & payment plan')} <ArrowRight className="size-3.5 rtl:rotate-180" /></a>

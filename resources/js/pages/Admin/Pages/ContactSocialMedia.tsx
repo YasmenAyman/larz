@@ -3,12 +3,14 @@ import { useState } from 'react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField, Notification, StatusBadge } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type Copy = { eyebrow: string; heading: string };
 
 export default function ContactSocialMedia({ settings, status, updated_at }: { settings: Copy & { translations?: { en?: Copy; ar?: Copy } }; status: string; updated_at: string | null }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const { locale } = useI18n();
+    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const defaults: Copy = { eyebrow: '', heading: '' };
     const savedEn = settings.translations?.en ?? settings;
     const savedAr = settings.translations?.ar ?? defaults;
@@ -20,19 +22,19 @@ export default function ContactSocialMedia({ settings, status, updated_at }: { s
     return (
         <AdminLayout>
             <Head title="Contact Page / Social Media" />
-            <div className="mx-auto max-w-5xl space-y-8">
+            <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div>
                     <Breadcrumbs items={['Dashboard', 'Website Pages', 'Contact Page', 'Social Media']} />
                     <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">Social media section</h1>
                     <p className="mt-1 text-sm text-white/50">Edit both language versions of the social media section headings.</p>
-                    <p className="mt-1 text-xs text-white/35">Social links, phone, and email are managed in admin/settings.</p>
+                    <p className="mt-1 text-xs text-white/35">{locale === 'ar' ? '\u064a\u062a\u0645 \u0625\u062f\u0627\u0631\u0629 \u0631\u0648\u0627\u0628\u0637 \u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0648\u0627\u0644\u0647\u0627\u062a\u0641 \u0648\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0641\u064a \u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a.' : 'Social links, phone, and email are managed in admin/settings.'}</p>
                 </div>
                 <Notification message={flash?.success} />
                 <form onSubmit={submit} className="space-y-5 rounded-2xl border border-white/10 bg-[#161619]/90 p-6 shadow-xl">
                     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                         <div>
                             <h2 className="text-lg font-bold text-white">Section copy</h2>
-                            <p className="mt-1 text-xs text-white/45">Last update: {updated_at ?? 'never'}</p>
+                            <p className="mt-1 text-xs text-white/45">{locale === 'ar' ? '\u0622\u062e\u0631 \u062a\u062d\u062f\u064a\u062b: ' : 'Last update: '}{updated_at ?? (locale === 'ar' ? '\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b' : 'never')}</p>
                         </div>
                         <StatusBadge status={status === 'published' ? 'Dynamic' : status} />
                     </div>

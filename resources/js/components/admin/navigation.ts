@@ -28,6 +28,7 @@ export const adminNavigation: AdminNavigationGroup[] = [
                 { label: 'Our Story', href: '/admin/pages/about/story', permission: 'pages.view' },
                 { label: 'Awards & Achievements', href: '/admin/pages/about/awards', permission: 'pages.view' },
                 { label: 'Partnerships & Affiliations', href: '/admin/pages/about/partners', permission: 'pages.view' },
+                { label: 'Promise CTA', href: '/admin/pages/about/promise-cta', permission: 'pages.view' },
             ] },
             { label: 'Projects', href: '/admin/projects', permission: 'projects.view' },
             { label: 'Media', href: '/admin/pages/media', permission: 'pages.view', children: [
@@ -35,12 +36,14 @@ export const adminNavigation: AdminNavigationGroup[] = [
                 { label: 'News & Press Releases', href: '/admin/pages/media/news', permission: 'pages.view' },
                 { label: 'Blogs', href: '/admin/pages/media/stories', permission: 'pages.view' },
                 { label: 'Photo Gallery', href: '/admin/pages/media/gallery', permission: 'pages.view' },
+                { label: 'Newsletter CTA', href: '/admin/pages/media/newsletter', permission: 'pages.view' },
             ] },
             { label: 'Careers', href: '/admin/pages/careers', permission: 'pages.view', children: [
                 { label: 'Hero Section', href: '/admin/pages/careers/hero', permission: 'pages.view' },
                 { label: 'Why LARZ / Values', href: '/admin/pages/careers/values', permission: 'pages.view' },
                 { label: 'Vacancies', href: '/admin/pages/careers/vacancies-settings', permission: 'pages.view' },
                 { label: 'Internship Programs', href: '/admin/pages/careers/internship', permission: 'pages.view' },
+                { label: 'General CV CTA', href: '/admin/pages/careers/general-cv-cta', permission: 'pages.view' },
             ] },
             { label: 'Contact Us', href: '/admin/pages/contact', permission: 'pages.view', children: [
                 { label: 'Hero Section', href: '/admin/pages/contact/hero', permission: 'pages.view' },

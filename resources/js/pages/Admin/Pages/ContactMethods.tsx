@@ -2,6 +2,8 @@ import { Head, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField } from '@/components/admin/AdminLayoutParts';
 import { useState } from 'react';
+import { useI18n } from '@/i18n';
+import { translateAdmin } from '@/admin-translations';
 
 type ContactItem = { key: string; icon: string; title: string; value: string; note: string };
 type LocaleData = { eyebrow: string; heading: string; description: string; items: ContactItem[] };
@@ -13,7 +15,8 @@ type Tab = typeof tabs[number];
 const icons = ['phone', 'message-circle', 'mail', 'map-pin'] as const;
 
 export default function ContactMethods({ settings }: { settings: Settings }) {
-  const [activeTab, setActiveTab] = useState<Tab>('English');
+  const { locale: websiteLocale } = useI18n();
+  const [activeTab, setActiveTab] = useState<Tab>(websiteLocale === 'ar' ? tabs[1] : 'English');
   const locale = activeTab === 'English' ? 'en' : 'ar';
 
   const { data, setData } = useForm<{ translations: { en: LocaleData; ar: LocaleData } }>({
@@ -62,8 +65,8 @@ export default function ContactMethods({ settings }: { settings: Settings }) {
   return (
     <AdminLayout>
       <Head title="Contact Methods" />
-      <div className="mx-auto max-w-4xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-        <Breadcrumbs items={['Admin', 'Website Pages', 'Contact Us', 'Contact Methods']} />
+      <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+      <Breadcrumbs items={['Dashboard', 'Website Pages', 'Contact Page', 'Contact Methods']} />
         <h1 className="text-3xl font-semibold">Contact Methods</h1>
 
         <div className="flex gap-2 border-b border-slate-800 pb-3">
@@ -129,7 +132,7 @@ export default function ContactMethods({ settings }: { settings: Settings }) {
           </div>
 
           <button type="submit" className="rounded-lg bg-emerald-600 px-6 py-2 text-sm font-medium hover:bg-emerald-500">
-            Save {activeTab === 'English' ? 'English' : 'Arabic'} contact methods
+            {translateAdmin(activeTab === 'English' ? 'Save English contact methods' : 'Save Arabic contact methods', websiteLocale)}
           </button>
         </form>
       </div>

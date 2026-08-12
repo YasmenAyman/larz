@@ -1,8 +1,10 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import WebsiteLayout from '@/layouts/WebsiteLayout';
 import { SeoHead, type SeoMetadata } from '@/components/shared/SeoHead';
+import { useI18n } from '@/i18n';
 
 export default function Show({ post, seo }: { post: { slug: string; type: string; category: string | null; date: string | null; title: string; excerpt: string | null; content: string | null; image: string | null }; seo: SeoMetadata }) {
+    const { t } = useI18n();
 
     return (
         <WebsiteLayout>
@@ -21,7 +23,7 @@ export default function Show({ post, seo }: { post: { slug: string; type: string
                         <div className="text-sm leading-[1.9] text-paper-muted">
                             <p>{post.excerpt}</p>
                             {post.content && <div className="mt-6 whitespace-pre-line">{post.content}</div>}
-                            <a href="/contact" className="mt-10 inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-paper-ink uppercase hover:bg-gold/10">Talk to us <ArrowRight className="size-3.5 rtl:rotate-180" /></a>
+                            <a href="/contact" className="mt-10 inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-paper-ink uppercase hover:bg-gold/10">{t('Talk to us')} <ArrowRight className="size-3.5 rtl:rotate-180" /></a>
                         </div>
                         <figure className="relative overflow-hidden border border-paper-muted/30 bg-[#dedee2]"><img src={post.image ?? ''} alt={post.title} className="h-[420px] w-full object-cover" /><figcaption className="absolute bottom-4 left-4 text-[0.52rem] tracking-[0.2em] text-paper uppercase">Media image</figcaption></figure>
                     </div>

@@ -1,4 +1,5 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
+import { useI18n } from '@/i18n';
 
 export type SeoMetadata = {
     title: string;
@@ -12,8 +13,22 @@ export type SeoMetadata = {
 };
 
 export function SeoHead({ seo }: { seo: SeoMetadata }) {
+    const { locale } = useI18n();
+    const { url } = usePage();
+    const path = url.split('?')[0];
+    const pageTitles: Record<string, { en: string; ar: string }> = {
+        '/': { en: 'Home', ar: '\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629' },
+        '/about-us': { en: 'About Us', ar: '\u0645\u0646 \u0646\u062d\u0646' },
+        '/projects': { en: 'Projects', ar: '\u0627\u0644\u0645\u0634\u0631\u0648\u0639\u0627\u062a' },
+        '/media': { en: 'Media', ar: '\u0627\u0644\u0625\u0639\u0644\u0627\u0645' },
+        '/careers': { en: 'Careers', ar: '\u0627\u0644\u0648\u0638\u0627\u0626\u0641' },
+        '/contact-us': { en: 'Contact Us', ar: '\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627' },
+        '/contact': { en: 'Contact Us', ar: '\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627' },
+    };
+    const localizedTitle = pageTitles[path]?.[locale];
+
     return (
-        <Head title={seo.title}>
+        <Head title={localizedTitle ?? seo.title}>
             {seo.description && <meta name="description" content={seo.description} />}
             <link rel="canonical" href={seo.canonical} />
             <meta name="robots" content={seo.robots} />

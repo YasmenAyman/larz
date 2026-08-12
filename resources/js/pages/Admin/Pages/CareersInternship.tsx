@@ -3,12 +3,14 @@ import { useState } from 'react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField, Notification, ImageUploadField } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type Copy = { eyebrow?: string; heading?: string; description?: string; cta_label?: string };
 
 export default function CareersInternship({ translations, image }: { translations: { en?: Copy; ar?: Copy }; image: string | null }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const { locale } = useI18n();
+    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const form = useForm<{ translations: { en: Copy; ar: Copy }; image: File | null }>({
         translations: { en: translations.en ?? {}, ar: translations.ar ?? {} },
         image: null,
@@ -24,7 +26,7 @@ export default function CareersInternship({ translations, image }: { translation
     return (
         <AdminLayout>
             <Head title="Careers Internship" />
-            <div className="mx-auto max-w-5xl space-y-6">
+            <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div>
                     <Breadcrumbs items={['Dashboard', 'Website Pages', 'Careers Page', 'Internship Section']} />
                     <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">Internship section</h1>

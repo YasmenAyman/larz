@@ -4,6 +4,7 @@ import { Award, Crown, Medal, Star } from 'lucide-react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, EmptyState, FormField, Notification, StatusBadge } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type AwardTranslation = { title: string; description: string };
 type AwardRecord = {
@@ -23,8 +24,15 @@ type IconKey = keyof typeof iconMap;
 
 export default function Index({ settings, awards }: { settings: Settings; awards: AwardRecord[] }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<'en' | 'ar'>('en');
-    const { data, setData, put, processing, errors } = useForm<{ translations: { en: { eyebrow: string; heading: string }; ar: { eyebrow: string; heading: string } } }>({
+    const { locale } = useI18n();
+    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
+    const { data, setData, put, processing, errors } = useForm<{ sections: { awards: { eyebrow: string; heading: string } }; translations: { en: { eyebrow: string; heading: string }; ar: { eyebrow: string; heading: string } } }>({
+        sections: {
+            awards: {
+                eyebrow: settings.eyebrow,
+                heading: settings.heading,
+            },
+        },
         translations: {
             en: settings.translations.en,
             ar: settings.translations.ar,
@@ -37,7 +45,7 @@ export default function Index({ settings, awards }: { settings: Settings; awards
     return (
         <AdminLayout>
             <Head title="About Us / Awards" />
-            <div className="mx-auto max-w-6xl space-y-8">
+            <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div className="flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <Breadcrumbs items={['Dashboard', 'Website Pages', 'About Us', 'Awards']} />
@@ -59,7 +67,7 @@ export default function Index({ settings, awards }: { settings: Settings; awards
                     </div>
                     <div className="flex gap-2 border-b border-white/10 pb-4">
                         <button type="button" onClick={() => setLanguage('en')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'en' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>English</button>
-                        <button type="button" onClick={() => setLanguage('ar')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'ar' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>العربية / Arabic</button>
+                        <button type="button" onClick={() => setLanguage('ar')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'ar' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>العربية</button>
                     </div>
                     <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="grid gap-5 md:grid-cols-2">
                         <FormField label="Eyebrow" error={errors[`translations.${language}.eyebrow`]}>

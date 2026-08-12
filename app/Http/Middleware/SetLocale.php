@@ -10,11 +10,7 @@ class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // The dashboard chrome and its default data are always English. The
-        // visitor's selected locale applies only to public website requests.
-        $locale = $request->is('admin') || $request->is('admin/*')
-            ? 'en'
-            : $request->session()->get('locale', config('app.locale', 'en'));
+        $locale = $request->session()->get('locale', config('app.locale', 'en'));
 
         if (! in_array($locale, ['en', 'ar'], true)) {
             $locale = 'en';

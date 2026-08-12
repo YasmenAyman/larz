@@ -2,6 +2,7 @@ import { Head, router, useForm, usePage } from '@inertiajs/react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, EmptyState, FormField, Notification, Pagination, SearchInput, StatusBadge } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type Request = {
     id: number;
@@ -21,22 +22,24 @@ const statuses = ['new', 'in_progress', 'delivered', 'closed', 'spam'];
 
 export default function Index({ requests, filters }: { requests: { data: Request[]; current_page: number; last_page: number }; filters: { search?: string; status?: string } }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
+    const { locale } = useI18n(); const ar = locale === 'ar';
+    const tr = (v: string) => ar ? ({ Dashboard: 'لوحة التحكم', Leads: 'العملاء المحتملون', 'Brochure requests': 'طلبات الكتيبات', 'Brochure Requests': 'طلبات الكتيبات', Search: 'ابحث بالاسم أو البريد أو الهاتف', 'All statuses': 'كل الحالات', new: 'جديد', in_progress: 'قيد المتابعة', contacted: 'تم التواصل', qualified: 'مؤهل', closed: 'مغلق', spam: 'غير مرغوب', 'No brochure requests yet': 'لا توجد طلبات كتيبات بعد', 'When a visitor requests a brochure it will appear here.': 'عند طلب أحد الزوار للكتيب سيظهر هنا' } as Record<string, string>)[v] ?? v : v;
 
     return (
         <AdminLayout>
-            <Head title="Brochure Requests" />
+            <Head title={tr('Brochure Requests')} />
             <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-                <div><Breadcrumbs items={['Admin', 'Leads', 'Brochure requests']} /><h1 className="mt-3 text-3xl font-semibold">Brochure requests</h1></div>
+                <div><Breadcrumbs items={['Dashboard', 'Leads', 'Brochure requests'].map(tr)} /><h1 className="mt-3 text-3xl font-semibold">{tr('Brochure requests')}</h1></div>
                 <Notification message={flash?.success} />
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <SearchInput value={filters.search ?? ''} onChange={(value) => router.get('/admin/brochure-requests', { search: value }, { preserveState: true })} placeholder="Search by name, email, phone" />
+                    <SearchInput value={filters.search ?? ''} onChange={(value) => router.get('/admin/brochure-requests', { search: value }, { preserveState: true })} placeholder={tr('Search')} />
                     <select value={filters.status ?? ''} onChange={(event) => router.get('/admin/brochure-requests', { ...filters, status: event.target.value || undefined }, { preserveState: true })} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200">
-                        <option value="">All statuses</option>
-                        {statuses.map((status) => <option key={status} value={status}>{status}</option>)}
+                        <option value="">{tr('All statuses')}</option>
+                        {statuses.map((status) => <option key={status} value={status}>{tr(status)}</option>)}
                     </select>
                 </div>
                 {requests.data.length === 0
-                    ? <EmptyState title="No brochure requests yet" message="When a visitor requests a brochure it will appear here." />
+                    ? <EmptyState title={tr('No brochure requests yet')} message={tr('When a visitor requests a brochure it will appear here.')} />
                     : <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
                         <table className="w-full text-left text-sm">
                             <thead className="border-b border-slate-800 text-xs uppercase text-slate-500">

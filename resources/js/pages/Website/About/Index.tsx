@@ -1,4 +1,5 @@
 import { SeoHead, type SeoMetadata } from '@/components/shared/SeoHead';
+import { Head } from '@inertiajs/react';
 import { ArrowRight, Award, Crown, Medal, Star } from 'lucide-react';
 import { Eyebrow } from '@/components/shared/Eyebrow';
 import WebsiteLayout from '@/layouts/WebsiteLayout';
@@ -11,29 +12,30 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
     return (
         <WebsiteLayout>
             <SeoHead seo={seo} />
-            <section
-                className="relative overflow-hidden py-10"
-                style={{
-                    backgroundImage: `
-              radial-gradient(
-                ellipse 60% 70% at 82% 10%,
-                rgba(164, 121, 43, 0.30) 0%,
-                rgba(115, 79, 27, 0.2) 35%,
-                transparent 72%
-              ),
-              linear-gradient(
-                110deg,
-                rgba(6, 4, 4, 0.98) 28%,
-                rgba(2, 2, 4, 0.73) 100%
-              ),
-              url(${hero.backgroundImage})
-            `,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                }}
-            >
-                <div className="relative mx-auto flex min-h-[620px] max-w-[1440px] flex-col justify-center px-6 pt-36 pb-20 sm:px-10 lg:px-24">
+            <Head>
+                <link rel="preload" as="image" href={hero.backgroundImage} fetchPriority="high" />
+            </Head>
+            <section className="relative isolate overflow-hidden bg-night py-10">
+                <img
+                    src={hero.backgroundImage}
+                    alt=""
+                    aria-hidden="true"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="sync"
+                    className="pointer-events-none absolute inset-0 z-0 size-full object-cover"
+                />
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 z-10"
+                    style={{
+                        backgroundImage: `
+                            radial-gradient(ellipse 60% 70% at 82% 10%, rgba(164, 121, 43, 0.30) 0%, rgba(115, 79, 27, 0.2) 35%, transparent 72%),
+                            linear-gradient(110deg, rgba(6, 4, 4, 0.98) 28%, rgba(2, 2, 4, 0.73) 100%)
+                        `,
+                    }}
+                />
+                <div className="relative z-20 mx-auto flex min-h-[620px] max-w-[1440px] flex-col justify-center px-6 pt-36 pb-20 sm:px-10 lg:px-24">
                     <Eyebrow className="text-ink">{hero.eyebrow ?? 'About LARZ'}</Eyebrow>
                     <h1 className="mt-7 max-w-3xl text-3xl font-light leading-[1.08] tracking-[-0.03em] text-ink sm:text-4xl lg:text-[4.2rem]">
                         {heroLines.map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}

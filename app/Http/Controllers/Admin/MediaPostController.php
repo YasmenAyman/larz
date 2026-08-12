@@ -101,6 +101,10 @@ class MediaPostController extends Controller
         if ($request->hasFile('open_graph_image') && $oldOpenGraphImage) $uploads->deleteIfUnreferenced($oldOpenGraphImage);
         WebsiteCache::mediaSections();
         WebsiteCache::sitemap();
+        if ($request->routeIs('admin.pages.media.news.post.update')) {
+            return to_route('admin.pages.media.news.edit')->with('success', 'Media post updated.');
+        }
+
         return back()->with('success', 'Media post updated.');
     }
 
@@ -130,9 +134,11 @@ class MediaPostController extends Controller
     private function syncColumnsFromEnglish(array $data): array
     {
         $en = $data['translations']['en'] ?? [];
+        $ar = $data['translations']['ar'] ?? [];
         foreach (['title', 'excerpt', 'content'] as $key) {
-            if (array_key_exists($key, $en) && is_string($en[$key])) {
-                $data[$key] = $en[$key];
+            $value = is_string($en[$key] ?? null) && trim($en[$key]) !== '' ? $en[$key] : ($ar[$key] ?? null);
+            if (is_string($value)) {
+                $data[$key] = $value;
             }
         }
         return $data;

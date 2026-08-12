@@ -6,7 +6,18 @@ import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { useI18n } from '@/i18n';
 
 function isActivePath(currentUrl: string, target: string) {
-    return target === '/' ? currentUrl === '/' : currentUrl === target || currentUrl.startsWith(`${target}/`);
+    const currentPath = currentUrl.split(/[?#]/)[0].replace(/\/$/, '') || '/';
+    const targetPath = target.split(/[?#]/)[0].replace(/\/$/, '') || '/';
+    const aliases: Record<string, string> = { '/about': '/about-us', '/about-us': '/about-us', '/contact': '/contact-us', '/contact-us': '/contact-us' };
+    const normalizedCurrent = aliases[currentPath] ?? currentPath;
+    const normalizedTarget = aliases[targetPath] ?? targetPath;
+    return normalizedTarget === '/' ? normalizedCurrent === '/' : normalizedCurrent === normalizedTarget || normalizedCurrent.startsWith(`${normalizedTarget}/`);
+}
+
+function canonicalNavUrl(url: string) {
+    const [path, suffix] = url.split(/([?#].*)/, 2);
+    const canonical = path === '/about' ? '/about-us' : path === '/contact' ? '/contact-us' : path;
+    return `${canonical}${suffix ?? ''}`;
 }
 
 export function Header() {
@@ -21,6 +32,11 @@ export function Header() {
 
     const dropdownMenus: Record<string, { label: string; hash: string }[]> = {
         '/about': [
+            { label: t('Our Story'), hash: '#story' },
+            { label: t('Awards & Achievements'), hash: '#awards' },
+            { label: t('Partnerships & Affiliations'), hash: '#partners' },
+        ],
+        '/about-us': [
             { label: t('Our Story'), hash: '#story' },
             { label: t('Awards & Achievements'), hash: '#awards' },
             { label: t('Partnerships & Affiliations'), hash: '#partners' },
@@ -74,7 +90,9 @@ export function Header() {
                         >
                             {open ? <X className="size-5" strokeWidth={1.5} /> : <Menu className="size-5" strokeWidth={1.5} />}
                         </button>
-                        <LanguageSwitcher dark />
+                        <div className="order-3">
+                            <LanguageSwitcher dark />
+                        </div>
                     </>
                 )}
 
@@ -101,7 +119,6 @@ export function Header() {
                         const hasDropdown = dropdownMenus[link.to];
 
                         if (isProjects) {
-                            const projectsHref = projects.length > 0 ? `/projects/${projects[0].slug}` : link.to;
                             return (
                                 <div
                                     key={link.label}
@@ -110,15 +127,15 @@ export function Header() {
                                     onMouseLeave={() => { setMegaOpen(false); setActiveProject(null); }}
                                 >
                                     <Link
-                                        href={projectsHref}
-                                        className={`text-[16px] font-light text-white/60 transition-colors duration-200 hover:text-white [&.active]:text-white${isActivePath(url, link.to) ? ' active' : ''}`}
+                                        href={canonicalNavUrl(link.to)}
+                                        className={`website-nav-link text-[16px] font-light text-white/60 transition-colors duration-200 hover:text-white [&.active]:text-white${isActivePath(url, link.to) ? ' active' : ''}`}
                                     >
                                         {link.label}
                                     </Link>
 
                                     {/* Projects dropdown */}
                                     {megaOpen && projects.length > 0 && (
-                                        <div className="absolute left-0 top-full z-50 mt-1 min-w-[180px] rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 backdrop-blur-md shadow-2xl">
+                                        <div className="absolute left-1/2 top-full z-50 mt-1 min-w-[180px] -translate-x-1/2 rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 backdrop-blur-md shadow-2xl">
                                             <ul className="space-y-2">
                                                 {projects.map((project) => (
                                                     <li
@@ -170,20 +187,20 @@ export function Header() {
                                     onMouseLeave={() => setActiveDropdown(null)}
                                 >
                                     <Link
-                                        href={link.to}
-                                        className={`text-[16px] font-light text-white/60 transition-colors duration-200 hover:text-white [&.active]:text-white${isActivePath(url, link.to) ? ' active' : ''}`}
+                                        href={canonicalNavUrl(link.to)}
+                                        className={`website-nav-link text-[16px] font-light text-white/60 transition-colors duration-200 hover:text-white [&.active]:text-white${isActivePath(url, link.to) ? ' active' : ''}`}
                                     >
                                         {link.label}
                                     </Link>
 
                                     {/* Dropdown */}
                                     {activeDropdown === link.to && (
-                                        <div className="absolute left-0 top-full z-50 mt-1 min-w-[200px] rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 backdrop-blur-md shadow-2xl">
+                                        <div className="absolute left-1/2 top-full z-50 mt-1 min-w-[200px] -translate-x-1/2 rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 backdrop-blur-md shadow-2xl">
                                             <ul className="space-y-2">
                                                 {hasDropdown.map((item) => (
                                                     <li key={item.hash}>
                                                         <Link
-                                                            href={`${link.to}${item.hash}`}
+                                                            href={`${canonicalNavUrl(link.to)}${item.hash}`}
                                                             className="block text-sm text-white/60 hover:text-white"
                                                         >
                                                             {item.label}
@@ -200,8 +217,8 @@ export function Header() {
                         return (
                             <Link
                                 key={link.label}
-                                href={link.to}
-                                className={`text-[16px] font-light text-white/60 transition-colors duration-200 hover:text-white [&.active]:text-white${isActivePath(url, link.to) ? ' active' : ''}`}
+                                href={canonicalNavUrl(link.to)}
+                                className={`website-nav-link text-[16px] font-light text-white/60 transition-colors duration-200 hover:text-white [&.active]:text-white${isActivePath(url, link.to) ? ' active' : ''}`}
                             >
                                 {link.label}
                             </Link>
@@ -212,6 +229,7 @@ export function Header() {
                 {/* Hamburger – LTR (right side) */}
                 {!isRtl && (
                     <>
+                        <LanguageSwitcher dark />
                         <button
                             type="button"
                             onClick={() => { setOpen((v) => !v); setMobileDropdown(null); }}
@@ -293,7 +311,7 @@ export function Header() {
                                                 {hasDropdown.map((item) => (
                                                     <Link
                                                         key={item.hash}
-                                                        href={`${link.to}${item.hash}`}
+                                                        href={`${canonicalNavUrl(link.to)}${item.hash}`}
                                                         onClick={() => setOpen(false)}
                                                         className="block text-xs text-white/50 hover:text-white/80"
                                                     >
@@ -309,9 +327,9 @@ export function Header() {
                             return (
                                 <Link
                                     key={link.label}
-                                    href={link.to}
+                                    href={canonicalNavUrl(link.to)}
                                     onClick={() => setOpen(false)}
-                                    className={`text-sm font-light text-white/60 [&.active]:text-white${isActivePath(url, link.to) ? ' active' : ''}`}
+                                    className={`website-nav-link text-sm font-light text-white/60 transition-colors hover:text-white [&.active]:text-white${isActivePath(url, link.to) ? ' active' : ''}`}
                                 >
                                     {link.label}
                                 </Link>

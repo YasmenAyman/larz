@@ -3,12 +3,14 @@ import { useState } from 'react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField, Notification, StatusBadge } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type Copy = { eyebrow: string; heading: string; description: string };
 
 export default function ContactRequestHero({ settings, status, updated_at }: { settings: Copy & { translations?: { en?: Copy; ar?: Copy } }; status: string; updated_at: string | null }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const { locale } = useI18n();
+    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const defaults: Copy = { eyebrow: '', heading: '', description: '' };
     const savedEn = settings.translations?.en ?? settings;
     const savedAr = settings.translations?.ar ?? defaults;
@@ -20,7 +22,7 @@ export default function ContactRequestHero({ settings, status, updated_at }: { s
     return (
         <AdminLayout>
             <Head title="Contact Page / Request Form" />
-            <div className="mx-auto max-w-5xl space-y-8">
+            <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div>
                     <Breadcrumbs items={['Dashboard', 'Website Pages', 'Contact Page', 'Request Form']} />
                     <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">Request form hero</h1>
@@ -31,7 +33,7 @@ export default function ContactRequestHero({ settings, status, updated_at }: { s
                     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                         <div>
                             <h2 className="text-lg font-bold text-white">Section copy</h2>
-                            <p className="mt-1 text-xs text-white/45">Last update: {updated_at ?? 'never'}</p>
+                            <p className="mt-1 text-xs text-white/45">{locale === 'ar' ? '\u0622\u062e\u0631 \u062a\u062d\u062f\u064a\u062b: ' : 'Last update: '}{updated_at ?? (locale === 'ar' ? '\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u062a\u062d\u062f\u064a\u062b' : 'never')}</p>
                         </div>
                         <StatusBadge status={status === 'published' ? 'Dynamic' : status} />
                     </div>

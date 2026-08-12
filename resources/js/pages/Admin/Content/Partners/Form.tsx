@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField, Notification } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type Copy = { name: string; role: string; description: string };
 type Partner = { id?: number; name: string; role: string; description: string; url: string; sort_order: number; is_published: boolean; logo?: any; translations?: { en?: Partial<Copy>; ar?: Partial<Copy> } };
@@ -10,7 +11,9 @@ const inputClass = 'w-full rounded-xl border border-white/15 bg-[#1e1e22] px-4 p
 
 export default function Form({ partner }: { partner: Partner | null }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<'en' | 'ar'>('en');
+    const { locale } = useI18n();
+    const isArabic = locale === 'ar';
+    const [language, setLanguage] = useState<'en' | 'ar'>(isArabic ? 'ar' : 'en');
     const form = useForm<Partner & { translations: { en: Copy; ar: Copy }; logo: File | null }>({ name: partner?.name ?? '', role: partner?.role ?? '', description: partner?.description ?? '', url: partner?.url ?? '', sort_order: partner?.sort_order ?? 0, is_published: partner?.is_published ?? true, logo: null, translations: { en: { name: partner?.translations?.en?.name ?? partner?.name ?? '', role: partner?.translations?.en?.role ?? partner?.role ?? '', description: partner?.translations?.en?.description ?? partner?.description ?? '' }, ar: { name: partner?.translations?.ar?.name ?? '', role: partner?.translations?.ar?.role ?? '', description: partner?.translations?.ar?.description ?? '' } } });
     const errors = form.errors;
     const copy = form.data.translations[language];

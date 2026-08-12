@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
 import { Breadcrumbs, FormField, Notification } from '@/components/admin/AdminLayoutParts';
+import { useI18n } from '@/i18n';
 
 type AwardTranslation = { title: string; description: string };
 type AwardRecord = {
@@ -28,8 +29,11 @@ const emptyTranslation: AwardTranslation = { title: '', description: '' };
 
 export default function Form({ award }: { award: AwardRecord | null }) {
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
-    const [language, setLanguage] = useState<Locale>('en');
-    const { data, setData, post, put, processing, errors } = useForm({
+    const { locale } = useI18n();
+    const isArabic = locale === 'ar';
+    const [language, setLanguage] = useState<Locale>(isArabic ? 'ar' : 'en');
+    const label = (english: string, arabic: string) => isArabic ? arabic : english;
+    const { data, setData, post, put, transform, processing, errors } = useForm({
         title: award?.title ?? '',
         year: award?.year ?? (new Date().getFullYear() as number),
         description: award?.description ?? '',
@@ -46,46 +50,46 @@ export default function Form({ award }: { award: AwardRecord | null }) {
     });
     const copy = data.translations[language] ?? emptyTranslation;
     const updateCopy = (key: keyof AwardTranslation, value: string) => setData('translations', { ...data.translations, [language]: { ...copy, [key]: value } });
-    const submit = (event: React.FormEvent) => { event.preventDefault(); award?.id ? put(`/admin/pages/about/awards/${award.id}`) : post('/admin/pages/about/awards'); };
+    const submit = (event: React.FormEvent) => { event.preventDefault(); transform((payload) => { const primary = payload.translations.en.title ? payload.translations.en : payload.translations.ar; return { ...payload, title: primary.title, description: primary.description }; }); award?.id ? put(`/admin/pages/about/awards/${award.id}`) : post('/admin/pages/about/awards'); };
 
     return (
         <AdminLayout>
-            <Head title={award ? 'Edit Award' : 'Add Award'} />
+            <Head title={label(award ? 'Edit Award' : 'Add Award', award ? 'تعديل جائزة' : 'إضافة جائزة')} />
             <div className="mx-auto max-w-3xl space-y-8">
                 <div>
-                    <Breadcrumbs items={['Dashboard', 'Website Pages', 'About Us', 'Awards', award ? 'Edit' : 'Add']} />
-                    <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">{award ? 'Edit award' : 'Add award'}</h1>
+                    <Breadcrumbs items={isArabic ? ['لوحة التحكم', 'صفحات الموقع', 'من نحن', 'الجوائز', award ? 'تعديل' : 'إضافة'] : ['Dashboard', 'Website Pages', 'About Us', 'Awards', award ? 'Edit' : 'Add']} />
+                    <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">{label(award ? 'Edit award' : 'Add award', award ? 'تعديل جائزة' : 'إضافة جائزة')}</h1>
                 </div>
 
                 <Notification message={flash?.success} />
 
                 <form onSubmit={submit} className="space-y-5 rounded-2xl border border-white/10 bg-[#161619]/90 p-6 shadow-xl">
                     <div className="flex gap-2 border-b border-white/10 pb-4">
-                        <button type="button" onClick={() => setLanguage('en')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'en' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>English</button>
-                        <button type="button" onClick={() => setLanguage('ar')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'ar' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>العربية / Arabic</button>
+                        <button type="button" onClick={() => setLanguage('en')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'en' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>{label('English', 'الإنجليزية')}</button>
+                        <button type="button" onClick={() => setLanguage('ar')} className={`rounded-xl px-5 py-2 text-xs font-semibold uppercase tracking-wider transition ${language === 'ar' ? 'bg-gradient-to-r from-[#C5A880] to-[#D4AF37] text-black' : 'border border-white/15 text-white/65 hover:border-white/30 hover:text-white'}`}>{label('Arabic', 'العربية')}</button>
                     </div>
                     <div dir={language === 'ar' ? 'rtl' : 'ltr'} className="grid gap-5 sm:grid-cols-2">
-                        <FormField label="Title" error={errors[`translations.${language}.title`]}>
+                        <FormField label={label('Title', 'العنوان')} error={errors[`translations.${language}.title`]}>
                             <input value={copy.title} onChange={(event) => updateCopy('title', event.target.value)} className={inputClass} placeholder={language === 'ar' ? 'العنوان بالعربية' : 'English title'} />
                         </FormField>
-                        <FormField label="Year" error={errors.year}>
+                        <FormField label={label('Year', 'السنة')} error={errors.year}>
                             <input type="number" min="1900" max="2100" value={data.year ?? ''} onChange={(event) => setData('year', event.target.value === '' ? null as unknown as number : Number(event.target.value))} className={inputClass} placeholder="Leave empty for milestones" />
                         </FormField>
                     </div>
                     <div dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                        <FormField label="Description" error={errors[`translations.${language}.description`]}>
+                        <FormField label={label('Description', 'الوصف')} error={errors[`translations.${language}.description`]}>
                             <textarea rows={4} value={copy.description} onChange={(event) => updateCopy('description', event.target.value)} className={inputClass} placeholder={language === 'ar' ? 'الوصف بالعربية' : 'English description'} />
                         </FormField>
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2">
-                        <FormField label="Icon" error={errors.icon_key}>
+                        <FormField label={label('Icon', 'الأيقونة')} error={errors.icon_key}>
                             <select value={data.icon_key ?? 'award'} onChange={(event) => setData('icon_key', event.target.value)} className={inputClass}>
                                 {iconOptions.map((option) => (
                                     <option key={option.value} value={option.value} className="bg-[#19191c] text-white">{option.label}</option>
                                 ))}
                             </select>
                         </FormField>
-                        <FormField label="Sort order" error={errors.sort_order}>
+                        <FormField label={label('Sort order', 'ترتيب العرض')} error={errors.sort_order}>
                             <input type="number" min="0" value={data.sort_order} onChange={(event) => setData('sort_order', Number(event.target.value))} className={inputClass} />
                         </FormField>
                     </div>

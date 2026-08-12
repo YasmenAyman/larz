@@ -1,10 +1,12 @@
 import { useState, type ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { useI18n } from '@/i18n';
 
 export function Breadcrumbs({ items }: { items: string[] }) {
+    const { t } = useI18n();
     return (
         <nav aria-label="Breadcrumb" className="text-xs font-medium text-[#C5A880]/70 uppercase tracking-wider">
-            {items.join(' / ')}
+            {items.map(t).join(' / ')}
         </nav>
     );
 }
@@ -43,28 +45,30 @@ export function ConfirmationModal({ open, title, message, onCancel, onConfirm }:
 }
 
 export function Pagination({ current = 1, total = 1 }: { current?: number; total?: number }) {
+    const { locale } = useI18n();
+    const ar = locale === 'ar';
     return (
         <div className="flex items-center justify-between text-xs text-white/50">
-            <span>Page {current} of {total}</span>
+            <span>{ar ? `صفحة ${current} من ${total}` : `Page ${current} of ${total}`}</span>
             <div className="flex gap-2">
                 <button type="button" disabled={current <= 1} className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 transition-all hover:border-[#C5A880] hover:text-white disabled:opacity-30">
-                    Previous
+                    {ar ? 'السابق' : 'Previous'}
                 </button>
                 <button type="button" disabled={current >= total} className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 transition-all hover:border-[#C5A880] hover:text-white disabled:opacity-30">
-                    Next
+                    {ar ? 'التالي' : 'Next'}
                 </button>
             </div>
         </div>
     );
 }
 
-export function SearchInput({ value, onChange, placeholder = 'Search...' }: { value: string; onChange: (value: string) => void; placeholder?: string }) {
+export function SearchInput({ value, onChange, placeholder = 'Search...', className = '' }: { value: string; onChange: (value: string) => void; placeholder?: string; className?: string }) {
     return (
         <input
             value={value}
             onChange={(event) => onChange(event.target.value)}
             placeholder={placeholder}
-            className="h-[42px] w-full rounded-xl border border-white/15 bg-[#1e1e22] px-4 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30"
+            className={`h-[42px] w-full sm:!w-96 rounded-xl border border-white/15 bg-[#1e1e22] px-4 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 ${className}`}
         />
     );
 }
