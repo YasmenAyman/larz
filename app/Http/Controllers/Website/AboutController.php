@@ -31,9 +31,16 @@ class AboutController extends Controller
             'awards' => [
                 'eyebrow' => $awardsSection['eyebrow'] ?? 'Awards & achievements',
                 'heading' => $awardsSection['heading'] ?? 'Recognised for building things that last.',
-                'items' => Award::query()->where('is_published', true)->orderBy('sort_order')->get()->map(fn ($award) => array_merge([
-                    'title' => $award->title, 'year' => $award->year, 'copy' => $award->description, 'icon' => $award->icon_key,
-                ], LocalizedContent::record($award, ['title', 'description'])))->values()->all(),
+                'items' => Award::query()->where('is_published', true)->orderBy('sort_order')->get()->map(function ($award) {
+                    $localized = LocalizedContent::record($award, ['title', 'description']);
+
+                    return [
+                        'title' => $localized['title'] ?? $award->title,
+                        'year' => $award->year,
+                        'copy' => $localized['description'] ?? $award->description,
+                        'icon' => $award->icon_key,
+                    ];
+                })->values()->all(),
             ],
             'partners' => [
                 'settings' => WebsiteContent::section('about', 'partners'),

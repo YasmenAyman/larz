@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             PartnersSeeder::class,
             AwardsSeeder::class,
             TestimonialsSeeder::class,
+            ArabicContentSeeder::class,
         ]);
     }
 }

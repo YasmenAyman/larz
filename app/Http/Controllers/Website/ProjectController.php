@@ -12,6 +12,7 @@ use App\Models\ProjectInquiry;
 use App\Services\FormNotificationContext;
 use App\Services\FormSubmissionService;
 use App\Services\SeoMetadataService;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteContent;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
@@ -22,15 +23,19 @@ class ProjectController extends Controller
     {
         $projects = Project::query()->with(['heroImage', 'category'])->where('is_published', true)->orderBy('sort_order')->get();
         return Inertia::render('Website/Projects/Index', [
-            'projects' => $projects->map(fn ($item) => [
-                'id' => $item->id,
-                'title' => $item->title,
-                'slug' => $item->slug,
-                'location' => $item->location,
-                'shortDescription' => $item->short_description,
-                'heroImage' => WebsiteContent::assetUrl($item->heroImage),
-                'category' => $item->category?->name,
-            ])->values()->all(),
+            'projects' => $projects->map(function ($item) {
+                $localized = LocalizedContent::record($item, ['title', 'location', 'short_description']);
+
+                return [
+                    'id' => $item->id,
+                    'title' => $localized['title'] ?? $item->title,
+                    'slug' => $item->slug,
+                    'location' => $localized['location'] ?? $item->location,
+                    'shortDescription' => $localized['short_description'] ?? $item->short_description,
+                    'heroImage' => WebsiteContent::assetUrl($item->heroImage),
+                    'category' => $item->category?->name,
+                ];
+            })->values()->all(),
             'seo' => $seo->forPage('projects', '/projects', ['title' => 'Projects | LARZ Developments'], [
                 $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')], ['name' => 'Projects', 'url' => url('/projects')]]),
             ]),

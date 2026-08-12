@@ -84,7 +84,16 @@ export function MediaStories({ posts, settings }: { posts: MediaPost[]; settings
 export function MediaGallery({ gallery, settings }: { gallery: string[]; settings: SectionSettings }) {
     const { t } = useI18n();
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-    const items = gallery.map((src, index) => ({ src, label: 'PHOTO', col: [1, 2, 3, 4, 1, 3, 4, 2][index], row: [1, 1, 1, 1, 2, 2, 2, 3][index], colSpan: 1, rowSpan: index === 1 || index === 5 ? 2 : 1 }));
+    const featuredSlots = [
+        { col: 1, row: 1, rowSpan: 1 },
+        { col: 2, row: 1, rowSpan: 2 },
+        { col: 3, row: 1, rowSpan: 1 },
+        { col: 4, row: 1, rowSpan: 1 },
+        { col: 1, row: 2, rowSpan: 1 },
+        { col: 3, row: 2, rowSpan: 2 },
+        { col: 4, row: 2, rowSpan: 1 },
+        { col: 2, row: 3, rowSpan: 1 },
+    ];
 
     return (
         <section id="gallery" className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
@@ -92,13 +101,18 @@ export function MediaGallery({ gallery, settings }: { gallery: string[]; setting
                 <Eyebrow tone="light">{t(settings.eyebrow ?? 'Photo gallery')}</Eyebrow>
                 <h2 className="mt-5 text-4xl font-light sm:text-[2.5rem]">{t(settings.heading ?? 'Inside our communities.')}</h2>
                 {settings.description && <p className="mt-4 max-w-2xl text-sm text-paper-muted">{settings.description}</p>}
-                <div className="mt-10" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(3, 200px)', gap: '10px' }}>
-                    {items.map(({ src, col, row, colSpan, rowSpan }, index) => (
-                        <button type="button" key={index} onClick={() => setSelectedImageIndex(index)} aria-label={`Open gallery image ${index + 1}`} className="relative cursor-zoom-in overflow-hidden bg-[#d8d8dc] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-paper-ink" style={{ gridColumnStart: col, gridColumnEnd: col + colSpan, gridRowStart: row, gridRowEnd: row + rowSpan }}>
-                            <img src={src} alt={`LARZ gallery ${index + 1}`} className="size-full object-cover" />
-                            <div className="absolute left-0 top-0 h-full w-full" style={{ backgroundImage: 'radial-gradient(ellipse 60% 70% at 82% 20%, rgba(255, 255, 255, 0.3) 0%, rgba(190, 190, 190, 0.2) 35%, transparent 72%), linear-gradient(110deg, rgba(6, 4, 4, 0.40) 28%, rgba(2, 2, 4, 0.10) 100%)' }} />
-                        </button>
-                    ))}
+                <div className="mt-10" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gridTemplateRows: 'repeat(3, 200px)', gridAutoRows: '200px', gap: '10px' }}>
+                    {gallery.map((src, index) => {
+                        const slot = featuredSlots[index];
+                        const placement = slot ? { gridColumnStart: slot.col, gridColumnEnd: slot.col + 1, gridRowStart: slot.row, gridRowEnd: slot.row + slot.rowSpan } : undefined;
+
+                        return (
+                            <button type="button" key={`${src}-${index}`} onClick={() => setSelectedImageIndex(index)} aria-label={`Open gallery image ${index + 1}`} className="relative cursor-zoom-in overflow-hidden bg-[#d8d8dc] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-paper-ink" style={placement}>
+                                <img src={src} alt={`LARZ gallery ${index + 1}`} className="size-full object-cover" />
+                                <div className="absolute left-0 top-0 h-full w-full" style={{ backgroundImage: 'radial-gradient(ellipse 60% 70% at 82% 20%, rgba(255, 255, 255, 0.3) 0%, rgba(190, 190, 190, 0.2) 35%, transparent 72%), linear-gradient(110deg, rgba(6, 4, 4, 0.40) 28%, rgba(2, 2, 4, 0.10) 100%)' }} />
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
             {selectedImageIndex !== null && <ImageLightbox images={gallery} initialIndex={selectedImageIndex} alt="Selected LARZ gallery image" onClose={() => setSelectedImageIndex(null)} />}

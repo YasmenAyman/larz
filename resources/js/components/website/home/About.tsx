@@ -28,7 +28,7 @@ export function About({ stats }: { stats: Array<{ value: string; label: string }
                             <dt className="sr-only">{t(stat.label)}</dt>
                             <dd className="flex items-baseline gap-2">
                                 <span className="font-serif text-3xl text-ink sm:text-[40px]">{stat.value}</span>
-                                <span className="text-[22px] text-ink/80">+ {t(stat.label)}</span>
+                                <span className="text-[22px] text-ink/80">{t(stat.label)}</span>
                             </dd>
                         </div>
                     ))}

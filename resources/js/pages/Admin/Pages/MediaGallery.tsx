@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, Trash2 } from 'lucide-react';
 import type { PageProps } from '@/types';
 import AdminLayout from '@/layouts/AdminLayout';
-import { Breadcrumbs, EmptyState, FormField, ImageUploadField, Notification } from '@/components/admin/AdminLayoutParts';
+import { Breadcrumbs, ConfirmationModal, EmptyState, FormField, ImageUploadField, Notification } from '@/components/admin/AdminLayoutParts';
 import { useI18n } from '@/i18n';
 
 type Copy = { eyebrow: string; heading: string; description: string };
@@ -29,6 +29,8 @@ export default function MediaGallery({ settings, items }: { settings: Settings; 
     const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const [uploadError, setUploadError] = useState('');
     const [selectedPreviews, setSelectedPreviews] = useState<string[]>([]);
+    const [confirmDelete, setConfirmDelete] = useState<GalleryItem | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
     const initial = settings.translations ?? { en: { eyebrow: settings.eyebrow, heading: settings.heading, description: settings.description }, ar: emptyCopy };
 
     const form = useForm({
@@ -36,7 +38,6 @@ export default function MediaGallery({ settings, items }: { settings: Settings; 
         heading: settings.heading,
         description: settings.description,
         images: [] as File[],
-        remove_ids: [] as number[],
         gallery_ids: items.map((item) => item.id),
         translations: {
             en: initial.en ?? emptyCopy,
@@ -50,7 +51,11 @@ export default function MediaGallery({ settings, items }: { settings: Settings; 
     const submit = (event: React.FormEvent) => {
         event.preventDefault();
         form.transform((payload) => ({ ...payload, _method: 'put' }));
-        form.post('/admin/pages/media/gallery', { forceFormData: true, preserveScroll: true });
+        form.post('/admin/pages/media/gallery', {
+            forceFormData: true,
+            preserveScroll: true,
+            preserveState: false,
+        });
     };
 
     const move = (index: number, direction: -1 | 1) => {
@@ -61,8 +66,15 @@ export default function MediaGallery({ settings, items }: { settings: Settings; 
         setData('gallery_ids', next);
     };
 
-    const toggleRemove = (id: number) => {
-        setData('remove_ids', data.remove_ids.includes(id) ? data.remove_ids.filter((value) => value !== id) : [...data.remove_ids, id]);
+    const remove = (item: GalleryItem) => {
+        setDeletingId(item.id);
+        router.delete(`/admin/pages/media/gallery/${item.id}`, {
+            preserveScroll: true,
+            onFinish: () => {
+                setDeletingId(null);
+                setConfirmDelete(null);
+            },
+        });
     };
 
     const visibleItems = data.gallery_ids
@@ -70,9 +82,16 @@ export default function MediaGallery({ settings, items }: { settings: Settings; 
         .filter((item): item is GalleryItem => Boolean(item));
 
     const handleImages = (files: File[]) => {
+        const oversizedFile = files.find((file) => file.size > 25 * 1024 * 1024);
+        if (oversizedFile) {
+            setUploadError(`“${oversizedFile.name}” exceeds the 25 MB limit per image.`);
+            setSelectedPreviews([]);
+            setData('images', []);
+            return;
+        }
         const totalBytes = files.reduce((total, file) => total + file.size, 0);
         if (totalBytes > 250 * 1024 * 1024) {
-            setUploadError('The selected images exceed the 250 MB total upload limit.');
+            setUploadError('The selected images exceed the 250 MB total upload limit. Upload fewer images at a time.');
             setSelectedPreviews([]);
             setData('images', []);
             return;
@@ -127,13 +146,15 @@ export default function MediaGallery({ settings, items }: { settings: Settings; 
                         <div className="flex items-center justify-between border-b border-white/10 pb-4">
                             <div>
                                 <h2 className="text-lg font-bold text-white">Gallery photos</h2>
-                                <p className="mt-1 text-xs text-white/45">Reorder, remove, or upload new photos. Changes save together with the section copy.</p>
+                                <p className="mt-1 text-xs text-white/45">Reorder or upload photos, then save. Deleting a photo takes effect immediately after confirmation.</p>
                             </div>
                             <span className="text-xs text-white/45">{visibleItems.length} photos</span>
                         </div>
                         <div className="mt-5 space-y-3">
                             <ImageUploadField label="Upload new photos" multiple onChange={(files) => handleImages(Array.isArray(files) ? files : files ? [files] : [])} />
                             {uploadError && <p className="text-xs text-rose-400">{uploadError}</p>}
+                            {(errors.images || errors['images.0']) && <p className="text-xs text-rose-400">{errors.images ?? errors['images.0']}</p>}
+                            <p className="text-xs text-white/45">PNG, JPEG, WebP, or SVG. Up to 25 MB per image and 250 MB total per save.</p>
                             {selectedPreviews.length > 0 && (
                                 <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-4">
                                     {selectedPreviews.map((preview) => (
@@ -161,7 +182,7 @@ export default function MediaGallery({ settings, items }: { settings: Settings; 
                                                         <ArrowRight className="size-3.5" />
                                                     </button>
                                                 </div>
-                                                <button type="button" onClick={() => toggleRemove(item.id)} aria-label="Mark for removal" className={`grid size-8 place-items-center rounded-lg border ${data.remove_ids.includes(item.id) ? 'border-rose-500 bg-rose-500/15 text-rose-300' : 'border-white/15 text-white/70 hover:border-rose-400 hover:text-rose-300'}`}>
+                                                <button type="button" onClick={() => setConfirmDelete(item)} disabled={deletingId !== null} aria-label="Delete photo" className="grid size-8 place-items-center rounded-lg border border-white/15 text-white/70 hover:border-rose-400 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50">
                                                     <Trash2 className="size-3.5" />
                                                 </button>
                                             </div>
@@ -176,6 +197,13 @@ export default function MediaGallery({ settings, items }: { settings: Settings; 
                         <button disabled={processing} className="rounded-xl bg-gradient-to-r from-[#C5A880] to-[#D4AF37] px-5 py-3 text-sm font-semibold text-black disabled:opacity-50">Save gallery</button>
                     </div>
                 </form>
+                <ConfirmationModal
+                    open={Boolean(confirmDelete)}
+                    title={locale === 'ar' ? 'حذف الصورة؟' : 'Delete photo?'}
+                    message={locale === 'ar' ? 'سيتم حذف هذه الصورة من المعرض فورًا. لا يلزم حفظ الصفحة.' : 'This photo will be removed from the gallery immediately. You do not need to save the page.'}
+                    onCancel={() => !deletingId && setConfirmDelete(null)}
+                    onConfirm={() => confirmDelete && remove(confirmDelete)}
+                />
             </div>
         </AdminLayout>
     );

@@ -138,6 +138,7 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
                  Route::put('/pages/'.$page.'/'.$section, [$sectionController, $updateAction])->defaults('page', $page)->defaults('section', $section)->middleware('permission:pages.update')->name('pages.'.$page.'.'.$sectionName.'.update');
              }
          }
+         Route::delete('/pages/media/gallery/{photoGalleryItem}', [MediaGalleryController::class, 'destroy'])->middleware('permission:pages.update')->name('pages.media.gallery.item.destroy');
          Route::get('/pages/media/news/create', [MediaPostController::class, 'newsCreate'])->middleware('permission:pages.update')->name('pages.media.news.create');
          Route::post('/pages/media/news', [MediaPostController::class, 'store'])->middleware('permission:pages.update')->name('pages.media.news.store');
          Route::get('/pages/media/news/{mediaPost}/edit', [MediaPostController::class, 'newsEdit'])->middleware('permission:pages.update')->name('pages.media.news.post.edit');

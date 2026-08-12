@@ -133,6 +133,44 @@ class AdminPageNavigationTest extends TestCase
         $this->assertNotNull(PhotoGalleryItem::first()->media_asset_id);
     }
 
+    public function test_media_gallery_multipart_post_uploads_and_removes_photos(): void
+    {
+        Storage::fake('public');
+        $user = $this->pageEditor();
+        $asset = MediaAsset::factory()->create(['disk' => 'public', 'path' => 'seed/gallery.jpg']);
+        $item = PhotoGalleryItem::create(['media_asset_id' => $asset->id, 'sort_order' => 0, 'is_published' => true, 'is_active' => true]);
+
+        $this->actingAs($user)->post('/admin/pages/media/gallery', [
+            '_method' => 'PUT',
+            'translations' => [
+                'en' => ['eyebrow' => 'Gallery', 'heading' => 'English heading', 'description' => 'English copy'],
+                'ar' => ['eyebrow' => 'المعرض', 'heading' => 'عنوان عربي', 'description' => 'وصف عربي'],
+            ],
+            'gallery_ids' => [$item->id],
+            'remove_ids' => [$item->id],
+            'images' => [UploadedFile::fake()->image('gallery-upload.jpg')],
+        ])->assertRedirect();
+
+        $this->assertSoftDeleted('photo_gallery_items', ['id' => $item->id]);
+        $this->assertSame(1, PhotoGalleryItem::query()->count());
+        $this->assertSame('English heading', PageSection::query()->where('page_key', 'media')->where('section_key', 'gallery')->firstOrFail()->content_snapshot['translations']['en']['heading']);
+    }
+
+    public function test_media_gallery_photo_can_be_deleted_without_saving_the_section(): void
+    {
+        Storage::fake('public');
+        $user = $this->pageEditor();
+        $asset = MediaAsset::factory()->create(['disk' => 'public', 'path' => 'media/gallery/photo.jpg']);
+        $item = PhotoGalleryItem::create(['media_asset_id' => $asset->id, 'sort_order' => 0, 'is_published' => true, 'is_active' => true]);
+
+        $this->actingAs($user)
+            ->delete("/admin/pages/media/gallery/{$item->id}")
+            ->assertRedirect();
+
+        $this->assertSoftDeleted('photo_gallery_items', ['id' => $item->id]);
+        $this->assertDatabaseMissing('media_assets', ['id' => $asset->id]);
+    }
+
     public function test_home_featured_projects_editor_selects_and_orders_projects(): void
     {
         $user = $this->pageEditor();
