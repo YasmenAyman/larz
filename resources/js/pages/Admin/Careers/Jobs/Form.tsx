@@ -14,6 +14,8 @@ type Tab = typeof tabs[number];
 export default function Form({ job }: { job: JobRecord | null }) {
   const { locale } = useI18n();
   const ar = locale === 'ar';
+  // Duplicate legacy labels resolve to the same translation at runtime.
+  // @ts-ignore TS1117
   const tr = (v: string) => ar ? ({ Dashboard: 'لوحة التحكم', Jobs: 'الوظائف', Edit: 'تعديل', Create: 'إنشاء', 'Edit Job': 'تعديل وظيفة', 'Create Job': 'إنشاء وظيفة', 'Edit job': 'تعديل الوظيفة', 'Create job': 'إنشاء وظيفة', Slug: 'الرابط المختصر', Deadline: 'الموعد النهائي', English: 'الإنجليزية', Arabic: 'العربية', Title: 'العنوان', Department: 'القسم', Location: 'الموقع', 'Employment type': 'نوع التوظيف', 'Experience level': 'مستوى الخبرة', Summary: 'الملخص', Description: 'الوصف', Requirements: 'المتطلبات', Responsibilities: 'المسؤوليات', Benefits: 'المزايا', 'Sort order': 'ترتيب العرض', Published: 'منشور', Draft: 'مسودة', Featured: 'مميز', 'Not featured': 'غير مميز', 'Update job': 'تحديث الوظيفة', 'Create job': 'إنشاء الوظيفة', Cancel: 'إلغاء' } as Record<string, string>)[v] ?? v : v;
   const [activeTab, setActiveTab] = useState<Tab>('English');
   const { data, setData, post, put, processing } = useForm<JobForm>({

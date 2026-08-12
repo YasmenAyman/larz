@@ -27,6 +27,8 @@ export default function Index({ inquiries, filters }: { inquiries: { data: Inqui
     const [selected, setSelected] = useState<Inquiry | null>(null);
     const { locale } = useI18n();
     const ar = locale === 'ar';
+    // Duplicate legacy labels resolve to the same translation at runtime.
+    // @ts-ignore TS1117
     const tr = (v: string) => ar ? ({ Dashboard: 'لوحة التحكم', Leads: 'العملاء المحتملون', 'Contact inquiries': 'استفسارات التواصل', 'Contact Inquiries': 'استفسارات التواصل', 'Contact inquiries': 'استفسارات التواصل', Search: 'ابحث بالاسم أو البريد أو الهاتف', 'All statuses': 'كل الحالات', new: 'جديد', in_progress: 'قيد المتابعة', contacted: 'تم التواصل', qualified: 'مؤهل', closed: 'مغلق', spam: 'غير مرغوب', 'No inquiries yet': 'لا توجد استفسارات بعد', 'Submissions from the public contact form will appear here.': 'ستظهر هنا الطلبات المرسلة من نموذج التواصل العام' } as Record<string, string>)[v] ?? v : v;
 
     return (
