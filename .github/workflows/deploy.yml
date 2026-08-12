@@ -48,7 +48,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "."
           target: "/home2/${{ secrets.SSH_USER }}/releases/${{ github.sha }}"
-          strip_components: 1
+          strip_components: 0
           # overwrite: true   # اختياري
 
       - name: Deploy & Run Commands on Server
