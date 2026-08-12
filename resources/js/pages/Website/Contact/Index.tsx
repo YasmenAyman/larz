@@ -27,6 +27,7 @@ export default function Index({ contact, projects, contact_methods, request_form
     const { t } = useI18n();
     const [isAddressOpen, setIsAddressOpen] = useState(false);
     const mapQuery = location_map.address || 'New Cairo, Egypt';
+    const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`;
     const iconMap: Record<string, typeof Phone> = { 'phone': Phone, 'message-circle': MessageCircle, 'mail': Mail, 'map-pin': MapPin };
     const cards = (contact_methods?.items ?? []).map((item) => ({
         icon: iconMap[item.icon] ?? Phone,
@@ -141,7 +142,7 @@ export default function Index({ contact, projects, contact_methods, request_form
                         <h2 className="mt-5 text-3xl font-light leading-[1.1] sm:text-[3rem]">{location_map.heading}</h2>
                         <p className="mt-6 text-md leading-relaxed text-paper-muted/80">{location_map.description}</p>
                         <p className="mt-5 text-xs text-paper-muted/80">{location_map.address}</p>
-                        <a href={location_map.cta_url} className="mt-7 inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.8rem] tracking-[0.2em] text-paper-ink uppercase hover:bg-gold/10">{location_map.cta_label} <ArrowRight className="size-3.5 rtl:rotate-180" /></a>
+                        <a href={directionsUrl} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.8rem] tracking-[0.2em] text-paper-ink uppercase hover:bg-gold/10">{location_map.cta_label} <ArrowRight className="size-3.5 rtl:rotate-180" /></a>
                     </div>
                     <figure className="relative h-[360px] overflow-hidden border border-paper-muted/30 bg-[#e4e4e7] sm:h-[420px]">
                         {location_map.image ? (
@@ -175,8 +176,8 @@ export default function Index({ contact, projects, contact_methods, request_form
                             { Icon: Facebook, label: 'Facebook', href: safeSocial.facebook },
                             { Icon: Linkedin, label: 'LinkedIn', href: safeSocial.linkedin },
                             { Icon: Youtube, label: 'YouTube', href: safeSocial.youtube },
-                        ].map(({ Icon, label, href }) => (
-                            <a key={label} href={href ?? '#'} aria-label={label} className="grid size-10 place-items-center rounded-full border border-hairline text-ink-muted hover:border-gold hover:text-gold"><Icon className="size-4" /></a>
+                        ].flatMap((socialLink) => socialLink.href && socialLink.href !== '#' ? [{ ...socialLink, href: socialLink.href }] : []).map(({ Icon, label, href }) => (
+                            <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="grid size-10 place-items-center rounded-full border border-hairline text-ink-muted hover:border-gold hover:text-gold"><Icon className="size-4" /></a>
                         ))}
                     </div>
                     <p className="mt-5 text-sm text-ink-muted">Hotline {contact_phone} · {contact_email}</p>

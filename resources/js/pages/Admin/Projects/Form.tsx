@@ -77,6 +77,63 @@ const emptySections: SectionData = {
     cta: { eyebrow: '', heading: '', whatsappNumber: '', primaryCtaLabel: '', secondaryCtaLabel: '' },
 };
 
+function normaliseSections(saved?: Partial<SectionData>): SectionData {
+    const savedSections = saved ?? {};
+    const heroSlides = Array.isArray(savedSections.heroSlides) ? savedSections.heroSlides : emptySections.heroSlides;
+    const stats = Array.isArray(savedSections.stats) ? savedSections.stats : emptySections.stats;
+    const savedHomes3d = savedSections.homes3d ?? emptySections.homes3d;
+    const savedConstruction = savedSections.construction ?? emptySections.construction;
+    const savedAmenities = savedSections.amenities ?? emptySections.amenities;
+    const savedLocation = savedSections.location ?? emptySections.location;
+
+    return {
+        ...emptySections,
+        ...savedSections,
+        heroSlides: heroSlides.map((slide) => Object.assign({}, emptySections.heroSlides[0], slide)),
+        stats: stats.map((stat) => Object.assign({ value: '', label: '', note: '' }, stat)),
+        overview: { ...emptySections.overview, ...(savedSections.overview ?? {}) },
+        masterplan: { ...emptySections.masterplan, ...(savedSections.masterplan ?? {}) },
+        virtualTour: { ...emptySections.virtualTour, ...(savedSections.virtualTour ?? {}) },
+        homes3d: {
+            ...emptySections.homes3d,
+            ...(savedHomes3d ?? {}),
+            items: Array.isArray(savedHomes3d.items)
+                ? savedHomes3d.items.map((item) => Object.assign({ tag: '', name: '', size: '', url: '' }, item))
+                : emptySections.homes3d.items,
+        },
+        construction: {
+            ...emptySections.construction,
+            ...(savedConstruction ?? {}),
+            items: Array.isArray(savedConstruction.items)
+                ? savedConstruction.items.map((item) => Object.assign({ tag: '', title: '', image: null }, item))
+                : emptySections.construction.items,
+        },
+        amenities: {
+            ...emptySections.amenities,
+            ...(savedAmenities ?? {}),
+            categories: Array.isArray(savedAmenities.categories)
+                ? savedAmenities.categories.map((category) => Object.assign(
+                    { title: '', items: [] as Array<{ icon: string | null; title: string; description: string }> },
+                    category,
+                    {
+                        items: Array.isArray(category.items)
+                            ? category.items.map((item) => Object.assign({ icon: null, title: '', description: '' }, item))
+                            : [],
+                    },
+                ))
+                : emptySections.amenities.categories,
+        },
+        location: {
+            ...emptySections.location,
+            ...(savedLocation ?? {}),
+            nearbyLocations: Array.isArray(savedLocation.nearbyLocations)
+                ? savedLocation.nearbyLocations.map((location) => Object.assign({ place: '', time: '' }, location))
+                : emptySections.location.nearbyLocations,
+        },
+        cta: { ...emptySections.cta, ...(savedSections.cta ?? {}) },
+    };
+}
+
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="rounded-xl border border-slate-800 bg-slate-950 p-6">
@@ -131,8 +188,8 @@ export default function Form({ project, categories }: { project: Project | null;
         robots: project?.robots ?? '',
         translations: { en: project?.translations?.en ?? {}, ar: project?.translations?.ar ?? {} },
         sections: {
-            en: { ...emptySections, ...(project?.sections?.en ?? {}), amenities: { ...emptySections.amenities, ...((project?.sections?.en as any)?.amenities ?? {}), categories: ((project?.sections?.en as any)?.amenities?.categories ?? emptySections.amenities.categories) }, location: { ...emptySections.location, ...((project?.sections?.en as any)?.location ?? {}), nearbyLocations: ((project?.sections?.en as any)?.location?.nearbyLocations ?? emptySections.location.nearbyLocations) } },
-            ar: { ...emptySections, ...(project?.sections?.ar ?? {}), amenities: { ...emptySections.amenities, ...((project?.sections?.ar as any)?.amenities ?? {}), categories: ((project?.sections?.ar as any)?.amenities?.categories ?? emptySections.amenities.categories) }, location: { ...emptySections.location, ...((project?.sections?.ar as any)?.location ?? {}), nearbyLocations: ((project?.sections?.ar as any)?.location?.nearbyLocations ?? emptySections.location.nearbyLocations) } },
+            en: normaliseSections(project?.sections?.en),
+            ar: normaliseSections(project?.sections?.ar),
         },
     });
 
