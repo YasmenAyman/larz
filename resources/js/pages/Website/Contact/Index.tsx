@@ -1,5 +1,6 @@
 import { useForm, usePage } from '@inertiajs/react';
 import { ArrowRight, Facebook, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone, Youtube } from 'lucide-react';
+import { useState } from 'react';
 import { Eyebrow } from '@/components/shared/Eyebrow';
 import WebsiteLayout from '@/layouts/WebsiteLayout';
 import type { PageProps } from '@/types';
@@ -24,6 +25,7 @@ type ContactForm = { name: string; phone: string; project_id: string; email: str
 
 export default function Index({ contact, projects, contact_methods, request_form, hero, location_map, social, social_media, contact_phone, contact_email, seo }: ContactProps) {
     const { t } = useI18n();
+    const [isAddressOpen, setIsAddressOpen] = useState(false);
     const mapQuery = location_map.address || 'New Cairo, Egypt';
     const iconMap: Record<string, typeof Phone> = { 'phone': Phone, 'message-circle': MessageCircle, 'mail': Mail, 'map-pin': MapPin };
     const cards = (contact_methods?.items ?? []).map((item) => ({
@@ -153,6 +155,13 @@ export default function Index({ contact, projects, contact_methods, request_form
                                 referrerPolicy="no-referrer-when-downgrade"
                             />
                         )}
+                        <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-full">
+                            {isAddressOpen && <div role="status" className="absolute bottom-[calc(100%+10px)] left-1/2 w-56 -translate-x-1/2 rounded-lg bg-white px-4 py-3 text-center text-xs leading-relaxed text-paper-ink shadow-xl">{location_map.address || t('Location & Map')}</div>}
+                            <button type="button" onClick={() => setIsAddressOpen((open) => !open)} aria-label={isAddressOpen ? 'Hide address' : 'Show address'} aria-expanded={isAddressOpen} className="relative block cursor-pointer drop-shadow-[0_8px_10px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                                <MapPin className="size-10 fill-[#d4af37] text-[#6f5423] sm:size-12" strokeWidth={1.5} />
+                                <span className="pointer-events-none absolute left-1/2 top-[37%] size-2.5 -translate-x-1/2 rounded-full border-2 border-white bg-[#6f5423] sm:size-3" />
+                            </button>
+                        </div>
                     </figure>
                 </div>
             </section>

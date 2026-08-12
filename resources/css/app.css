@@ -171,12 +171,12 @@
 }
 
 .bg_pattern {
-  background-image: url("../assets/herobg.png");
+  background-image: url("../assets/herobg.webp");
   background-size: 100% 100%;
   background-position: bottom center;
 }
 .bg_state{
-  background-image: url("../assets/stats_bg.png");
+  background-image: url("../assets/stats_bg.webp");
   background-size: cover;
   background-position: bottom center;
 }

@@ -5,6 +5,14 @@
 
     RewriteEngine On
 
+    # Serve the generated WebP counterpart for legacy PNG/JPEG asset URLs.
+    # Existing CMS records and templates keep working, while capable browsers
+    # receive the much smaller file without waiting on the original image.
+    RewriteCond %{HTTP:Accept} image/webp [NC]
+    RewriteCond %{REQUEST_FILENAME} ^(.+)\.(?:png|jpe?g)$ [NC]
+    RewriteCond %1.webp -f
+    RewriteRule ^assets/(.+)\.(?:png|jpe?g)$ assets/$1.webp [END]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -22,6 +30,21 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/avif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header append Vary Accept
+    <FilesMatch "\.(?:avif|webp|jpe?g|png|gif|svg)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
 </IfModule>
 
 # Gallery uploads are sent as one multipart request. Keep the request ceiling

@@ -1,9 +1,9 @@
-import gallery1 from '@assets/Gallery_1.png';
-import gallery2 from '@assets/Gallery_2.png';
-import gallery3 from '@assets/Gallery_3.png';
-import gallery4 from '@assets/Gallery_4.png';
-import gallery5 from '@assets/Gallery_5.png';
-import projectImage2 from '@assets/project_img_2.png';
+import gallery1 from '@assets/Gallery_1.webp';
+import gallery2 from '@assets/Gallery_2.webp';
+import gallery3 from '@assets/Gallery_3.webp';
+import gallery4 from '@assets/Gallery_4.webp';
+import gallery5 from '@assets/Gallery_5.webp';
+import projectImage2 from '@assets/project_img_2.webp';
 
 export const projectStats = [
     { value: '24.', label: 'Feddans', note: 'Room to breathe' },

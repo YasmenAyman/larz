@@ -3,7 +3,7 @@ import { useI18n } from '@/i18n';
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 import { Logo } from '@/components/shared/Logo';
 import { PillButton } from '@/components/shared/PillButton';
-import footerBackground from '@assets/Footer_bg.png';
+import footerBackground from '@assets/Footer_bg.webp';
 import type { WebsiteSharedProps } from '@/types/website';
 
 export function Footer() {

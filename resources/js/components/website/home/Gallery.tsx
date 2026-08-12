@@ -3,7 +3,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PillButton } from '@/components/shared/PillButton';
 import { SectionHeading } from '@/components/shared/SectionHeading';
-import newMask from '@assets/new_mask.png';
+import newMask from '@assets/new_mask.webp';
 import { useI18n } from '@/i18n';
 import { ImageLightbox } from '@/components/shared/ImageLightbox';
 

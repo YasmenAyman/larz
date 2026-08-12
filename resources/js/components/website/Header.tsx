@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import type { WebsiteSharedProps } from '@/types/website';
@@ -26,9 +26,24 @@ export function Header() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [activeProject, setActiveProject] = useState<string | null>(null);
     const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);
+    const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const { url, props } = usePage<WebsiteSharedProps>();
     const { t, dir } = useI18n();
     const isRtl = dir === 'rtl';
+
+    const cancelScheduledClose = () => {
+        if (closeTimer.current) {
+            clearTimeout(closeTimer.current);
+            closeTimer.current = null;
+        }
+    };
+
+    const scheduleClose = (close: () => void) => {
+        cancelScheduledClose();
+        closeTimer.current = setTimeout(close, 250);
+    };
+
+    useEffect(() => () => cancelScheduledClose(), []);
 
     const dropdownMenus: Record<string, { label: string; hash: string }[]> = {
         '/about': [
@@ -123,8 +138,8 @@ export function Header() {
                                 <div
                                     key={link.label}
                                     className="relative"
-                                    onMouseEnter={() => setMegaOpen(true)}
-                                    onMouseLeave={() => { setMegaOpen(false); setActiveProject(null); }}
+                                    onMouseEnter={() => { cancelScheduledClose(); setMegaOpen(true); }}
+                                    onMouseLeave={() => scheduleClose(() => { setMegaOpen(false); setActiveProject(null); })}
                                 >
                                     <Link
                                         href={canonicalNavUrl(link.to)}
@@ -135,8 +150,9 @@ export function Header() {
 
                                     {/* Projects dropdown */}
                                     {megaOpen && projects.length > 0 && (
-                                        <div className="absolute left-1/2 top-full z-50 mt-1 min-w-[180px] -translate-x-1/2 rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 backdrop-blur-md shadow-2xl">
-                                            <ul className="space-y-2">
+                                        <div className="absolute left-1/2 top-full z-50 min-w-[180px] -translate-x-1/2 pt-2">
+                                            <div className="rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 shadow-2xl backdrop-blur-md">
+                                                <ul className="space-y-2">
                                                 {projects.map((project) => (
                                                     <li
                                                         key={project.slug}
@@ -171,7 +187,8 @@ export function Header() {
                                                         )}
                                                     </li>
                                                 ))}
-                                            </ul>
+                                                </ul>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -183,8 +200,8 @@ export function Header() {
                                 <div
                                     key={link.label}
                                     className="relative"
-                                    onMouseEnter={() => setActiveDropdown(link.to)}
-                                    onMouseLeave={() => setActiveDropdown(null)}
+                                    onMouseEnter={() => { cancelScheduledClose(); setActiveDropdown(link.to); }}
+                                    onMouseLeave={() => scheduleClose(() => setActiveDropdown(null))}
                                 >
                                     <Link
                                         href={canonicalNavUrl(link.to)}
@@ -195,8 +212,9 @@ export function Header() {
 
                                     {/* Dropdown */}
                                     {activeDropdown === link.to && (
-                                        <div className="absolute left-1/2 top-full z-50 mt-1 min-w-[200px] -translate-x-1/2 rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 backdrop-blur-md shadow-2xl">
-                                            <ul className="space-y-2">
+                                        <div className="absolute left-1/2 top-full z-50 min-w-[200px] -translate-x-1/2 pt-2">
+                                            <div className="rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 shadow-2xl backdrop-blur-md">
+                                                <ul className="space-y-2">
                                                 {hasDropdown.map((item) => (
                                                     <li key={item.hash}>
                                                         <Link
@@ -207,7 +225,8 @@ export function Header() {
                                                         </Link>
                                                     </li>
                                                 ))}
-                                            </ul>
+                                                </ul>
+                                            </div>
                                         </div>
                                     )}
                                 </div>

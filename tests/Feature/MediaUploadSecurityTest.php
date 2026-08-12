@@ -36,8 +36,8 @@ class MediaUploadSecurityTest extends TestCase
         $second = $this->uploads->storePublicImage(UploadedFile::fake()->image('hero.jpg', 320, 180), 'media/posts');
 
         $this->assertNotSame($first->path, $second->path);
-        $this->assertMatchesRegularExpression('/^media\/posts\/[a-f0-9-]+\.jpg$/', $first->path);
-        $this->assertSame('image/jpeg', $first->mime_type);
+        $this->assertMatchesRegularExpression('/^media\/posts\/[a-f0-9-]+\.webp$/', $first->path);
+        $this->assertSame('image/webp', $first->mime_type);
         $this->assertSame(320, $first->width);
         $this->assertSame(180, $first->height);
         Storage::disk('public')->assertExists($first->path);

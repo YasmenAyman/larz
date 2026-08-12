@@ -1,12 +1,12 @@
-import gallery1 from '@assets/Gallery_1.png';
-import gallery2 from '@assets/Gallery_2.png';
-import gallery3 from '@assets/Gallery_3.png';
-import gallery4 from '@assets/Gallery_4.png';
-import gallery5 from '@assets/Gallery_5.png';
-import projectImage1 from '@assets/project_img_1.png';
-import projectImage2 from '@assets/project_img_2.png';
-import projectImage3 from '@assets/project_img_3.png';
-import projectImage4 from '@assets/project_img_4.png';
+import gallery1 from '@assets/Gallery_1.webp';
+import gallery2 from '@assets/Gallery_2.webp';
+import gallery3 from '@assets/Gallery_3.webp';
+import gallery4 from '@assets/Gallery_4.webp';
+import gallery5 from '@assets/Gallery_5.webp';
+import projectImage1 from '@assets/project_img_1.webp';
+import projectImage2 from '@assets/project_img_2.webp';
+import projectImage3 from '@assets/project_img_3.webp';
+import projectImage4 from '@assets/project_img_4.webp';
 
 export const projects = [
     {

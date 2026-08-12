@@ -4,7 +4,7 @@ import Autoplay from 'embla-carousel-autoplay';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import { useI18n } from '@/i18n';
-import reviewBackground from '@assets/review_bg.png';
+import reviewBackground from '@assets/review_bg.webp';
 
 export function Testimonials({ testimonials, settings }: { testimonials: Array<{ quote: string; name: string; role: string | null; image: string | null }>; settings: { eyebrow: string; heading: string; description: string } }) {
     const autoplayPlugin = useRef(Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true }));

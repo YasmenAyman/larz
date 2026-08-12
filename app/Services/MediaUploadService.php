@@ -195,6 +195,15 @@ final class MediaUploadService
         [$width, $height] = $this->imageDimensions($contents, $extension, $profile);
         $this->assertDimensions($width, $height, $options);
 
+        if ($profile === 'public_image' && $extension !== 'svg') {
+            [$contents, $extension, $mime, $size, $width, $height] = $this->optimizePublicImage(
+                $contents,
+                $extension,
+                $width,
+                $height,
+            );
+        }
+
         $path = trim($directory, '/').'/' . Str::lower((string) Str::uuid()).'.'.$extension;
         $disk = $definition['disk'];
 
@@ -264,6 +273,48 @@ final class MediaUploadService
         }
 
         return [$dimensions[0], $dimensions[1]];
+    }
+
+    /**
+     * Resize raster uploads to a sensible maximum and store them as WebP.
+     * This keeps CMS content fast even when an editor uploads a camera-original
+     * PNG or JPEG.
+     *
+     * @return array{string, string, string, int, int, int}
+     */
+    private function optimizePublicImage(string $contents, string $extension, int $width, int $height): array
+    {
+        if (! function_exists('imagecreatefromstring') || ! function_exists('imagewebp')) {
+            throw new InvalidArgumentException('The server image processor is not available.');
+        }
+
+        $source = @imagecreatefromstring($contents);
+        if (! $source) {
+            throw new InvalidArgumentException('The uploaded image is invalid.');
+        }
+
+        $maxDimension = 2560;
+        $scale = min(1, $maxDimension / max($width, $height));
+        $targetWidth = max(1, (int) round($width * $scale));
+        $targetHeight = max(1, (int) round($height * $scale));
+        $target = imagecreatetruecolor($targetWidth, $targetHeight);
+
+        imagealphablending($target, false);
+        imagesavealpha($target, true);
+        imagefill($target, 0, 0, imagecolorallocatealpha($target, 0, 0, 0, 127));
+        imagecopyresampled($target, $source, 0, 0, 0, 0, $targetWidth, $targetHeight, $width, $height);
+
+        ob_start();
+        $encoded = imagewebp($target, null, 82);
+        $optimized = (string) ob_get_clean();
+        imagedestroy($source);
+        imagedestroy($target);
+
+        if (! $encoded || $optimized === '') {
+            throw new InvalidArgumentException('The uploaded image could not be optimized.');
+        }
+
+        return [$optimized, 'webp', 'image/webp', strlen($optimized), $targetWidth, $targetHeight];
     }
 
     private function assertDimensions(?int $width, ?int $height, array $options): void
