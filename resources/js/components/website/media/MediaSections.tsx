@@ -1,6 +1,8 @@
 import { ArrowRight } from 'lucide-react';
 import { useForm, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import { Eyebrow } from '@/components/shared/Eyebrow';
+import { ImageLightbox } from '@/components/shared/ImageLightbox';
 import type { PageProps } from '@/types';
 import { useI18n } from '@/i18n';
 
@@ -33,9 +35,9 @@ export function MediaPress({ posts, settings }: { posts: MediaPost[]; settings: 
                 <div className="mt-10 grid gap-3 lg:grid-cols-3">
                     {posts.filter((post) => post.type === 'press').map((post) => (
                         <article key={post.slug} className="border border-paper-muted/25 bg-[#f7f7f8]">
-                            <div className="relative h-50 overflow-hidden bg-[#dedee2]">
-                                <img src={post.image ?? ''} alt={post.title} className="size-full object-cover" />
-                            </div>
+                            <a href={`/media/${post.slug}`} aria-label={`Read ${post.title}`} className="relative block h-50 overflow-hidden bg-[#dedee2] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                                <img src={post.image ?? ''} alt={post.title} className="size-full object-cover transition-transform duration-300 hover:scale-105" />
+                            </a>
                             <div className="p-4">
                                 <p className="text-[0.9rem] tracking-[0.16em] text-ink-muted/60">{post.date}</p>
                                 <h3 className="mt-3 text-md leading-tight text-paper-ink">{post.title}</h3>
@@ -61,10 +63,10 @@ export function MediaStories({ posts, settings }: { posts: MediaPost[]; settings
                 <div className="mt-10 grid gap-3 lg:grid-cols-3">
                     {posts.filter((post) => post.type === 'blog').map((post) => (
                         <article key={post.slug} className="border border-hairline/50 bg-surface-deep">
-                            <div className="relative h-50 overflow-hidden border-b border-hairline/50">
-                                <img src={post.image ?? ''} alt={post.title} className="size-full object-cover" />
+                            <a href={`/media/${post.slug}`} aria-label={`Read ${post.title}`} className="relative block h-50 overflow-hidden border-b border-hairline/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+                                <img src={post.image ?? ''} alt={post.title} className="size-full object-cover transition-transform duration-300 hover:scale-105" />
                                 <div className="absolute left-0 top-0 h-full w-full" style={{ backgroundImage: 'radial-gradient(ellipse 60% 70% at 82% 20%, rgba(255, 255, 255, 0.3) 0%, rgba(190, 190, 190, 0.2) 35%, transparent 72%), linear-gradient(110deg, rgba(6, 4, 4, 0.40) 28%, rgba(2, 2, 4, 0.10) 100%)' }} />
-                            </div>
+                            </a>
                             <div className="p-4">
                                 <p className="text-[0.9rem] tracking-[0.16em] text-ink-muted/60 uppercase">{post.category}</p>
                                 <h3 className="mt-3 text-lg leading-tight text-ink">{post.title}</h3>
@@ -81,6 +83,7 @@ export function MediaStories({ posts, settings }: { posts: MediaPost[]; settings
 
 export function MediaGallery({ gallery, settings }: { gallery: string[]; settings: SectionSettings }) {
     const { t } = useI18n();
+    const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const items = gallery.map((src, index) => ({ src, label: 'PHOTO', col: [1, 2, 3, 4, 1, 3, 4, 2][index], row: [1, 1, 1, 1, 2, 2, 2, 3][index], colSpan: 1, rowSpan: index === 1 || index === 5 ? 2 : 1 }));
 
     return (
@@ -91,13 +94,14 @@ export function MediaGallery({ gallery, settings }: { gallery: string[]; setting
                 {settings.description && <p className="mt-4 max-w-2xl text-sm text-paper-muted">{settings.description}</p>}
                 <div className="mt-10" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(3, 200px)', gap: '10px' }}>
                     {items.map(({ src, col, row, colSpan, rowSpan }, index) => (
-                        <figure key={index} className="relative overflow-hidden bg-[#d8d8dc]" style={{ gridColumnStart: col, gridColumnEnd: col + colSpan, gridRowStart: row, gridRowEnd: row + rowSpan }}>
+                        <button type="button" key={index} onClick={() => setSelectedImageIndex(index)} aria-label={`Open gallery image ${index + 1}`} className="relative cursor-zoom-in overflow-hidden bg-[#d8d8dc] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-paper-ink" style={{ gridColumnStart: col, gridColumnEnd: col + colSpan, gridRowStart: row, gridRowEnd: row + rowSpan }}>
                             <img src={src} alt={`LARZ gallery ${index + 1}`} className="size-full object-cover" />
                             <div className="absolute left-0 top-0 h-full w-full" style={{ backgroundImage: 'radial-gradient(ellipse 60% 70% at 82% 20%, rgba(255, 255, 255, 0.3) 0%, rgba(190, 190, 190, 0.2) 35%, transparent 72%), linear-gradient(110deg, rgba(6, 4, 4, 0.40) 28%, rgba(2, 2, 4, 0.10) 100%)' }} />
-                        </figure>
+                        </button>
                     ))}
                 </div>
             </div>
+            {selectedImageIndex !== null && <ImageLightbox images={gallery} initialIndex={selectedImageIndex} alt="Selected LARZ gallery image" onClose={() => setSelectedImageIndex(null)} />}
         </section>
     );
 }
