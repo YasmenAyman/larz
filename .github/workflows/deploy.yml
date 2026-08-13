@@ -20,9 +20,11 @@ jobs:
 
 
       - name: Install Dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Verify PSR-4 autoload (Linux is case-sensitive)
         run: |
-          composer install
-          composer update
+          php -r "require 'vendor/autoload.php'; if (! class_exists('Database\\Seeders\\Support\\ProjectPageCopy')) { fwrite(STDERR, 'ProjectPageCopy autoload failed — check database/seeders/Support/ folder casing'.PHP_EOL); exit(1); }"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,9 +33,7 @@ jobs:
           cache: "npm"
 
       - name: Install Node Dependencies
-        run: |
-          npm ci
-          npm install
+        run: npm ci
 
       - name: Build Frontend
         run: npm run build
@@ -100,6 +100,10 @@ jobs:
               unlink "$APP_DIR/public_html" || true
             fi
             ln -nfs "$APP_DIR/current/public" "$APP_DIR/public_html"
+
+            if command -v composer >/dev/null 2>&1; then
+              composer dump-autoload -o --no-dev
+            fi
 
             /usr/local/bin/ea-php84 artisan migrate --force
             /usr/local/bin/ea-php84 artisan db:seed --force
