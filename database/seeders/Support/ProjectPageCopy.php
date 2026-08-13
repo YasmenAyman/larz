@@ -4,6 +4,7 @@ namespace Database\Seeders\Support;
 
 use App\Models\MediaAsset;
 use App\Models\Project;
+use App\Support\WebsiteContent;
 
 /** Bilingual project page copy (no literal newline characters). */
 final class ProjectPageCopy
@@ -50,6 +51,7 @@ final class ProjectPageCopy
             ['page_key' => $pageKey, 'section_key' => 'virtual_tour', 'section_type' => 'project.virtual_tour', 'content_snapshot' => $copy['virtualTour'] ?? []],
             ['page_key' => $pageKey, 'section_key' => 'cta', 'section_type' => 'project.cta', 'content_snapshot' => ['eyebrow' => $copy['cta']['eyebrow'] ?? '', 'heading' => $copy['cta']['heading'] ?? '']],
             ['page_key' => $pageKey, 'section_key' => 'homes3d', 'section_type' => 'project.homes3d', 'content_snapshot' => $copy['homes3d'] ?? []],
+            ['page_key' => $pageKey, 'section_key' => 'gallery', 'section_type' => 'project.gallery', 'content_snapshot' => $copy['gallery'] ?? ['eyebrow' => 'Gallery', 'heading' => 'A closer look.']],
             ['page_key' => $pageKey, 'section_key' => 'construction', 'section_type' => 'project.construction', 'content_snapshot' => ['heading' => $copy['construction']['heading'] ?? '', 'description' => $copy['construction']['description'] ?? '']],
             ['page_key' => $pageKey, 'section_key' => 'amenities', 'section_type' => 'project.amenities', 'content_snapshot' => ['heading' => $copy['amenities']['heading'] ?? '']],
             ['page_key' => $pageKey, 'section_key' => 'location', 'section_type' => 'project.location', 'content_snapshot' => $copy['location'] ?? []],
@@ -132,6 +134,10 @@ final class ProjectPageCopy
             'heroSlides' => $heroSlides,
             'stats' => $stats,
             'overview' => $localized['overview'] ?? ['heading' => '', 'body' => ''],
+            'gallery' => [
+                'eyebrow' => $localized['gallery']['eyebrow'] ?? ($locale === 'ar' ? 'المعرض' : 'Gallery'),
+                'heading' => $localized['gallery']['heading'] ?? ($locale === 'ar' ? 'نظرة أقرب.' : 'A closer look.'),
+            ],
             'masterplan' => $localized['masterplan'] ?? ['heading' => '', 'description' => '', 'brochureHeading' => '', 'brochureDescription' => ''],
             'virtualTour' => $localized['virtualTour'] ?? ['heading' => '', 'description' => '', 'videoUrl' => ''],
             'cta' => [
@@ -170,9 +176,7 @@ final class ProjectPageCopy
             return '';
         }
 
-        $path = MediaAsset::query()->whereKey($assetId)->value('path');
-
-        return $path ? asset($path) : '';
+        return WebsiteContent::assetUrl(MediaAsset::query()->find($assetId)) ?? '';
     }
 
     private static function kloveEn(): array

@@ -16,16 +16,25 @@ class AboutController extends Controller
 {
     public function __invoke(SeoMetadataService $seo): Response
     {
-        $hero = WebsiteContent::section('about', 'hero');
-        $legacyHeroBackground = $hero['background_image'] ?? null;
-        $heroBackground = ! empty($hero['background_image_id'])
-            ? WebsiteContent::assetUrl(MediaAsset::find($hero['background_image_id']))
+        $heroSnapshot = WebsiteContent::sectionSnapshot('about', 'hero');
+        $legacyHeroBackground = $heroSnapshot['background_image'] ?? null;
+        $heroBackground = ! empty($heroSnapshot['background_image_id'])
+            ? WebsiteContent::assetUrl(MediaAsset::find($heroSnapshot['background_image_id']))
             : asset($legacyHeroBackground === 'assets/TYPE-B-IMAGE-01.png' ? 'assets/about-hero-optimized.jpg' : ($legacyHeroBackground ?? 'assets/about-hero-optimized.jpg'));
         $story = WebsiteContent::section('about', 'story');
-        $awardsSection = LocalizedContent::section(WebsiteContent::section('about', 'awards'));
-        $promiseSection = LocalizedContent::section(WebsiteContent::section('about', 'promise'));
+        $awardsSection = LocalizedContent::section(WebsiteContent::sectionSnapshot('about', 'awards'));
+        $promiseSection = LocalizedContent::section(WebsiteContent::sectionSnapshot('about', 'promise'));
         return Inertia::render('Website/About/Index', [
-            'hero' => [...$hero, 'backgroundImage' => $heroBackground],
+            'hero' => [
+                'eyebrow' => LocalizedContent::field($heroSnapshot, 'eyebrow', 'About LARZ'),
+                'heading' => LocalizedContent::field($heroSnapshot, 'heading'),
+                'description' => LocalizedContent::field($heroSnapshot, 'description'),
+                'cta_label' => LocalizedContent::fieldFrom($heroSnapshot, ['cta_label', 'primary_cta_label'], 'Explore our projects'),
+                'cta_url' => LocalizedContent::fieldFrom($heroSnapshot, ['cta_url', 'primary_cta_url'], '/projects'),
+                'secondary_cta_label' => LocalizedContent::field($heroSnapshot, 'secondary_cta_label', 'Contact us'),
+                'secondary_cta_url' => LocalizedContent::field($heroSnapshot, 'secondary_cta_url', '/contact-us'),
+                'backgroundImage' => $heroBackground,
+            ],
             'stats' => WebsiteContent::section('about', 'stats')['items'] ?? [],
             'story' => [...$story, 'image' => ! empty($story['image_id']) ? WebsiteContent::assetUrl(MediaAsset::find($story['image_id'])) : asset($story['image'] ?? 'assets/IMAGE-01-RENDERED-1.png')],
             'awards' => [

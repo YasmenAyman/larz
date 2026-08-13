@@ -30,6 +30,7 @@ export type ProjectHeroSlide = { eyebrow: string; titleLine1: string; titleLine2
 export type ProjectSections = {
     heroSlides: ProjectHeroSlide[];
     overview: { heading: string; body: string };
+    gallery: { eyebrow: string; heading: string };
     masterplan: { heading: string; description: string; brochureHeading: string; brochureDescription: string };
     virtualTour: { heading: string; description: string; videoUrl: string };
     cta: { eyebrow: string; heading: string; whatsappNumber: string; primaryCtaLabel: string; secondaryCtaLabel: string };

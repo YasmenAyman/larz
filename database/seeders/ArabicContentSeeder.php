@@ -96,7 +96,7 @@ class ArabicContentSeeder extends Seeder
             ['home', 'gallery', ['eyebrow' => 'معرض الصور', 'heading' => 'مساحات تُلهم', 'description' => 'لمحة عن التفاصيل والتصاميم والوجهات التي تعرّف تجربة لارز.', 'cta_label' => 'استكشف الكل', 'cta_url' => '/projects']],
             ['home', 'testimonials', ['eyebrow' => 'آراء العملاء', 'heading' => 'مبني على الثقة. مثبت بالخبرة.', 'description' => 'رضا عملائنا يعكس التزامنا بتقديم تطويرات مدروسة وخدمة استثنائية.']],
             ['home', 'final_cta', ['eyebrow' => 'ابدأ الآن', 'heading' => 'هل أنت مستعد لإيجاد منزلك؟', 'description' => 'استكشف مجتمعاتنا أو تحدث مع فريقنا لاختيار الأنسب لك.', 'cta_label' => 'عرض المشاريع', 'cta_url' => '/projects']],
-            ['about', 'hero', ['eyebrow' => 'عن لارز', 'heading' => 'أنت لا تختار مبنى. أنت تختار كيف ستعيش.', 'description' => 'لأكثر من 40 عامًا، تعلّم مؤسسو لارز كيف يصنعون ذلك — في القاهرة الجديدة والعاصمة الإدارية.']],
+            ['about', 'hero', ['eyebrow' => 'عن لارز', 'heading' => 'أنت لا تختار مبنى. أنت تختار كيف ستعيش.', 'description' => 'لأكثر من 40 عامًا، تعلّم مؤسسو لارز كيف يصنعون ذلك — في القاهرة الجديدة والعاصمة الإدارية.', 'cta_label' => 'استكشف مشاريعنا', 'cta_url' => '/projects', 'secondary_cta_label' => 'تواصل معنا', 'secondary_cta_url' => '/contact-us']],
             ['about', 'stats', ['items' => [['value' => '+60', 'label' => 'مشروع', 'note' => 'مكتمل وقيد التنفيذ'], ['value' => '2', 'label' => 'دولة', 'note' => 'مصر والتوسع مستمر'], ['value' => '+15k', 'label' => 'عميل', 'note' => 'عائلات وشركات'], ['value' => '+40', 'label' => 'سنة خبرة', 'note' => 'خبرة المؤسسين']]]],
             ['about', 'story', ['eyebrow' => 'قصتنا', 'heading' => 'لماذا يهم من يبني المكان.', 'body' => 'أنت تبحث عن مكان تنتمي إليه. عن مساحة للتنفس. عن منزل يظل مناسبًا بعد عشر سنوات. في لارز تشعر بخبرة 40 عامًا في التفاصيل التي يسهل تجاهلها ويصعب إصلاحها: كيف يسقط الضوء صباحًا، وكيف يتماسك الحي، وكيف يعيش المنزل بعد سنوات.']],
             ['about', 'promise', ['eyebrow' => 'وعدنا', 'heading' => 'نبني أماكن تظل تستحق بعد تسليم المفاتيح.', 'primary_cta_label' => 'استكشف مشاريعنا', 'primary_cta_url' => '/projects', 'secondary_cta_label' => 'تحدث معنا', 'secondary_cta_url' => '/contact-us']],
@@ -110,12 +110,12 @@ class ArabicContentSeeder extends Seeder
             ['careers', 'hero', ['eyebrow' => 'الوظائف', 'heading' => 'ابنِ مستقبلك بينما نبني المجتمعات.', 'description' => 'انضم إلى فريق يهتم بالتفاصيل — وبمن ينفذونها.']],
             ['careers', 'values', ['eyebrow' => 'لماذا لارز', 'heading' => 'انمُ مع فريق يبني ما يدوم.', 'description' => 'نوظّف من يهتمون بالتفاصيل — وببعضهم البعض.']],
             ['careers', 'vacancies_settings', ['eyebrow' => 'الوظائف الشاغرة', 'heading' => 'فرص متاحة.', 'description' => 'انضم إلينا في تشكيل مجتمعات القاهرة الجديدة وما بعدها.']],
-            ['careers', 'internship', ['heading' => 'ابدأ مسيرتك معنا.', 'description' => 'برامج تدريبية تمنح الطلاب والخريجين خبرة حقيقية في التصميم والتسويق والمبيعات والهندسة.']],
+            ['careers', 'internship', ['eyebrow' => 'برامج التدريب', 'heading' => 'ابدأ مسيرتك معنا.', 'description' => 'برامج تدريبية تمنح الطلاب والخريجين خبرة حقيقية في التصميم والتسويق والمبيعات والهندسة.', 'cta_label' => 'قدّم لبرنامج التدريب']],
             ['careers', 'general_cv_cta', ['eyebrow' => 'الوظائف', 'heading' => 'لا تجد دورك؟ أرسل سيرتك الذاتية.', 'cta_label' => 'أرسل سيرتك الذاتية']],
             ['contact', 'hero', ['eyebrow' => 'تواصل معنا', 'heading' => 'لنتحدث.', 'description' => 'سواء كنت تختار منزلًا أو تستكشف شراكة، نحن هنا — ونرد بسرعة.', 'primary_cta_label' => 'أرسل رسالة', 'primary_cta_url' => '#contact-form', 'secondary_cta_label' => 'اتصل بنا', 'secondary_cta_url' => 'tel:15813']],
             ['contact', 'location', ['heading' => 'تجدنا.']],
             ['contact', 'contact_methods', ['eyebrow' => 'تواصل معنا', 'heading' => 'بالطريقة التي تناسبك.', 'description' => 'تواصل مع الفريق عبر القناة الأنسب لك.', 'items' => [['key' => 'hotline', 'icon' => 'phone', 'title' => 'الخط الساخن', 'value' => '15813', 'note' => 'السبت–الخميس، 9 ص–6 م'], ['key' => 'whatsapp', 'icon' => 'message-circle', 'title' => 'واتساب', 'value' => '+20 15813', 'note' => 'ردود سريعة يوميًا'], ['key' => 'email', 'icon' => 'mail', 'title' => 'البريد الإلكتروني', 'value' => 'info@larzdevelopments.com', 'note' => 'larzdevelopments.com'], ['key' => 'sales_office', 'icon' => 'map-pin', 'title' => 'مكتب المبيعات', 'value' => 'القاهرة الجديدة', 'note' => 'مول كوف، بجوار بوابة ميفيدا 6']]]],
-            ['contact', 'request_form', ['heading' => 'أرسل لنا رسالة.', 'description' => 'أخبرنا بما تبحث عنه وسيرد فريقنا خلال يوم عمل واحد.', 'submit_label' => 'إرسال الرسالة']],
+            ['contact', 'request_form', ['eyebrow' => 'طلب التسعير / جولة', 'heading' => 'أرسل لنا رسالة.', 'description' => 'أخبرنا بما تبحث عنه وسيرد فريقنا خلال يوم عمل واحد.', 'submit_label' => 'إرسال الرسالة']],
             ['contact', 'social_media', ['eyebrow' => 'وسائل التواصل', 'heading' => 'تابع لارز.', 'description' => 'أخبار وإطلاقات ولحظات من مجتمعاتنا.']],
         ];
 
@@ -138,6 +138,8 @@ class ArabicContentSeeder extends Seeder
             ]);
             $record->update(['content_snapshot' => LocalizedContent::sanitizeStrings($snapshot)]);
         }
+
+        \App\Support\WebsiteCache::flushSectionSnapshots();
     }
 
     private function translateProjectSections(): void
@@ -171,6 +173,7 @@ class ArabicContentSeeder extends Seeder
                 'virtual_tour' => $copy['virtualTour'] ?? [],
                 'cta' => ['eyebrow' => $copy['cta']['eyebrow'] ?? '', 'heading' => $copy['cta']['heading'] ?? ''],
                 'homes3d' => $copy['homes3d'] ?? [],
+                'gallery' => $copy['gallery'] ?? ['eyebrow' => 'المعرض', 'heading' => 'نظرة أقرب.'],
                 'construction' => ['heading' => $copy['construction']['heading'] ?? '', 'description' => $copy['construction']['description'] ?? ''],
                 'amenities' => ['heading' => $copy['amenities']['heading'] ?? ''],
                 'location' => $copy['location'] ?? [],

@@ -16,6 +16,13 @@ class UpdateAdminContentRequest extends FormRequest
         return [
             'sections' => ['required', 'array'],
             'sections.*' => ['required', 'array'],
+            'sections.*.eyebrow' => ['sometimes', 'string', 'max:160'],
+            'sections.*.translations' => ['sometimes', 'array'],
+            'sections.*.translations.en' => ['sometimes', 'array'],
+            'sections.*.translations.ar' => ['sometimes', 'array'],
+            'sections.*.translations.*.eyebrow' => ['sometimes', 'string', 'max:160'],
+            'sections.*.translations.*.heading' => ['sometimes', 'string', 'max:5000'],
+            'sections.*.translations.*.description' => ['sometimes', 'string', 'max:10000'],
             'sections.*.heading' => ['sometimes', 'string', 'max:5000'],
             'sections.*.description' => ['sometimes', 'string', 'max:10000'],
             'sections.*.body' => ['sometimes', 'string', 'max:30000'],

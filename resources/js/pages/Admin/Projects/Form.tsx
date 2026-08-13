@@ -55,6 +55,7 @@ type SectionData = {
     heroSlides: HeroSlide[];
     stats: Array<{ value: string; label: string; note: string }>;
     overview: { heading: string; body: string };
+    gallery: { eyebrow: string; heading: string };
     masterplan: { heading: string; description: string; brochureHeading: string; brochureDescription: string };
     virtualTour: { heading: string; description: string; videoUrl: string };
     homes3d: { heading: string; description: string; note: string; items: Array<{ tag: string; name: string; size: string; url: string }> };
@@ -68,6 +69,7 @@ const emptySections: SectionData = {
     heroSlides: [{ eyebrow: '', titleLine1: '', titleLine2: '', description: '', cta1Label: '', cta1Url: '#brochure', cta2Label: '', cta2Url: '#brochure' }],
     stats: [],
     overview: { heading: '', body: '' },
+    gallery: { eyebrow: 'Gallery', heading: 'A closer look.' },
     masterplan: { heading: '', description: '', brochureHeading: '', brochureDescription: '' },
     virtualTour: { heading: '', description: '', videoUrl: '' },
     homes3d: { heading: '', description: '', note: '', items: [] },
@@ -92,6 +94,7 @@ function normaliseSections(saved?: Partial<SectionData>): SectionData {
         heroSlides: heroSlides.map((slide) => Object.assign({}, emptySections.heroSlides[0], slide)),
         stats: stats.map((stat) => Object.assign({ value: '', label: '', note: '' }, stat)),
         overview: { ...emptySections.overview, ...(savedSections.overview ?? {}) },
+        gallery: { ...emptySections.gallery, ...(savedSections.gallery ?? {}) },
         masterplan: { ...emptySections.masterplan, ...(savedSections.masterplan ?? {}) },
         virtualTour: { ...emptySections.virtualTour, ...(savedSections.virtualTour ?? {}) },
         homes3d: {
@@ -429,6 +432,16 @@ export default function Form({ project, categories }: { project: Project | null;
                                     </div>
                                 ))}
                                 <button type="button" onClick={() => setSection('homes3d', { ...sections.homes3d, items: [...sections.homes3d.items, { tag: '', name: '', size: '', url: '' }] })} className="mt-2 flex items-center gap-2 text-xs text-gold hover:text-gold/80"><Plus className="size-3" /> Add home</button>
+                            </div>
+                        </div>
+                    </SectionCard>
+
+                    {/* ===== GALLERY (per-language) ===== */}
+                    <SectionCard title={ui('Gallery', 'المعرض')}>
+                        <div dir={isArabic ? 'rtl' : 'ltr'}>
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <FormField label="Eyebrow"><input value={sections.gallery.eyebrow} onChange={(e) => setSection('gallery', { ...sections.gallery, eyebrow: e.target.value })} className={textFieldClass} /></FormField>
+                                <FormField label="Heading"><input value={sections.gallery.heading} onChange={(e) => setSection('gallery', { ...sections.gallery, heading: e.target.value })} className={textFieldClass} /></FormField>
                             </div>
                         </div>
                     </SectionCard>

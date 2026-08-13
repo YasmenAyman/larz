@@ -24,17 +24,15 @@ class ContactController extends Controller
             'linkedin' => $settings['social.linkedin'] ?? null,
             'youtube' => $settings['social.youtube'] ?? null,
         ];
-        $heroRaw = WebsiteContent::section('contact', 'hero');
+        $heroRaw = WebsiteContent::sectionSnapshot('contact', 'hero');
         $hero = LocalizedContent::section($heroRaw);
         $methods = WebsiteContent::section('contact', 'contact_methods');
         $cards = $methods['items'] ?? [];
-        $locale = app()->getLocale();
-        $requestFormRaw = WebsiteContent::section('contact', 'request_form');
-        $requestFormTranslations = is_array($requestFormRaw['translations'] ?? null) ? $requestFormRaw['translations'] : ['en' => $requestFormRaw, 'ar' => []];
-        $requestForm = $requestFormTranslations[$locale] ?? $requestFormTranslations['en'] ?? [];
+        $requestFormSnapshot = WebsiteContent::sectionSnapshot('contact', 'request_form');
 
-        $locationRaw = WebsiteContent::section('contact', 'location_map');
+        $locationRaw = WebsiteContent::sectionSnapshot('contact', 'location_map');
         $locationTranslations = is_array($locationRaw['translations'] ?? null) ? $locationRaw['translations'] : ['en' => $locationRaw, 'ar' => []];
+        $locale = app()->getLocale();
         $locationCopy = $locationTranslations[$locale] ?? $locationTranslations['en'] ?? [];
         $addressSetting = \App\Models\SiteSetting::query()->where('key', $locale === 'ar' ? 'contact.address_ar' : 'contact.address')->value('value');
         if (! $addressSetting) {
@@ -65,9 +63,9 @@ class ContactController extends Controller
             ],
             'projects' => \App\Models\Project::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title'])->map(fn ($project) => ['id' => $project->id, 'title' => $project->title])->values()->all(),
             'request_form' => [
-                'eyebrow' => $requestForm['eyebrow'] ?? 'Request pricing / tour',
-                'heading' => $requestForm['heading'] ?? 'Book a visit or request pricing.',
-                'description' => $requestForm['description'] ?? '',
+                'eyebrow' => LocalizedContent::field($requestFormSnapshot, 'eyebrow', 'Request pricing / tour'),
+                'heading' => LocalizedContent::field($requestFormSnapshot, 'heading', 'Book a visit or request pricing.'),
+                'description' => LocalizedContent::field($requestFormSnapshot, 'description', ''),
             ],
             'location_map' => [
                 'eyebrow' => $locationCopy['eyebrow'] ?? 'Location & map',

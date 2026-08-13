@@ -68,7 +68,7 @@ export function MediaStories({ posts, settings }: { posts: MediaPost[]; settings
                                 <div className="absolute left-0 top-0 h-full w-full" style={{ backgroundImage: 'radial-gradient(ellipse 60% 70% at 82% 20%, rgba(255, 255, 255, 0.3) 0%, rgba(190, 190, 190, 0.2) 35%, transparent 72%), linear-gradient(110deg, rgba(6, 4, 4, 0.40) 28%, rgba(2, 2, 4, 0.10) 100%)' }} />
                             </a>
                             <div className="p-4">
-                                <p className="text-[0.9rem] tracking-[0.16em] text-ink-muted/60 uppercase">{post.category}</p>
+                                <p className="text-[0.9rem] tracking-[0.16em] text-ink-muted/60 uppercase">{post.category ? t(post.category) : null}</p>
                                 <h3 className="mt-3 text-lg leading-tight text-ink">{post.title}</h3>
                                 <p className="mt-2 text-xs text-ink-muted">{post.excerpt}</p>
                                 <a href={`/media/${post.slug}`} className="mt-4 inline-flex items-center gap-1 text-[0.9rem] tracking-[0.18em] text-ink-muted uppercase">{t('Read article')} <ArrowRight className="size-3 rtl:rotate-180" strokeWidth={1.5} /></a>

@@ -14,6 +14,8 @@ type Tab = typeof tabs[number];
 
 const icons = ['phone', 'message-circle', 'mail', 'map-pin'] as const;
 
+const inputClass = 'w-full rounded-xl border border-white/15 bg-[#1e1e22] px-4 py-3 text-sm text-white outline-none transition focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 placeholder:text-white/30';
+
 export default function ContactMethods({ settings }: { settings: Settings }) {
   const { locale: websiteLocale } = useI18n();
   const [activeTab, setActiveTab] = useState<Tab>(websiteLocale === 'ar' ? tabs[1] : 'English');
@@ -82,15 +84,15 @@ export default function ContactMethods({ settings }: { settings: Settings }) {
         </div>
 
         <form onSubmit={submit} className="space-y-6">
-          <div className="rounded-xl border border-slate-800 bg-slate-950 p-6">
+          <div className="grid gap-5">
             <FormField label="Eyebrow">
-              <input value={current.eyebrow} onChange={(e) => setField('eyebrow', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" />
+              <input value={current.eyebrow} onChange={(e) => setField('eyebrow', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className={inputClass} />
             </FormField>
             <FormField label="Heading">
-              <input value={current.heading} onChange={(e) => setField('heading', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" />
+              <input value={current.heading} onChange={(e) => setField('heading', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className={inputClass} />
             </FormField>
             <FormField label="Description">
-              <textarea value={current.description} onChange={(e) => setField('description', e.target.value)} rows={2} dir={locale === 'ar' ? 'rtl' : 'ltr'} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" />
+              <textarea value={current.description} onChange={(e) => setField('description', e.target.value)} rows={2} dir={locale === 'ar' ? 'rtl' : 'ltr'} className={inputClass} />
             </FormField>
           </div>
 
@@ -110,20 +112,20 @@ export default function ContactMethods({ settings }: { settings: Settings }) {
                   </div>
                   <div className="grid gap-3 sm:grid-cols-3">
                     <FormField label="Icon">
-                      <select value={item.icon} onChange={(e) => setItem(index, 'icon', e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2">
+                      <select value={item.icon} onChange={(e) => setItem(index, 'icon', e.target.value)} className={inputClass}>
                         {icons.map((ic) => <option key={ic} value={ic}>{ic}</option>)}
                       </select>
                     </FormField>
                     <FormField label="Title">
-                      <input value={item.title} onChange={(e) => setItem(index, 'title', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" />
+                      <input value={item.title} onChange={(e) => setItem(index, 'title', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className={inputClass} />
                     </FormField>
                     <FormField label="Value">
-                      <input value={item.value} onChange={(e) => setItem(index, 'value', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" />
+                      <input value={item.value} onChange={(e) => setItem(index, 'value', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className={inputClass} />
                     </FormField>
                   </div>
                   <div className="mt-3">
                     <FormField label="Note">
-                      <input value={item.note} onChange={(e) => setItem(index, 'note', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2" />
+                      <input value={item.note} onChange={(e) => setItem(index, 'note', e.target.value)} dir={locale === 'ar' ? 'rtl' : 'ltr'} className={inputClass} />
                     </FormField>
                   </div>
                 </div>

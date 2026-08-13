@@ -35,6 +35,26 @@ final class WebsiteCache
         Cache::forget(self::sectionKey($page, $section));
     }
 
+    public static function flushSectionSnapshots(): void
+    {
+        // Legacy unversioned keys from before cache versioning.
+        $legacyKeys = [
+            self::sectionKey('about', 'hero'),
+            self::sectionKey('contact', 'request_form'),
+            self::sectionKey('about', 'story'),
+            self::sectionKey('about', 'promise'),
+            self::sectionKey('contact', 'hero'),
+            self::sectionKey('contact', 'contact_methods'),
+            self::sectionKey('contact', 'location_map'),
+            self::sectionKey('contact', 'social_media'),
+            self::sectionKey('careers', 'internship'),
+        ];
+
+        foreach ($legacyKeys as $key) {
+            Cache::forget($key);
+        }
+    }
+
     public static function project(string $slug): void
     {
         Cache::forget(self::projectKey($slug));
@@ -66,6 +86,7 @@ final class WebsiteCache
     {
         Cache::forget('website.featured_projects');
         Cache::forget('website.projects.index');
+        Cache::forget('website.mega_menu.projects');
     }
 
     public static function sitemap(): void

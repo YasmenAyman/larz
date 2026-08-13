@@ -5,7 +5,7 @@ import { Eyebrow } from '@/components/shared/Eyebrow';
 import WebsiteLayout from '@/layouts/WebsiteLayout';
 const awardIcons = { award: Award, star: Star, medal: Medal, crown: Crown };
 
-export default function Index({ hero, stats, story, awards, partners, promise, seo }: { hero: { eyebrow?: string; heading: string; description: string; backgroundImage: string; cta_label?: string; cta_url?: string; secondary_cta_label?: string; secondary_cta_url?: string }; stats: Array<{ value: string; label: string; note: string }>; story: { heading: string; body: string; image: string }; awards: { eyebrow: string; heading: string; items: Array<{ icon: string | null; title: string; year: number | null; copy: string | null }> }; partners: { settings: { eyebrow?: string; heading?: string; description?: string }; items: Array<{ name: string; role: string | null; description: string | null; url: string | null; logo: string | null }> }; promise: { eyebrow: string; heading: string; primary_cta_label: string; primary_cta_url: string; secondary_cta_label: string; secondary_cta_url: string }; seo: SeoMetadata }) {
+export default function Index({ hero, stats, story, awards, partners, promise, seo }: { hero: { eyebrow?: string; heading: string; description: string; backgroundImage: string; cta_label?: string; cta_url?: string; secondary_cta_label?: string; secondary_cta_url?: string }; stats: Array<{ value: string; label: string; note: string }>; story: { eyebrow?: string; heading: string; body: string; image: string }; awards: { eyebrow: string; heading: string; items: Array<{ icon: string | null; title: string; year: number | null; copy: string | null }> }; partners: { settings: { eyebrow?: string; heading?: string; description?: string }; items: Array<{ name: string; role: string | null; description: string | null; url: string | null; logo: string | null }> }; promise: { eyebrow: string; heading: string; primary_cta_label: string; primary_cta_url: string; secondary_cta_label: string; secondary_cta_url: string }; seo: SeoMetadata }) {
     const heroLines = (hero.heading ?? 'You\'re not choosing\na building.').split('\n');
     const storyParagraphs = (story.body ?? '').split('\n');
     const promiseHeading = (promise.heading ?? '').split('\n');
@@ -45,19 +45,19 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
                     </p>
                     <div className="mt-8 flex flex-wrap items-center gap-6">
                         <a href={hero.cta_url ?? '/projects'} className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase transition-colors hover:bg-gold/10">
-                            {hero.cta_label ?? 'Explore our projects'} <ArrowRight className="size-3.5 rtl:rotate-180" strokeWidth={1.5} />
+                            {hero.cta_label} <ArrowRight className="size-3.5 rtl:rotate-180" strokeWidth={1.5} />
                         </a>
-                        <a href={hero.secondary_cta_url ?? '/contact'} className="text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">
-                            {hero.secondary_cta_label ?? 'Contact us'}
+                        <a href={hero.secondary_cta_url ?? '/contact-us'} className="text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">
+                            {hero.secondary_cta_label}
                         </a>
                     </div>
                 </div>
             </section>
 
             <section className="border-b border-hairline/50 bg-night">
-                <div className="mx-auto grid max-w-[950px] grid-cols-2 md:grid-cols-4">
+                <div className="mx-auto grid max-w-[1150px] grid-cols-2 md:grid-cols-4">
                     {stats.map(({ value, label, note }) => (
-                        <div key={label} className="border-r border-hairline/50 px-4 py-7 last:border-r-0 sm:px-6">
+                        <div key={label} className="border-e border-hairline/50 px-3 py-7 last:border-e-0 sm:px-5">
                             <p className="text-5xl font-light text-ink">{value}</p>
                             <p className="mt-2 text-[0.65rem] font-light tracking-[0.22em] text-ink uppercase">{label}</p>
                             <p className="mt-1 text-[0.7rem] text-ink-muted">{note}</p>
@@ -68,8 +68,8 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
 
             <section id="story" className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
                 <div className="mx-auto grid max-w-[1440px] gap-14 px-6 sm:px-10 md:grid-cols-2 lg:items-center">
-                    <div className="max-w-xl">
-                        <Eyebrow tone="light">Our story</Eyebrow>
+                    <div className="max-w-lg">
+                        <Eyebrow tone="light">{story.eyebrow ?? 'Our story'}</Eyebrow>
                         <h2 className="mt-5 text-3xl font-light leading-[1.1] sm:text-[3rem]">{story.heading}</h2>
                         <p className="mt-6 text-sm font-light leading-relaxed text-ink-muted md:text-lg">
                             {storyParagraphs.map((paragraph, index) => <span key={paragraph}>{index > 0 && <br />}{paragraph}</span>)}
@@ -104,7 +104,7 @@ export default function Index({ hero, stats, story, awards, partners, promise, s
             <section id="partners" className="bg-[#EFEFF1] py-20 text-paper-ink sm:py-24">
                 <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-24">
                     <Eyebrow tone="light">{partners.settings.eyebrow ?? 'Partnerships & affiliations'}</Eyebrow>
-                    <h2 className="mt-5 max-w-xl text-3xl font-light leading-[1.15] sm:text-[3rem]">{partners.settings.heading ?? 'The names behind our work.'}</h2>
+                    <h2 className="mt-5 max-w-md text-3xl font-light leading-[1.15] sm:text-[3rem]">{partners.settings.heading ?? 'The names behind our work.'}</h2>
                     <p className="mt-5 max-w-lg text-sm leading-relaxed text-paper-muted">{partners.settings.description ?? 'We build with partners who share our standards — in design, engineering and delivery.'}</p>
                     <div className="mt-10 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                         {partners.items.map(({ name, role, url, logo }) => {

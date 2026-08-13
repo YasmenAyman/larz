@@ -74,6 +74,9 @@ class ProjectsSeeder extends Seeder
         foreach ([['Latest update', 'Structure & landscaping progress', 'Gallery_2.png'], ['Previous', 'Foundations & clusters', 'Gallery_3.png'], ['Earlier', 'Groundworks begin', 'Gallery_4.png']] as $order => [$tag, $title, $file]) {
             ProjectUpdate::updateOrCreate(['project_id' => $klove->id, 'title' => $title], ['media_asset_id' => $asset($file), 'tag' => $tag, 'sort_order' => $order, 'is_published' => true]);
         }
+        foreach (['Gallery_1.png', 'Gallery_2.png', 'Gallery_3.png'] as $order => $file) {
+            ProjectGallery::updateOrCreate(['project_id' => $klove->id, 'media_asset_id' => $asset($file)], ['alt_text' => $klove->title.' gallery image '.($order + 1), 'sort_order' => $order, 'is_published' => true]);
+        }
         foreach ([['North Teseen Road', '1 min'], ['Rehab City', '3 min'], ["General Prosecutor's Office", '5 min'], ['American University in Cairo', '7 min'], ['New Administrative Capital', '20 min']] as $order => [$place, $time]) {
             NearbyLocation::updateOrCreate(['project_id' => $klove->id, 'place' => $place], ['time_label' => $time, 'sort_order' => $order, 'is_active' => true]);
         }

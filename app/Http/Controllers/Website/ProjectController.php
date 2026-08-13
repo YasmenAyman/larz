@@ -72,6 +72,10 @@ class ProjectController extends Controller
             'heroSlides' => [],
             'stats' => [],
             'overview' => ['heading' => '', 'body' => ''],
+            'gallery' => [
+                'eyebrow' => $locale === 'ar' ? 'المعرض' : 'Gallery',
+                'heading' => $locale === 'ar' ? 'نظرة أقرب.' : 'A closer look.',
+            ],
             'masterplan' => ['heading' => '', 'description' => '', 'brochureHeading' => '', 'brochureDescription' => ''],
             'virtualTour' => ['heading' => '', 'description' => '', 'videoUrl' => ''],
             'cta' => ['eyebrow' => '', 'heading' => ''],
@@ -84,13 +88,14 @@ class ProjectController extends Controller
         if (! empty($lang)) {
             $resolved = array_replace_recursive($defaults, $lang);
             $resolved['heroSlides'] = $this->normalizeHeroSlides($resolved['heroSlides'], $record);
-            return $resolved;
+            return $this->hydrateConstructionImages($resolved, $record);
         }
         $raw = PageSection::query()->where('page_key', 'project-'.$record->slug)->where('status', 'published')->pluck('content_snapshot', 'section_key')->all();
         $resolved = [
             'heroSlides' => $raw['hero_slides']['items'] ?? [],
             'stats' => [],
             'overview' => $raw['overview'] ?? ['heading' => '', 'body' => ''],
+            'gallery' => $raw['gallery'] ?? $defaults['gallery'],
             'masterplan' => $raw['masterplan'] ?? ['heading' => '', 'description' => '', 'brochureHeading' => '', 'brochureDescription' => ''],
             'virtualTour' => $raw['virtual_tour'] ?? ['heading' => '', 'description' => '', 'videoUrl' => ''],
             'cta' => $raw['cta'] ?? ['eyebrow' => '', 'heading' => ''],
@@ -101,6 +106,31 @@ class ProjectController extends Controller
         ];
 
         $resolved['heroSlides'] = $this->normalizeHeroSlides($resolved['heroSlides'], $record);
+
+        return $this->hydrateConstructionImages($resolved, $record);
+    }
+
+    private function hydrateConstructionImages(array $resolved, Project $record): array
+    {
+        if (! isset($resolved['construction']['items']) || ! is_array($resolved['construction']['items'])) {
+            return $resolved;
+        }
+
+        $updates = $record->updates->values();
+        $gallery = $record->galleries->map(fn ($item) => WebsiteContent::assetUrl($item->media))->filter()->values();
+
+        foreach ($resolved['construction']['items'] as $index => &$item) {
+            if (! empty($item['image'])) {
+                continue;
+            }
+
+            $item['image'] = WebsiteContent::assetUrl($updates->get($index)?->media)
+                ?? $gallery->get($index)
+                ?? $gallery->first()
+                ?? WebsiteContent::assetUrl($record->heroImage);
+        }
+        unset($item);
+
         return $resolved;
     }
 

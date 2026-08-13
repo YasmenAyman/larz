@@ -13,7 +13,7 @@ export default function Show({ project, sections, seo }: { project: WebsiteProje
             <Masterplan project={project} sections={sections} />
             <VirtualTour project={project} sections={sections} />
             <Homes3D project={project} sections={sections} />
-            <ProjectGallery project={project} />
+            <ProjectGallery project={project} sections={sections} />
             <ConstructionUpdates project={project} sections={sections} />
             <Amenities project={project} sections={sections} />
             <LocationMap project={project} sections={sections} />

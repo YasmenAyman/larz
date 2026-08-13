@@ -18,6 +18,35 @@ final class LocalizedContent
         return self::sanitizeStrings(self::deepMerge($snapshot, $overlay));
     }
 
+    public static function field(array $snapshot, string $key, ?string $fallback = null): string
+    {
+        $translations = is_array($snapshot['translations'] ?? null) ? $snapshot['translations'] : [];
+        $locale = app()->getLocale();
+
+        foreach ([$translations[$locale] ?? [], $translations['en'] ?? [], $snapshot] as $source) {
+            if (! is_array($source) || ! isset($source[$key]) || ! is_string($source[$key]) || $source[$key] === '') {
+                continue;
+            }
+
+            return self::sanitizeNewlines($source[$key]);
+        }
+
+        return $fallback ?? '';
+    }
+
+    /** @param  list<string>  $keys */
+    public static function fieldFrom(array $snapshot, array $keys, ?string $fallback = null): string
+    {
+        foreach ($keys as $key) {
+            $value = self::field($snapshot, $key);
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        return $fallback ?? '';
+    }
+
     /** @param  list<string>  $keys */
     public static function adminTranslations(array $snapshot, array $keys): array
     {

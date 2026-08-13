@@ -68,17 +68,17 @@ export function SearchInput({ value, onChange, placeholder = 'Search...', classN
             value={value}
             onChange={(event) => onChange(event.target.value)}
             placeholder={placeholder}
-            className={`h-[42px] w-full sm:!w-96 rounded-xl border border-white/15 bg-[#1e1e22] px-4 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 ${className}`}
+            className={`h-[42px] w-full rounded-xl border border-white/15 bg-[#1e1e22] px-4 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]/30 ${className}`}
         />
     );
 }
 
-export function FilterSelect({ value, onChange, options }: { value: string; onChange: (value: string) => void; options: string[] }) {
+export function FilterSelect({ value, onChange, options, className = '' }: { value: string; onChange: (value: string) => void; options: string[]; className?: string }) {
     return (
         <select
             value={value}
             onChange={(event) => onChange(event.target.value)}
-            className="h-[42px] rounded-xl border border-white/15 bg-[#1e1e22] px-3.5 text-sm text-white/90 outline-none focus:border-[#C5A880]"
+            className={`h-[42px] w-full rounded-xl border border-white/15 bg-[#1e1e22] px-3.5 text-sm text-white/90 outline-none focus:border-[#C5A880] ${className}`}
         >
             {options.map((option) => (
                 <option key={option} className="bg-[#19191c] text-white">

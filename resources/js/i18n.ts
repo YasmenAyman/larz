@@ -15,6 +15,9 @@ const translations: Record<string, string> = {
     'Media Page': '\u0635\u0641\u062d\u0629 \u0627\u0644\u0625\u0639\u0644\u0627\u0645',
     'News': '\u0627\u0644\u0623\u062e\u0628\u0627\u0631',
     'Offices & retail': 'مكاتب ومحلات تجارية',
+    'Residential': 'سكني',
+    'Mixed-use': 'متعدد الاستخدامات',
+    'Medical': 'طبي',
     'Admin': 'الإدارة',
     'Search by title...': 'ابحث بالعنوان...',
     'All': 'الكل',
@@ -41,6 +44,7 @@ const translations: Record<string, string> = {
     'What\'s happening at LARZ.': 'ماذا يحدث في LARZ؟',
     'Stories & insight.': 'قصص ورؤى',
     'Blogs': 'المدونة',
+    'Press releases': 'البيانات الصحفية',
     'Photo gallery': 'معرض الصور',
     'Inside our communities.': 'من داخل مجتمعاتنا',
     'Newsletter': 'النشرة البريدية',
@@ -194,7 +198,11 @@ const translations: Record<string, string> = {
     'Masterplan & Brochure': 'المخطط الرئيسي والبروشور',
     'Virtual Tour': 'جولة افتراضية',
     '3D Gallery': 'معرض ثلاثي الأبعاد',
+    'View in 3D': 'عرض ثلاثي الأبعاد',
     'Facilities': 'المرافق',
+    'Back to media': 'العودة إلى الإعلام',
+    'The homes · in 3D': 'المنازل · ثلاثي الأبعاد',
+    'A closer look.': 'نظرة أقرب.',
 };
 
 export function translate(value: string, locale: 'en' | 'ar'): string {

@@ -15,13 +15,26 @@ final class WebsiteContent
         return app(MediaUploadService::class)->publicUrl($asset);
     }
 
-    public static function section(string $page, string $key): array
+    public static function sectionSnapshot(string $page, string $key): array
     {
-        return LocalizedContent::section(Cache::remember('website.section.'.$page.'.'.$key, now()->addHour(), fn () => PageSection::query()
+        $version = PageSection::query()
             ->where('page_key', $page)
             ->where('section_key', $key)
             ->where('status', 'published')
-            ->first()?->content_snapshot ?? []));
+            ->value('updated_at');
+
+        $cacheKey = WebsiteCache::sectionKey($page, $key).'.'.($version?->timestamp ?? 0);
+
+        return Cache::remember($cacheKey, now()->addHour(), fn () => PageSection::query()
+            ->where('page_key', $page)
+            ->where('section_key', $key)
+            ->where('status', 'published')
+            ->value('content_snapshot') ?? []);
+    }
+
+    public static function section(string $page, string $key): array
+    {
+        return LocalizedContent::section(self::sectionSnapshot($page, $key));
     }
 
     public static function project(Project $project): array

@@ -97,29 +97,29 @@ export default function Index({ contact, projects, contact_methods, request_form
                             </p>
                         )}
                         <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                            <label className="text-[0.52rem] tracking-[0.2em] text-ink-muted uppercase">
+                            <label className="text-sm tracking-[0.2em] text-ink-muted uppercase">
                                 {t('Name')}
                                 <input type="text" value={data.name} onChange={(event) => setData('name', event.target.value)} required placeholder={t('Your name')} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
                                 {errors.name && <span className="mt-1 block text-xs text-rose-400">{errors.name}</span>}
                             </label>
-                            <label className="text-[0.52rem] tracking-[0.2em] text-ink-muted uppercase">
+                            <label className="text-sm tracking-[0.2em] text-ink-muted uppercase">
                                 {t('Phone')}
                                 <input type="tel" value={data.phone} onChange={(event) => setData('phone', event.target.value)} required placeholder={t('Your number')} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
                                 {errors.phone && <span className="mt-1 block text-xs text-rose-400">{errors.phone}</span>}
                             </label>
                         </div>
-                        <label className="mt-5 block text-[0.52rem] tracking-[0.2em] text-ink-muted uppercase">
+                        <label className="mt-5 block text-sm tracking-[0.2em] text-ink-muted uppercase">
                             {t('Project')}
                             <select value={data.project_id} onChange={(event) => setData('project_id', event.target.value)} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none focus:border-gold">
                                 {projects.map((project) => <option key={project.id} value={project.id}>{project.title}</option>)}
                             </select>
                         </label>
-                        <label className="mt-5 block text-[0.52rem] tracking-[0.2em] text-ink-muted uppercase">
+                        <label className="mt-5 block text-sm tracking-[0.2em] text-ink-muted uppercase">
                             {t('Email')}
                             <input type="email" value={data.email} onChange={(event) => setData('email', event.target.value)} placeholder={t('Optional')} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
                             {errors.email && <span className="mt-1 block text-xs text-rose-400">{errors.email}</span>}
                         </label>
-                        <label className="mt-5 block text-[0.52rem] tracking-[0.2em] text-ink-muted uppercase">
+                        <label className="mt-5 block text-sm tracking-[0.2em] text-ink-muted uppercase">
                             {t('Message')}
                             <textarea rows={4} value={data.message} onChange={(event) => setData('message', event.target.value)} placeholder={t("Anything you'd like us to know")} className="mt-2 block w-full resize-none border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
                         </label>
@@ -128,7 +128,7 @@ export default function Index({ contact, projects, contact_methods, request_form
                         <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
                             <label>Do not fill<input type="text" tabIndex={-1} autoComplete="off" value={data._hp_website} onChange={(event) => setData('_hp_website', event.target.value)} /></label>
                         </div>
-                        <button type="submit" disabled={processing} className="mt-5 inline-flex w-full items-center justify-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase transition-colors hover:bg-gold/10 disabled:opacity-60">
+                        <button type="submit" disabled={processing} className="mt-5 inline-flex w-full items-center justify-center gap-3 border border-gold px-5 py-3 text-base tracking-[0.2em] text-ink uppercase transition-colors hover:bg-gold/10 disabled:opacity-60">
                             {processing ? t('Sending...') : t('Send request')} <ArrowRight className="size-3.5 rtl:rotate-180" />
                         </button>
                         <p className="mt-3 text-center text-[0.58rem] text-ink-muted">{t("We'll only use your details to follow up on this request.")}</p>

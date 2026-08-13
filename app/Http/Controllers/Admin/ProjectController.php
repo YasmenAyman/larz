@@ -162,6 +162,7 @@ class ProjectController extends Controller
             ], $raw['hero_slides']['items'] ?? []),
             'stats' => [],
             'overview' => $raw['overview'] ?? ['heading' => '', 'body' => ''],
+            'gallery' => $raw['gallery'] ?? ['eyebrow' => 'Gallery', 'heading' => 'A closer look.'],
             'masterplan' => $raw['masterplan'] ?? ['heading' => '', 'description' => '', 'brochureHeading' => '', 'brochureDescription' => ''],
             'virtualTour' => $raw['virtual_tour'] ?? ['heading' => '', 'description' => '', 'videoUrl' => ''],
             'cta' => $raw['cta'] ?? ['eyebrow' => '', 'heading' => '', 'whatsappNumber' => '', 'primaryCtaLabel' => '', 'secondaryCtaLabel' => ''],

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateAdminContentRequest;
 use App\Models\PageSection;
 use App\Services\RichTextSanitizer;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteCache;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -15,18 +16,17 @@ class ContactRequestHeroController extends Controller
 {
     public function edit(): Response
     {
+        $snapshot = PageSection::query()->where('page_key', 'contact')->where('section_key', 'request_form')->value('content_snapshot') ?? [];
+        $translations = LocalizedContent::adminTranslations($snapshot, ['eyebrow', 'heading', 'description']);
         $section = PageSection::query()->where('page_key', 'contact')->where('section_key', 'request_form')->first();
-        $defaults = [
-            'eyebrow' => 'Request pricing / tour',
-            'heading' => 'Book a visit or request pricing.',
-            'description' => 'Tell us which community you\'re interested in and how to reach you. Our team will follow up with pricing, payment plans and available units.',
-        ];
-        $snapshot = $section?->content_snapshot ?? [];
-        $settings = array_merge($defaults, $snapshot);
-        $settings['translations'] = $snapshot['translations'] ?? ['en' => $settings, 'ar' => []];
 
         return Inertia::render('Admin/Pages/ContactRequestHero', [
-            'settings' => $settings,
+            'settings' => [
+                'eyebrow' => $translations['en']['eyebrow'] ?? 'Request pricing / tour',
+                'heading' => $translations['en']['heading'] ?? 'Book a visit or request pricing.',
+                'description' => $translations['en']['description'] ?? '',
+                'translations' => $translations,
+            ],
             'status' => $section?->status ?? 'inactive',
             'updated_at' => $section?->updated_at?->toDateTimeString(),
         ]);
@@ -34,9 +34,14 @@ class ContactRequestHeroController extends Controller
 
     public function updateSettings(UpdateAdminContentRequest $request): RedirectResponse
     {
-        $content = app(RichTextSanitizer::class)->sanitizeArray($request->input('section', $request->input('sections.request_form', [])));
-        if (isset($content['translations'])) {
-            $content = ['translations' => $content['translations']];
+        $content = $request->input('sections.request_form', []);
+        if (isset($content['translations']) && is_array($content['translations'])) {
+            $content = ['translations' => app(RichTextSanitizer::class)->sanitizeArray($content['translations'])];
+        } else {
+            $content = app(RichTextSanitizer::class)->sanitizeArray($content);
+            if (isset($content['translations'])) {
+                $content = ['translations' => $content['translations']];
+            }
         }
         PageSection::updateOrCreate(
             ['page_key' => 'contact', 'section_key' => 'request_form'],

@@ -28,7 +28,7 @@ export default function Index({ projects, seo }: { projects: ProjectItem[]; seo:
                                 <div className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/30 to-transparent" />
                                 <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6">
                                     <div>
-                                        {project.category && <p className="mb-2 text-[0.6rem] tracking-[0.22em] text-gold uppercase">{project.category}</p>}
+                                        {project.category && <p className="mb-2 text-[0.6rem] tracking-[0.22em] text-gold uppercase">{t(project.category)}</p>}
                                         <h3 className="text-xl text-ink">{project.title}</h3>
                                         {project.location && <p className="mt-1 text-xs text-ink-muted">{project.location}</p>}
                                         {project.shortDescription && <p className="mt-2 max-w-xs text-xs leading-relaxed text-ink-muted/70 line-clamp-2">{project.shortDescription}</p>}

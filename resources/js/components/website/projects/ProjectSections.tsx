@@ -28,22 +28,25 @@ export function ProjectStats({ project }: { project: WebsiteProject }) {
 }
 
 export function ProjectOverview({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
+    const { t } = useI18n();
     const overviewImage = imageSource(project.overviewImage, project.gallery[0], project.heroImage);
-    return <section id="overview" className="bg-white py-20 text-paper-ink sm:py-24"><div className="mx-auto grid max-w-[1440px] gap-14 px-6 sm:px-10 md:grid-cols-2 lg:items-center"><div><Eyebrow tone="light">Overview</Eyebrow><h2 className="mt-5 text-3xl font-light leading-[1.1] sm:text-[3rem]">{sections.overview.heading}</h2><p className="mt-6 text-sm font-light leading-relaxed text-ink-muted md:text-lg">{sections.overview.body}</p></div><figure className="relative h-[360px] max-w-xl overflow-hidden border border-paper-muted/30 bg-[#e4e4e7] sm:h-[500px]">{overviewImage && <img src={overviewImage} alt="Courtyard and greenery" className="size-full object-cover" />}</figure></div></section>;
+    return <section id="overview" className="bg-white py-20 text-paper-ink sm:py-24"><div className="mx-auto grid max-w-[1440px] gap-14 px-6 sm:px-10 md:grid-cols-2 lg:items-center"><div><Eyebrow tone="light">{t('Overview')}</Eyebrow><h2 className="mt-5 text-3xl font-light leading-[1.1] sm:text-[3rem]">{sections.overview.heading}</h2><p className="mt-6 text-sm font-light leading-relaxed text-ink-muted md:text-lg">{sections.overview.body}</p></div><figure className="relative h-[360px] max-w-xl overflow-hidden border border-paper-muted/30 bg-[#e4e4e7] sm:h-[500px]">{overviewImage && <img src={overviewImage} alt="Courtyard and greenery" className="size-full object-cover" />}</figure></div></section>;
 }
 
-export function ProjectGallery({ project }: { project: WebsiteProject }) {
+export function ProjectGallery({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
     if (!project.gallery.length) return null;
-    return <section id="gallery" className="bg-night py-24"><div className="mx-auto max-w-5xl px-6 sm:px-10"><Eyebrow className="text-ink">Gallery</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-ink sm:text-[2.25rem]">A closer look.</h2><div className="mt-10 grid gap-4 sm:grid-cols-3">{project.gallery.map((src, i) => <img key={`${src}-${i}`} src={src} alt={`Gallery image ${i + 1}`} className="h-[220px] w-full object-cover" loading="lazy" />)}</div></div></section>;
+    const gallery = sections.gallery ?? { eyebrow: 'Gallery', heading: 'A closer look.' };
+    return <section id="gallery" className="bg-night py-24"><div className="mx-auto max-w-5xl px-6 sm:px-10"><Eyebrow className="text-ink">{gallery.eyebrow}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-ink sm:text-[2.25rem]">{gallery.heading}</h2><div className="mt-10 grid gap-4 sm:grid-cols-3">{project.gallery.map((src, i) => <img key={`${src}-${i}`} src={src} alt={`Gallery image ${i + 1}`} className="h-[220px] w-full object-cover" loading="lazy" />)}</div></div></section>;
 }
 
 export function Homes3D({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
+    const { t } = useI18n();
     if (!sections.homes3d?.heading) return null;
     const items = sections.homes3d.items ?? [];
     return (
         <section id="homes3d" className="bg-[#0d0d0f] py-[72px] text-[#d8d5d3] sm:py-[86px]">
             <div className="mx-auto max-w-[1096px] px-[14px] sm:px-8">
-                <Eyebrow className="text-ink">The homes &middot; in 3D</Eyebrow>
+                <Eyebrow className="text-ink">{t('The homes · in 3D')}</Eyebrow>
                 <h2 className="mt-6 max-w-[590px] text-[2.65rem] font-light leading-[1.08] tracking-[-0.025em] text-[#d8d5d3] sm:text-[3rem]">{sections.homes3d.heading}</h2>
                 <p className="mt-6 max-w-[610px] text-[0.95rem] font-light leading-[1.65] text-[#716f70]">{sections.homes3d.description}</p>
                 {items.length > 0 && (
@@ -56,7 +59,7 @@ export function Homes3D({ project, sections }: { project: WebsiteProject; sectio
                                     <p className="mt-5 text-[1.65rem] font-light leading-none tracking-[-0.02em] text-[#aaa7a7]">{item.size} <span className="text-[0.75rem] tracking-normal text-[#858283]">m&sup2;</span></p>
                                 </div>
                                 <a href={item.url || '#'} target={item.url ? '_blank' : undefined} rel={item.url ? 'noopener noreferrer' : undefined} className="mt-6 inline-flex items-center gap-1 text-[0.61rem] font-light tracking-[0.2em] text-[#696769] uppercase transition-colors hover:text-[#c8a15a]">
-                                    View in 3D <ArrowRight className="size-3 rtl:rotate-180" />
+                                    {t('View in 3D')} <ArrowRight className="size-3 rtl:rotate-180" />
                                 </a>
                             </div>
                         ))}
@@ -126,7 +129,7 @@ export function ConstructionUpdates({ project, sections }: { project: WebsitePro
                         {items.map((item, i) => (
                             <article key={i}>
                                 <div className="aspect-[16/10] overflow-hidden bg-[#e8e7e5]">
-                                    {imageSource(item.image, project.gallery[i], project.gallery[0], project.heroImage) && <img src={imageSource(item.image, project.gallery[i], project.gallery[0], project.heroImage)} alt={item.title} className="size-full object-cover" loading="lazy" />}
+                                    {imageSource(item.image, project.updates[i]?.image, project.gallery[i], project.gallery[0], project.heroImage) && <img src={imageSource(item.image, project.updates[i]?.image, project.gallery[i], project.gallery[0], project.heroImage)} alt={item.title} className="size-full object-cover" loading="lazy" />}
                                 </div>
                                 <p className="mt-4 text-[0.62rem] font-light tracking-[0.2em] text-[#858283] uppercase">{item.tag}</p>
                                 <h3 className="mt-2 text-[0.95rem] font-light text-paper-ink">{item.title}</h3>

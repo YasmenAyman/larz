@@ -56,13 +56,13 @@ export default function Index({ projects, categories, filters }: { projects: { d
                 </div>
                 <Notification message={flash?.success ?? null} />
                 <section className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-                    <div className="grid gap-3 sm:grid-cols-3">
-                        <SearchInput value={search} onChange={(value) => { setSearch(value); applyFilters({ search: value }); }} placeholder={t('Search by title...')} />
-                        <FilterSelect value={status} onChange={(value) => { setStatus(value); applyFilters({ status: value }); }} options={[t('All'), t('Published'), t('Draft')]} />
+                    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                        <SearchInput value={search} onChange={(value) => { setSearch(value); applyFilters({ search: value }); }} placeholder={t('Search by title...')} className="sm:w-64" />
+                        <FilterSelect value={status} onChange={(value) => { setStatus(value); applyFilters({ status: value }); }} options={[t('All'), t('Published'), t('Draft')]} className="sm:w-44" />
                         <select
                             value={category}
                             onChange={(event) => { setCategory(event.target.value); applyFilters({ category: event.target.value }); }}
-                            className="h-[42px] rounded-xl border border-white/15 bg-[#1e1e22] px-3.5 text-sm text-white/90 outline-none focus:border-[#C5A880]"
+                            className="h-[42px] w-full rounded-xl border border-white/15 bg-[#1e1e22] px-3.5 text-sm text-white/90 outline-none focus:border-[#C5A880] sm:w-56"
                         >
                             <option value="">{t('All categories')}</option>
                             {categories.map((c) => <option key={c.id} value={c.id}>{t(c.name)}</option>)}

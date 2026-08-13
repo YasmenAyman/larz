@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\NavigationItem;
 use App\Models\Project;
 use App\Models\SiteSetting;
+use App\Support\LocalizedContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
@@ -45,11 +46,23 @@ class HandleInertiaRequests extends Middleware
                         'location' => $item->location,
                     ])->values()->all(),
                 ),
-                'projects' => fn () => Cache::remember(
+                'projects' => fn () => collect(Cache::remember(
                     'website.mega_menu.projects',
                     now()->addHour(),
-                    fn () => Project::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title', 'slug'])->values()->all(),
-                ),
+                    fn () => Project::query()
+                        ->where('is_published', true)
+                        ->orderBy('sort_order')
+                        ->get(['id', 'title', 'slug', 'translations'])
+                        ->all(),
+                ))->map(function (Project $project) {
+                    $localized = LocalizedContent::record($project, ['title']);
+
+                    return [
+                        'id' => $project->id,
+                        'title' => $localized['title'] ?? $project->title,
+                        'slug' => $project->slug,
+                    ];
+                })->values()->all(),
             ],
             'auth' => [
                 'user' => $request->user() ? [...$request->user()->only(['id', 'name', 'email']), 'permissions' => $request->user()->getAllPermissions()->pluck('name')->values()->all()] : null,
