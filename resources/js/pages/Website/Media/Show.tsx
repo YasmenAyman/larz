@@ -8,7 +8,7 @@ export default function Show({ post, seo }: { post: { slug: string; type: string
 
     return (
         <WebsiteLayout>
-            <SeoHead seo={seo} />
+            <SeoHead seo={seo} tabTitle={post.title} />
             <article className="bg-night text-ink">
                 <header className="relative overflow-hidden border-b border-hairline/30 bg-night px-6 pt-40 pb-20 sm:px-10 lg:px-24">
                     <div className="mx-auto max-w-[1000px]">

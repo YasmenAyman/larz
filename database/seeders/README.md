@@ -14,6 +14,8 @@ These seeders are a development/content baseline extracted from the existing Rea
 - `PartnersSeeder`: approved partner names and roles currently present in the source.
 - `AwardsSeeder`: intentionally empty until real award names/content replace the source placeholders.
 - `TestimonialsSeeder`: current testimonial names, roles, and quotes.
+- `ArabicContentSeeder`: Arabic translations for public CMS content.
+- `ArabicSeoMetadataSeeder`: Arabic SEO metadata for the static public pages.
 
 ## Development Use
 

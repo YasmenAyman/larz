@@ -118,11 +118,11 @@ final class SeoMetadataService
             : ($fallback['robots'] ?? $defaults['robots']);
 
         $data = [
-            'title' => $record?->seo_title ?: ($fallback['title'] ?? $defaults['title']),
-            'description' => $record?->meta_description ?: ($fallback['description'] ?? $defaults['description']),
+            'title' => $this->localizedValue($record, 'seo_title') ?: ($fallback['title'] ?? $defaults['title']),
+            'description' => $this->localizedValue($record, 'meta_description') ?: ($fallback['description'] ?? $defaults['description']),
             'canonical' => $record?->canonical_url ?: ($fallback['canonical'] ?? url($path)),
-            'og_title' => $record?->og_title ?: ($fallback['og_title'] ?? ($fallback['title'] ?? $defaults['og_title'])),
-            'og_description' => $record?->og_description ?: ($fallback['og_description'] ?? ($fallback['description'] ?? $defaults['og_description'])),
+            'og_title' => $this->localizedValue($record, 'og_title') ?: ($fallback['og_title'] ?? ($fallback['title'] ?? $defaults['og_title'])),
+            'og_description' => $this->localizedValue($record, 'og_description') ?: ($fallback['og_description'] ?? ($fallback['description'] ?? $defaults['og_description'])),
             'og_image' => $record?->ogImage ? app(MediaUploadService::class)->publicUrl($record->ogImage) : ($fallback['og_image'] ?? $defaults['og_image']),
             'robots' => $robots,
             'indexable' => ! str_starts_with($robots, 'noindex'),
@@ -131,6 +131,25 @@ final class SeoMetadataService
         ];
 
         return $data;
+    }
+
+    private function localizedValue(?SeoMetadata $record, string $field): ?string
+    {
+        if (! $record) {
+            return null;
+        }
+
+        $translations = $record->translations;
+        if (is_array($translations)) {
+            foreach (array_unique([app()->getLocale(), 'en']) as $locale) {
+                $value = $translations[$locale][$field] ?? null;
+                if (is_string($value) && trim($value) !== '') {
+                    return $value;
+                }
+            }
+        }
+
+        return $record->getAttribute($field);
     }
 
     private function defaults(): array

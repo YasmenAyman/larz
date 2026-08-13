@@ -6,6 +6,10 @@
 
         <title inertia>{{ config('app.name', 'LARZ Developments') }}</title>
 
+        @if ($seoTitle = data_get($page, 'props.seo.title'))
+            <meta inertia="seo-title" name="title" content="{{ $seoTitle }}">
+        @endif
+
         @php
             $favicon = \Illuminate\Support\Facades\Cache::remember('website.settings.public', now()->addHour(), fn () => \App\Models\SiteSetting::query()->whereIn('group_name', ['brand', 'contact', 'footer', 'social', 'whatsapp'])->pluck('value', 'key')->all())['brand.favicon'] ?? null;
         @endphp

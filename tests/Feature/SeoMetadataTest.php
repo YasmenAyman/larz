@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\SeoMetadata;
 use App\Services\SeoMetadataService;
 use App\Models\User;
+use Database\Seeders\ArabicSeoMetadataSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\SiteSettingsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -43,6 +44,39 @@ class SeoMetadataTest extends TestCase
             ->where('seo.og_title', 'Custom Home Share Title')
             ->where('seo.robots', 'index, nofollow')
         );
+    }
+
+    public function test_arabic_seo_metadata_is_resolved_for_the_active_locale(): void
+    {
+        SeoMetadata::create([
+            'page_key' => 'about',
+            'seo_title' => 'About LARZ',
+            'meta_description' => 'Learn about LARZ.',
+            'og_title' => 'About LARZ',
+            'og_description' => 'Learn about LARZ.',
+            'translations' => [
+                'ar' => [
+                    'seo_title' => 'من نحن | لارز',
+                    'meta_description' => 'تعرّف على لارز للتطوير العقاري.',
+                    'og_title' => 'من نحن | لارز',
+                    'og_description' => 'تعرّف على لارز للتطوير العقاري.',
+                ],
+            ],
+        ]);
+
+        $this->withSession(['locale' => 'ar'])->get('/about-us')->assertSuccessful()->assertInertia(fn ($page) => $page
+            ->where('seo.title', 'من نحن | لارز')
+            ->where('seo.description', 'تعرّف على لارز للتطوير العقاري.')
+            ->where('seo.og_title', 'من نحن | لارز')
+        );
+    }
+
+    public function test_arabic_seo_metadata_seeder_populates_static_pages(): void
+    {
+        $this->seed(ArabicSeoMetadataSeeder::class);
+
+        $this->assertDatabaseHas('seo_metadata', ['page_key' => 'home']);
+        $this->assertSame('لارز للتطوير العقاري | مصمم ليناسب أسلوب حياتك', SeoMetadata::query()->where('page_key', 'home')->firstOrFail()->translations['ar']['seo_title']);
     }
 
     public function test_media_article_metadata_contains_article_and_breadcrumb_schema(): void
@@ -124,6 +158,20 @@ class SeoMetadataTest extends TestCase
             'og_description' => 'Editable share description.',
             'indexable' => true,
             'followable' => false,
+            'translations' => [
+                'en' => [
+                    'seo_title' => 'Editable SEO title',
+                    'meta_description' => 'Editable SEO description.',
+                    'og_title' => 'Editable share title',
+                    'og_description' => 'Editable share description.',
+                ],
+                'ar' => [
+                    'seo_title' => 'عنوان SEO قابل للتعديل',
+                    'meta_description' => 'وصف SEO قابل للتعديل.',
+                    'og_title' => 'عنوان مشاركة قابل للتعديل',
+                    'og_description' => 'وصف مشاركة قابل للتعديل.',
+                ],
+            ],
         ])->assertRedirect();
 
         $this->assertDatabaseHas('seo_metadata', [
@@ -132,5 +180,13 @@ class SeoMetadataTest extends TestCase
             'canonical_url' => 'https://example.test/',
             'followable' => false,
         ]);
+
+        $this->get('/')->assertSuccessful()->assertInertia(fn ($page) => $page
+            ->where('seo.title', 'Editable SEO title')
+        );
+
+        $this->withSession(['locale' => 'ar'])->get('/')->assertSuccessful()->assertInertia(fn ($page) => $page
+            ->where('seo.title', 'عنوان SEO قابل للتعديل')
+        );
     }
 }

@@ -9,10 +9,10 @@ class SeoMetadata extends Model
 {
     protected $fillable = [
         'page_key', 'seo_title', 'meta_description', 'canonical_url',
-        'og_title', 'og_description', 'og_image_id', 'indexable', 'followable',
+        'og_title', 'og_description', 'og_image_id', 'indexable', 'followable', 'translations',
     ];
 
-    protected $casts = ['indexable' => 'boolean', 'followable' => 'boolean'];
+    protected $casts = ['indexable' => 'boolean', 'followable' => 'boolean', 'translations' => 'array'];
 
     public function ogImage(): BelongsTo
     {

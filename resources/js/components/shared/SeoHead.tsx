@@ -12,7 +12,7 @@ export type SeoMetadata = {
     structured_data: Array<Record<string, unknown>>;
 };
 
-export function SeoHead({ seo }: { seo: SeoMetadata }) {
+export function SeoHead({ seo, tabTitle }: { seo: SeoMetadata; tabTitle?: string }) {
     const { locale } = useI18n();
     const { url } = usePage();
     const path = url.split('?')[0];
@@ -23,12 +23,12 @@ export function SeoHead({ seo }: { seo: SeoMetadata }) {
         '/media': { en: 'Media', ar: '\u0627\u0644\u0625\u0639\u0644\u0627\u0645' },
         '/careers': { en: 'Careers', ar: '\u0627\u0644\u0648\u0638\u0627\u0626\u0641' },
         '/contact-us': { en: 'Contact Us', ar: '\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627' },
-        '/contact': { en: 'Contact Us', ar: '\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627' },
     };
-    const localizedTitle = pageTitles[path]?.[locale];
+    const localizedTabTitle = pageTitles[path]?.[locale];
 
     return (
-        <Head title={localizedTitle ?? seo.title}>
+        <Head title={tabTitle ?? localizedTabTitle ?? seo.title}>
+            <meta head-key="seo-title" name="title" content={seo.title} />
             {seo.description && <meta name="description" content={seo.description} />}
             <link rel="canonical" href={seo.canonical} />
             <meta name="robots" content={seo.robots} />

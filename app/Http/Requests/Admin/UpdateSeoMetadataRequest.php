@@ -26,6 +26,17 @@ class UpdateSeoMetadataRequest extends FormRequest
             'og_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,svg', 'mimetypes:image/jpeg,image/png,image/webp,image/svg+xml', 'max:5120'],
             'indexable' => ['boolean'],
             'followable' => ['boolean'],
+            'translations' => ['nullable', 'array'],
+            'translations.en' => ['nullable', 'array'],
+            'translations.ar' => ['nullable', 'array'],
+            'translations.en.seo_title' => ['nullable', 'string', 'max:180'],
+            'translations.en.meta_description' => ['nullable', 'string', 'max:320'],
+            'translations.en.og_title' => ['nullable', 'string', 'max:180'],
+            'translations.en.og_description' => ['nullable', 'string', 'max:320'],
+            'translations.ar.seo_title' => ['nullable', 'string', 'max:180'],
+            'translations.ar.meta_description' => ['nullable', 'string', 'max:320'],
+            'translations.ar.og_title' => ['nullable', 'string', 'max:180'],
+            'translations.ar.og_description' => ['nullable', 'string', 'max:320'],
         ];
     }
 }

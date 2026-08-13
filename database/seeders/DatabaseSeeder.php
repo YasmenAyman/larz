@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             AwardsSeeder::class,
             TestimonialsSeeder::class,
             ArabicContentSeeder::class,
+            ArabicSeoMetadataSeeder::class,
         ]);
     }
 }

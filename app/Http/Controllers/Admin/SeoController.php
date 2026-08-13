@@ -12,6 +12,7 @@ use App\Services\SeoMetadataService;
 use App\Support\WebsiteCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -38,10 +39,18 @@ class SeoController extends Controller
     public function update(UpdateSeoMetadataRequest $request, string $target, MediaUploadService $uploads): RedirectResponse
     {
         $pageKey = $this->pageKey($target);
-        $data = $request->safe()->except('og_image');
+        $validated = $request->validated();
+        $translations = $validated['translations'] ?? [];
+        $data = Arr::except($validated, ['og_image', 'translations']);
+        foreach (self::COPY_FIELDS as $field) {
+            if (array_key_exists($field, $translations['en'] ?? [])) {
+                $data[$field] = $translations['en'][$field];
+            }
+        }
         $data['indexable'] = $request->boolean('indexable');
         $data['followable'] = $request->boolean('followable');
         $record = SeoMetadata::query()->firstOrNew(['page_key' => $pageKey]);
+        $data['translations'] = $this->translations($record, $translations, $data);
         $oldImage = $record->ogImage;
         $newImage = null;
 
@@ -73,7 +82,9 @@ class SeoController extends Controller
             WebsiteCache::sitemap();
         }
 
-        return back()->with('success', 'SEO metadata updated.');
+        return back()->with('success', app()->getLocale() === 'ar'
+            ? 'تم تحديث بيانات تحسين محركات البحث.'
+            : 'SEO metadata updated.');
     }
 
     private function pageKey(string $target): string
@@ -101,19 +112,49 @@ class SeoController extends Controller
     {
         $metadata = SeoMetadata::query()->where('page_key', $this->pageKey($target))->first();
         $resolved = $seo->forPage($metadata?->page_key ?? $target, $path);
+        $english = [
+            'seo_title' => $metadata?->seo_title ?? $resolved['title'],
+            'meta_description' => $metadata?->meta_description ?? $resolved['description'],
+            'og_title' => $metadata?->og_title ?? $resolved['og_title'],
+            'og_description' => $metadata?->og_description ?? $resolved['og_description'],
+        ];
+        $translations = is_array($metadata?->translations) ? $metadata->translations : [];
 
         return [
             'target' => $target,
             'label' => $label,
             'path' => $path,
-            'seo_title' => $metadata?->seo_title ?? $resolved['title'],
-            'meta_description' => $metadata?->meta_description ?? $resolved['description'],
+            'seo_title' => $english['seo_title'],
+            'meta_description' => $english['meta_description'],
             'canonical_url' => $metadata?->canonical_url ?? $resolved['canonical'],
-            'og_title' => $metadata?->og_title ?? $resolved['og_title'],
-            'og_description' => $metadata?->og_description ?? $resolved['og_description'],
+            'og_title' => $english['og_title'],
+            'og_description' => $english['og_description'],
             'og_image' => $metadata?->ogImage ? $seo->forPage($metadata->page_key, $path)['og_image'] : $resolved['og_image'],
             'indexable' => $metadata?->indexable ?? true,
             'followable' => $metadata?->followable ?? true,
+            'translations' => [
+                'en' => array_replace($english, Arr::only($translations['en'] ?? [], self::COPY_FIELDS)),
+                'ar' => Arr::only($translations['ar'] ?? [], self::COPY_FIELDS),
+            ],
+        ];
+    }
+
+    private const COPY_FIELDS = ['seo_title', 'meta_description', 'og_title', 'og_description'];
+
+    private function translations(SeoMetadata $record, array $translations, array $data): array
+    {
+        $existing = is_array($record->translations) ? $record->translations : [];
+
+        return [
+            'en' => array_replace(
+                Arr::only($existing['en'] ?? [], self::COPY_FIELDS),
+                Arr::only($data, self::COPY_FIELDS),
+                Arr::only($translations['en'] ?? [], self::COPY_FIELDS),
+            ),
+            'ar' => array_replace(
+                Arr::only($existing['ar'] ?? [], self::COPY_FIELDS),
+                Arr::only($translations['ar'] ?? [], self::COPY_FIELDS),
+            ),
         ];
     }
 }

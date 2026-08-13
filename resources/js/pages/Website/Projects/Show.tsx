@@ -6,7 +6,7 @@ import { SeoHead, type SeoMetadata } from '@/components/shared/SeoHead';
 export default function Show({ project, sections, seo }: { project: WebsiteProject; sections: ProjectSections; seo: SeoMetadata }) {
     return (
         <WebsiteLayout>
-            <SeoHead seo={seo} />
+            <SeoHead seo={seo} tabTitle={project.title} />
             <ProjectHero project={project} sections={sections} />
             <ProjectStats project={project} />
             <ProjectOverview project={project} sections={sections} />
