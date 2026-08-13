@@ -6,7 +6,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { WebsiteToastHostRoot } from '@/components/shared/WebsiteToast';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'LARZ Developments';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

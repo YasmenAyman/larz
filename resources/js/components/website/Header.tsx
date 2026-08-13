@@ -94,25 +94,7 @@ export function Header() {
     return (
         <header className="absolute inset-x-0 top-0 z-50 flex flex-col items-center px-4 pt-5 sm:px-8">
             {/* Pill navbar */}
-            <div className="flex w-[914px] max-w-full items-center gap-8 rounded-full border border-white/10 bg-[#1a1a1c]/90 px-6 py-3.5 shadow-[0_4px_32px_rgba(0,0,0,0.55)] backdrop-blur-md">
-                {/* Hamburger + Language – RTL (left side) */}
-                {isRtl && (
-                    <>
-                        <button
-                            type="button"
-                            onClick={() => { setOpen((v) => !v); setMobileDropdown(null); }}
-                            aria-label={open ? t('Close menu') : t('Open menu')}
-                            aria-expanded={open}
-                            className="me-auto grid size-8 shrink-0 place-items-center text-white/60 hover:text-white lg:hidden"
-                        >
-                            {open ? <X className="size-5" strokeWidth={1.5} /> : <Menu className="size-5" strokeWidth={1.5} />}
-                        </button>
-                        <div className="order-3">
-                            <LanguageSwitcher dark />
-                        </div>
-                    </>
-                )}
-
+            <div className="website-mobile-header-bar flex w-[914px] max-w-full items-center gap-8 rounded-full border border-white/10 bg-[#1a1a1c]/90 px-6 py-3.5 shadow-[0_4px_32px_rgba(0,0,0,0.55)] backdrop-blur-md">
                 {/* Logo */}
                 <Link href="/" aria-label="LARZ home" className="shrink-0">
                     {logo ? (
@@ -247,21 +229,16 @@ export function Header() {
                     })}
                 </nav>
 
-                {/* Hamburger – LTR (right side) */}
-                {!isRtl && (
-                    <>
-                        <LanguageSwitcher dark />
-                        <button
-                            type="button"
-                            onClick={() => { setOpen((v) => !v); setMobileDropdown(null); }}
-                            aria-label={open ? t('Close menu') : t('Open menu')}
-                            aria-expanded={open}
-                            className="ms-auto grid size-8 shrink-0 place-items-center text-white/60 hover:text-white lg:hidden"
-                        >
-                            {open ? <X className="size-5" strokeWidth={1.5} /> : <Menu className="size-5" strokeWidth={1.5} />}
-                        </button>
-                    </>
-                )}
+                <LanguageSwitcher dark />
+                <button
+                    type="button"
+                    onClick={() => { setOpen((v) => !v); setMobileDropdown(null); }}
+                    aria-label={open ? t('Close menu') : t('Open menu')}
+                    aria-expanded={open}
+                    className="ms-auto grid size-8 shrink-0 place-items-center text-white/60 hover:text-white lg:hidden"
+                >
+                    {open ? <X className="size-5" strokeWidth={1.5} /> : <Menu className="size-5" strokeWidth={1.5} />}
+                </button>
             </div>
 
             {/* Mobile dropdown */}

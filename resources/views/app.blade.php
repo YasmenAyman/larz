@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'LARZ Developments') }}</title>
 
         @php
             $favicon = \Illuminate\Support\Facades\Cache::remember('website.settings.public', now()->addHour(), fn () => \App\Models\SiteSetting::query()->whereIn('group_name', ['brand', 'contact', 'footer', 'social', 'whatsapp'])->pluck('value', 'key')->all())['brand.favicon'] ?? null;

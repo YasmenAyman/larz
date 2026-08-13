@@ -228,6 +228,15 @@ html[dir="rtl"] .border-l {
   border-right-width: 1px;
 }
 
+/* Keep the compact header's physical order consistent between languages:
+   logo on the left, language switcher after it, and the menu control right. */
+@media (max-width: 1023px) {
+  html[dir="rtl"] .website-mobile-header-bar,
+  html[dir="rtl"] .website-mobile-header-bar > * {
+    direction: ltr !important;
+  }
+}
+
 /* Keep the admin palette neutral. Some older screens still use slate utility
    classes whose default Tailwind values read blue against the warm shell. */
 .admin-shell .bg-slate-950 {

@@ -18,7 +18,7 @@ export default function Show({ post, seo }: { post: { slug: string; type: string
                         <p className="mt-7 max-w-xl text-sm leading-relaxed text-ink-muted">{post.excerpt}</p>
                     </div>
                 </header>
-                <section className="bg-paper py-20 text-paper-ink sm:py-24">
+                <section className="bg-paper px-6 py-20 text-paper-ink sm:px-10 sm:py-24 lg:px-0">
                     <div className="mx-auto grid max-w-[1000px] gap-12 md:grid-cols-[1.2fr_0.8fr] md:items-start">
                         <div className="text-sm leading-[1.9] text-paper-muted">
                             <p>{post.excerpt}</p>
