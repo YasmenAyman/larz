@@ -26,7 +26,7 @@ const fields: Record<string, Field[]> = {
     featured_projects: [{ key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
     gallery: [{ key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
     testimonials: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Section heading', type: 'textarea' }, { key: 'description', label: 'Description', type: 'textarea' }],
-    final_cta: [],
+    final_cta: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'CTA heading', type: 'textarea' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'cta_label', label: 'CTA label' }, { key: 'cta_url', label: 'CTA URL' }],
     story: [{ key: 'heading', label: 'Heading' }, { key: 'body', label: 'Body', type: 'textarea' }],
     promise: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Promise heading', type: 'textarea' }, { key: 'primary_cta_label', label: 'Primary CTA label' }, { key: 'primary_cta_url', label: 'Primary CTA URL' }, { key: 'secondary_cta_label', label: 'Secondary CTA label' }, { key: 'secondary_cta_url', label: 'Secondary CTA URL' }],
     internship: [{ key: 'heading', label: 'Internship heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
@@ -57,7 +57,15 @@ export default function Editor({ page, label, section, sections }: { page: strin
     const sectionValues = Object.fromEntries(sections.map((record) => {
         const snapshot = record.content_snapshot ?? {};
         const translations = (snapshot as { translations?: { en?: SectionData; ar?: SectionData } }).translations;
-        return [record.section_key, { translations: { en: translations?.en ?? snapshot, ar: translations?.ar ?? {} } }];
+        const baseEn = Object.fromEntries(
+            Object.entries(snapshot).filter(([key, value]) => key !== 'translations' && typeof value === 'string'),
+        ) as SectionData;
+        return [record.section_key, {
+            translations: {
+                en: { ...baseEn, ...(translations?.en ?? {}) },
+                ar: translations?.ar ?? {},
+            },
+        }];
     })) as Record<string, LocalizedSection>;
     const { data, setData, put, processing, errors } = useForm<{ sections: Record<string, LocalizedSection> }>({ sections: sectionValues });
     const current = (sectionKey: string) => data.sections[sectionKey]?.translations[language] ?? {};

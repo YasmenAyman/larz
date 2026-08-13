@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateAboutHeroRequest;
 use App\Models\PageSection;
 use App\Services\MediaUploadService;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
@@ -18,8 +19,7 @@ class AboutHeroController extends Controller
     public function edit(): Response
     {
         $snapshot = PageSection::query()->where('page_key', 'about')->where('section_key', 'hero')->value('content_snapshot') ?? [];
-        $current = WebsiteContent::section('about', 'hero');
-        $translations = $snapshot['translations'] ?? ['en' => $current, 'ar' => []];
+        $translations = LocalizedContent::adminTranslations($snapshot, ['eyebrow', 'heading', 'description', 'cta_label', 'cta_url', 'primary_cta_label', 'primary_cta_url', 'secondary_cta_label', 'secondary_cta_url']);
         $background = null;
         if (! empty($snapshot['background_image_id'])) {
             $background = WebsiteContent::assetUrl(\App\Models\MediaAsset::find($snapshot['background_image_id']));

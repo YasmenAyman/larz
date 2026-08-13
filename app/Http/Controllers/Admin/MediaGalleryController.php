@@ -10,6 +10,7 @@ use App\Models\PageSection;
 use App\Models\PhotoGalleryItem;
 use App\Services\MediaUploadService;
 use App\Services\RichTextSanitizer;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
@@ -23,13 +24,13 @@ class MediaGalleryController extends Controller
     {
         $section = PageSection::query()->where('page_key', 'media')->where('section_key', 'gallery')->first();
         $raw = $section?->content_snapshot ?? [];
-        $defaults = [
+        $copyKeys = ['eyebrow', 'heading', 'description'];
+        $translations = LocalizedContent::adminTranslations($raw, $copyKeys);
+        $settings = array_merge([
             'eyebrow' => 'Photo gallery',
             'heading' => 'Inside our communities.',
             'description' => 'A glimpse into the details, designs, and destinations that define the LARZ experience.',
-        ];
-        $settings = array_merge($defaults, $raw);
-        $translations = $raw['translations'] ?? ['en' => $settings, 'ar' => ['eyebrow' => '', 'heading' => '', 'description' => '']];
+        ], $translations['en']);
         return Inertia::render('Admin/Pages/MediaGallery', [
             'settings' => [
                 'eyebrow' => $settings['eyebrow'],

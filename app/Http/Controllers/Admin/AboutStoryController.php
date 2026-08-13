@@ -8,6 +8,7 @@ use App\Models\MediaAsset;
 use App\Models\PageSection;
 use App\Services\MediaUploadService;
 use App\Services\RichTextSanitizer;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
@@ -20,8 +21,7 @@ class AboutStoryController extends Controller
     public function edit(): Response
     {
         $snapshot = PageSection::query()->where('page_key', 'about')->where('section_key', 'story')->value('content_snapshot') ?? [];
-        $current = WebsiteContent::section('about', 'story');
-        $translations = $snapshot['translations'] ?? ['en' => $current, 'ar' => []];
+        $translations = LocalizedContent::adminTranslations($snapshot, ['eyebrow', 'heading', 'body']);
         $image = ! empty($snapshot['image_id']) ? WebsiteContent::assetUrl(MediaAsset::find($snapshot['image_id'])) : asset($snapshot['image'] ?? 'assets/IMAGE-01-RENDERED-1.png');
 
         return Inertia::render('Admin/Pages/AboutStory', ['translations' => $translations, 'image' => $image]);

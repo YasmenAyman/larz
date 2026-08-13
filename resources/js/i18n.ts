@@ -50,7 +50,7 @@ const translations: Record<string, string> = {
     'Read article': 'اقرأ المقال',
     'Explore All': 'استكشف الكل',
     'Explore Project': 'استكشف المشروع',
-    'Designed for\nthe Way You Live': 'مصمم لأسلوب حياتك',
+    'Designed for the Way You Live': 'مصمم لأسلوب حياتك',
     'Discover thoughtfully designed communities that combine architectural excellence, lasting value, and a lifestyle built around comfort and elegance.': 'اكتشف مجتمعات مصممة بعناية تجمع بين التميز المعماري والقيمة المستدامة وأسلوب حياة يفيض بالراحة والرقي.',
     "Our Project's": 'مشروعاتنا',
     'Experience': 'خبرة',

@@ -30,7 +30,7 @@ class HomeController extends Controller
 
         $heroRaw = WebsiteContent::section('home', 'hero');
         $hero = [
-            'heading' => $heroRaw['heading'] ?? 'Designed for\nthe Way You Live',
+            'heading' => LocalizedContent::sanitizeNewlines($heroRaw['heading'] ?? 'Designed for the Way You Live'),
             'description' => $heroRaw['description'] ?? '',
             'cta_label' => $heroRaw['cta_label'] ?? $heroRaw['primary_cta_label'] ?? "Our Project's",
             'cta_url' => $heroRaw['cta_url'] ?? $heroRaw['primary_cta_url'] ?? '/projects',

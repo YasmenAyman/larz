@@ -83,14 +83,15 @@ class TestimonialController extends Controller
         $data['role'] = $en['role'] ?? $data['role'] ?? null;
         $data['quote'] = $en['quote'] ?? $data['quote'] ?? '';
         $newAsset = null;
+        $testimonial = null;
 
         try {
-            DB::transaction(function () use ($request, $uploads, &$newAsset, &$data): void {
+            DB::transaction(function () use ($request, $uploads, &$newAsset, &$data, &$testimonial): void {
                 if ($request->hasFile('image')) {
                     $newAsset = $uploads->storePublicImage($request->file('image'), 'media/testimonials');
                     $data['media_asset_id'] = $newAsset->id;
                 }
-                Testimonial::create($data);
+                $testimonial = Testimonial::create($data);
             });
         } catch (\Throwable $exception) {
             if ($newAsset) $uploads->delete($newAsset);
@@ -98,7 +99,7 @@ class TestimonialController extends Controller
         }
         WebsiteCache::section('home', 'testimonials');
 
-        return to_route('admin.pages.home.testimonials.edit')->with('success', 'Testimonial created.');
+        return to_route('admin.pages.home.testimonials.item.edit', $testimonial)->with('success', 'Testimonial created.');
     }
 
     public function edit(Testimonial $testimonial): Response
@@ -150,7 +151,7 @@ class TestimonialController extends Controller
         if ($request->hasFile('image') && $oldAsset) $uploads->deleteIfUnreferenced($oldAsset);
         WebsiteCache::section('home', 'testimonials');
 
-        return to_route('admin.pages.home.testimonials.edit')->with('success', 'Testimonial updated.');
+        return to_route('admin.pages.home.testimonials.item.edit', $testimonial)->with('success', 'Testimonial updated.');
     }
 
     public function destroy(Testimonial $testimonial, MediaUploadService $uploads): RedirectResponse

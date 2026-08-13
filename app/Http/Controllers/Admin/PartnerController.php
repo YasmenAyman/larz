@@ -72,7 +72,7 @@ class PartnerController extends Controller
         }
         WebsiteCache::section('about', 'partners');
 
-        return to_route('admin.pages.about.partners.edit', $partner)->with('success', 'Partner created.');
+        return to_route('admin.pages.about.partners.item.edit', $partner)->with('success', 'Partner created.');
     }
 
     public function edit(Partner $partner): Response
@@ -108,7 +108,7 @@ class PartnerController extends Controller
         if ($request->hasFile('logo') && $oldAsset) $uploads->deleteIfUnreferenced($oldAsset);
         WebsiteCache::section('about', 'partners');
 
-        return to_route('admin.pages.about.partners.edit', $partner)->with('success', 'Partner updated.');
+        return to_route('admin.pages.about.partners.item.edit', $partner)->with('success', 'Partner updated.');
     }
 
     public function destroy(Partner $partner, MediaUploadService $uploads): RedirectResponse

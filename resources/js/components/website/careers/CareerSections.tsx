@@ -33,7 +33,7 @@ export function CareersHero({ hero }: { hero: { eyebrow?: string; heading: strin
         }}>
             <div className="relative mx-auto flex min-h-[800px] max-w-[1440px] flex-col justify-center px-6 pt-36 pb-20 sm:px-10 lg:px-24">
                 <Eyebrow className="text-ink">{hero.eyebrow ?? t('Careers')}</Eyebrow>
-                <h1 className="mt-7 max-w-2xl text-3xl font-light leading-[1.08] tracking-[-0.03em] sm:text-6xl lg:text-[4.25rem]">{(hero.heading ?? `${t('Build your future')}\n${t('with LARZ.')}`).split('\n').map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}</h1>
+                <h1 className="mt-7 max-w-2xl text-3xl font-light leading-[1.08] tracking-[-0.03em] sm:text-6xl lg:text-[4.25rem]">{(hero.heading ?? `${t('Build your future')} ${t('with LARZ.')}`).replace(/\\n/g, ' ')}</h1>
                 <p className="mt-6 max-w-md text-sm leading-relaxed text-ink-muted">{hero.description}</p>
                 <div className="mt-8 flex flex-wrap items-center gap-6"><a href="#roles" className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10">{t('See open roles')} <ArrowRight className="size-3.5 rtl:rotate-180" strokeWidth={1.5} /></a><button type="button" onClick={() => setShowCvForm(true)} className="text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">{t('Send your CV')}</button></div>
             </div>

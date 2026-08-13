@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateHomeGalleryRequest;
 use App\Models\PageSection;
 use App\Models\PhotoGalleryItem;
 use App\Services\MediaUploadService;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +21,8 @@ class HomeGalleryController extends Controller
     {
         $settings = WebsiteContent::section('home', 'gallery');
         $raw = PageSection::query()->where('page_key', 'home')->where('section_key', 'gallery')->value('content_snapshot') ?? [];
-        $translations = $raw['translations'] ?? ['en' => $settings, 'ar' => ['eyebrow' => '', 'heading' => '', 'description' => '', 'cta_label' => '', 'cta_url' => '']];
+        $copyKeys = ['eyebrow', 'heading', 'description', 'cta_label', 'cta_url'];
+        $translations = LocalizedContent::adminTranslations($raw, $copyKeys);
         return Inertia::render('Admin/Pages/HomeGallery', [
             'settings' => [
                 'eyebrow' => $settings['eyebrow'] ?? 'Our Gallery',

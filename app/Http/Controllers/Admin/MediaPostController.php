@@ -104,6 +104,9 @@ class MediaPostController extends Controller
         if ($request->routeIs('admin.pages.media.news.post.update')) {
             return to_route('admin.pages.media.news.edit')->with('success', 'Media post updated.');
         }
+        if ($request->routeIs('admin.pages.media.stories.post.update')) {
+            return to_route('admin.pages.media.stories.edit')->with('success', 'Media post updated.');
+        }
 
         return back()->with('success', 'Media post updated.');
     }

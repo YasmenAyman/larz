@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateCareersHeroRequest;
 use App\Models\MediaAsset;
 use App\Models\PageSection;
 use App\Services\MediaUploadService;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
@@ -19,8 +20,7 @@ class CareersHeroController extends Controller
     public function edit(): Response
     {
         $snapshot = PageSection::query()->where('page_key', 'careers')->where('section_key', 'hero')->value('content_snapshot') ?? [];
-        $current = WebsiteContent::section('careers', 'hero');
-        $translations = $snapshot['translations'] ?? ['en' => $current, 'ar' => []];
+        $translations = LocalizedContent::adminTranslations($snapshot, ['eyebrow', 'heading', 'description']);
         $background = null;
         if (! empty($snapshot['background_image_id'])) {
             $background = WebsiteContent::assetUrl(MediaAsset::find($snapshot['background_image_id']));

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateHomeFeaturedProjectsRequest;
 use App\Models\PageSection;
 use App\Models\Project;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
@@ -17,9 +18,10 @@ class HomeFeaturedProjectsController extends Controller
 {
     public function edit(): Response
     {
-        $settings = WebsiteContent::section('home', 'featured_projects');
         $raw = PageSection::query()->where('page_key', 'home')->where('section_key', 'featured_projects')->value('content_snapshot') ?? [];
-        $translations = $raw['translations'] ?? ['en' => $settings, 'ar' => ['eyebrow' => '', 'heading' => '', 'description' => '', 'cta_label' => '', 'cta_url' => '']];
+        $copyKeys = ['eyebrow', 'heading', 'description', 'cta_label', 'cta_url'];
+        $translations = LocalizedContent::adminTranslations($raw, $copyKeys);
+        $settings = WebsiteContent::section('home', 'featured_projects');
         $projects = Project::query()->where('is_published', true)->with('heroImage')->orderBy('sort_order')->get();
         $selected = $settings['project_ids'] ?? $projects->where('is_featured', true)->pluck('id')->values()->all();
         return Inertia::render('Admin/Pages/HomeFeaturedProjects', [

@@ -24,7 +24,7 @@ class SiteSettingsSeeder extends Seeder
             ['key' => 'contact.phone', 'value' => '15813', 'value_type' => 'string', 'group_name' => 'contact'],
             ['key' => 'whatsapp.number', 'value' => '201128775744', 'value_type' => 'string', 'group_name' => 'contact'],
             ['key' => 'whatsapp.message', 'value' => 'Hello LARZ Developments, I would like to inquire about your projects.', 'value_type' => 'string', 'group_name' => 'contact'],
-            ['key' => 'footer.cta_title', 'value' => "Let's Build\nThe Future Together", 'value_type' => 'string', 'group_name' => 'footer'],
+            ['key' => 'footer.cta_title', 'value' => "Let's Build The Future Together", 'value_type' => 'string', 'group_name' => 'footer'],
             ['key' => 'footer.cta_title_ar', 'value' => null, 'value_type' => 'string', 'group_name' => 'footer', 'description' => 'Footer CTA heading (Arabic).'],
             ['key' => 'footer.cta_button', 'value' => 'Get In Touch', 'value_type' => 'string', 'group_name' => 'footer'],
             ['key' => 'footer.cta_button_ar', 'value' => null, 'value_type' => 'string', 'group_name' => 'footer', 'description' => 'Footer CTA button label (Arabic).'],

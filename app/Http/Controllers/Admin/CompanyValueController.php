@@ -65,10 +65,10 @@ class CompanyValueController extends Controller
         $data['is_published'] = $request->boolean('is_published');
         $data['translations'] = $this->cleanTranslations($data['translations'] ?? []);
         $this->syncBaseFromTranslations($data);
-        CompanyValue::create($data);
+        $value = CompanyValue::create($data);
         WebsiteCache::section('careers', 'values');
 
-        return to_route('admin.pages.careers.values.edit')->with('success', 'Value created.');
+        return to_route('admin.pages.careers.values.item.edit', $value)->with('success', 'Value created.');
     }
 
     public function edit(CompanyValue $companyValue): Response
@@ -85,7 +85,7 @@ class CompanyValueController extends Controller
         $companyValue->update($data);
         WebsiteCache::section('careers', 'values');
 
-        return to_route('admin.pages.careers.values.edit')->with('success', 'Value updated.');
+        return to_route('admin.pages.careers.values.item.edit', $companyValue)->with('success', 'Value updated.');
     }
 
     public function destroy(CompanyValue $companyValue): RedirectResponse

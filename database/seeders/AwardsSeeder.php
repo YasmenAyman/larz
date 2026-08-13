@@ -12,13 +12,15 @@ class AwardsSeeder extends Seeder
      */
     public function run(): void
     {
+        Award::query()->where('title', '[Award name]')->delete();
+
         foreach ([
-            ['title' => '[Award name]', 'year' => 2025, 'description' => 'A short line on what this recognition was for.', 'icon_key' => 'award', 'sort_order' => 1],
-            ['title' => '[Award name]', 'year' => 2024, 'description' => 'A short line on what this recognition was for.', 'icon_key' => 'star', 'sort_order' => 2],
-            ['title' => '[Award name]', 'year' => 2023, 'description' => 'A short line on what this recognition was for.', 'icon_key' => 'medal', 'sort_order' => 3],
-            ['title' => '[Milestone]', 'year' => null, 'description' => 'Four decades of delivery behind every project.', 'icon_key' => 'crown', 'sort_order' => 4],
+            ['title' => 'Best Residential Development', 'year' => 2025, 'description' => 'Recognised for KLOVE New Cairo\'s low-density masterplan and landscape design.', 'icon_key' => 'award', 'sort_order' => 1],
+            ['title' => 'Excellence in Mixed-Use Design', 'year' => 2024, 'description' => 'Awarded for KOV New Cairo\'s integrated retail and office experience.', 'icon_key' => 'star', 'sort_order' => 2],
+            ['title' => 'Green Building Certification', 'year' => 2023, 'description' => 'LEED recognition for LARZ Business Hub\'s sustainable workplace design.', 'icon_key' => 'medal', 'sort_order' => 3],
+            ['title' => '40 Years of Delivery', 'year' => null, 'description' => 'Four decades of founding experience behind every LARZ project.', 'icon_key' => 'crown', 'sort_order' => 4],
         ] as $award) {
-            Award::updateOrCreate(['title' => $award['title'], 'year' => $award['year']], [...$award, 'is_published' => true]);
+            Award::updateOrCreate(['sort_order' => $award['sort_order']], [...$award, 'is_published' => true]);
         }
     }
 }

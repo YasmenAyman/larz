@@ -8,6 +8,7 @@ use App\Models\MediaAsset;
 use App\Models\PageSection;
 use App\Services\MediaUploadService;
 use App\Services\RichTextSanitizer;
+use App\Support\LocalizedContent;
 use App\Support\WebsiteCache;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +21,7 @@ class CareersInternshipController extends Controller
     public function edit(): Response
     {
         $snapshot = PageSection::query()->where('page_key', 'careers')->where('section_key', 'internship')->value('content_snapshot') ?? [];
-        $translations = $snapshot['translations'] ?? ['en' => [], 'ar' => []];
+        $translations = LocalizedContent::adminTranslations($snapshot, ['eyebrow', 'heading', 'description', 'cta_label']);
         $image = null;
         if (! empty($snapshot['image_id'])) {
             $image = WebsiteContent::assetUrl(MediaAsset::find($snapshot['image_id']));

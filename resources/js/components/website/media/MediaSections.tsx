@@ -16,7 +16,7 @@ export function MediaHero({ hero }: { hero: { eyebrow: string; heading: string; 
         <section className="relative overflow-hidden border-b border-hairline/30 bg-night" style={{ backgroundImage: `radial-gradient(ellipse 60% 70% at 82% 20%, rgba(164, 121, 43, 0.30) 0%, rgba(115, 79, 27, 0.2) 35%, transparent 72%), linear-gradient(110deg, rgba(6, 4, 4, 0.98) 28%, rgba(2, 2, 4, 0.73) 100%)`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
             <div className="relative mx-auto flex min-h-[700px] max-w-[1440px] flex-col justify-center px-6 pt-36 pb-16 sm:px-10 lg:px-24">
                 <Eyebrow className="text-ink">{t(hero.eyebrow ?? 'Media')}</Eyebrow>
-                <h1 className="mt-7 max-w-xl text-5xl font-light leading-[1.08] tracking-[-0.03em] sm:text-6xl lg:text-[5rem]">{(hero.heading ?? 'The latest from\nLARZ.').split('\n').map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}</h1>
+                <h1 className="mt-7 max-w-xl text-5xl font-light leading-[1.08] tracking-[-0.03em] sm:text-6xl lg:text-[5rem]">{(hero.heading ?? 'The latest from LARZ.').replace(/\\n/g, ' ')}</h1>
                 <p className="mt-6 text-sm text-ink-muted">{hero.description}</p>
                 <a href="#newsletter" className="mt-8 inline-flex w-fit items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase hover:bg-gold/10">{t('Subscribe')} <ArrowRight className="size-3.5 rtl:rotate-180" strokeWidth={1.5} /></a>
             </div>
@@ -34,15 +34,15 @@ export function MediaPress({ posts, settings }: { posts: MediaPost[]; settings: 
                 {settings.description && <p className="mt-4 max-w-2xl text-sm text-paper-muted">{settings.description}</p>}
                 <div className="mt-10 grid gap-3 lg:grid-cols-3">
                     {posts.filter((post) => post.type === 'press').map((post) => (
-                        <article key={post.slug} className="border border-paper-muted/25 bg-[#f7f7f8]">
+                        <article key={post.slug} className="flex flex-col border border-paper-muted/25 bg-[#f7f7f8]">
                             <a href={`/media/${post.slug}`} aria-label={`Read ${post.title}`} className="relative block h-50 overflow-hidden bg-[#dedee2] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                                 <img src={post.image ?? ''} alt={post.title} className="size-full object-cover transition-transform duration-300 hover:scale-105" />
                             </a>
-                            <div className="p-4">
+                            <div className="flex flex-1 flex-col p-4">
                                 <p className="text-[0.9rem] tracking-[0.16em] text-ink-muted/60">{post.date}</p>
                                 <h3 className="mt-3 text-md leading-tight text-paper-ink">{post.title}</h3>
-                                <p className="mt-2 text-sm leading-relaxed text-paper-muted">{post.excerpt}</p>
-                                <a href={`/media/${post.slug}`} className="mt-4 inline-flex items-center gap-1 text-[0.8rem] tracking-[0.18em] text-paper-muted uppercase">{t('Read more')} <ArrowRight className="size-3 rtl:rotate-180" strokeWidth={1.5} /></a>
+                                <p className="mt-2 line-clamp-2 min-h-[3rem] text-sm leading-relaxed text-paper-muted">{post.excerpt}</p>
+                                <a href={`/media/${post.slug}`} className="mt-4 inline-flex items-center gap-1 text-[0.8rem] font-bold tracking-[0.18em] text-[#A4792B] uppercase transition-colors hover:text-[#734F1B] focus:outline-none focus-visible:text-[#734F1B]">{t('Read more')} <ArrowRight className="size-3 rtl:rotate-180" strokeWidth={1.5} /></a>
                             </div>
                         </article>
                     ))}

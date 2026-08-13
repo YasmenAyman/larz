@@ -1,8 +1,13 @@
 import { PillButton } from '@/components/shared/PillButton';
 import { useI18n } from '@/i18n';
+
+function displayHeading(value: string): string {
+    return value.replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 export function Hero({ hero }: { hero: { heading: string; description: string; cta_label: string; cta_url: string; heroImage: string } }) {
     const { t } = useI18n();
-    const heading = (t(hero.heading ?? 'Designed for\nthe Way You Live')).split('\n');
+    const heading = displayHeading(t(hero.heading ?? 'Designed for the Way You Live'));
     return (
         <section className="relative min-h-[400px] overflow-hidden bg-surface bg_pattern pt-32 pb-16 lg:min-h-[850px] lg:pb-0">
             <span
@@ -15,7 +20,7 @@ export function Hero({ hero }: { hero: { heading: string; description: string; c
             <div className="relative mx-auto grid items-center gap-12 ps-4 pe-0 sm:ps-8 sm:pe-0 md:grid-cols-[1fr_52%]">
                 <div>
                     <h1 className="text-3xl font-bold leading-[1.15] text-ink sm:text-4xl lg:text-[88px]">
-                        {heading.map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}
+                        {heading}
                     </h1>
                     <p className="mt-6 max-w-md text-[18px] leading-relaxed text-ink-muted">
                         {t(hero.description)}
