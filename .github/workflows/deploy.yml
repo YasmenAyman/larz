@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -27,7 +27,7 @@ jobs:
           php -r "require 'vendor/autoload.php'; if (! class_exists('Database\\Seeders\\Support\\ProjectPageCopy')) { fwrite(STDERR, 'ProjectPageCopy autoload failed — check database/seeders/Support/ folder casing'.PHP_EOL); exit(1); }"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "24"
           cache: "npm"
