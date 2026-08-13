@@ -106,7 +106,6 @@ jobs:
             fi
 
             /usr/local/bin/ea-php84 artisan migrate --force
-            /usr/local/bin/ea-php84 artisan db:seed --force
             /usr/local/bin/ea-php84 artisan optimize:clear
 
             #/usr/local/bin/ea-php84 artisan jwt:secret
