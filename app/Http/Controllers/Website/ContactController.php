@@ -33,9 +33,8 @@ class ContactController extends Controller
         $requestFormSnapshot = WebsiteContent::sectionSnapshot('contact', 'request_form');
 
         $locationRaw = WebsiteContent::sectionSnapshot('contact', 'location_map');
-        $locationTranslations = is_array($locationRaw['translations'] ?? null) ? $locationRaw['translations'] : ['en' => $locationRaw, 'ar' => []];
         $locale = app()->getLocale();
-        $locationCopy = $locationTranslations[$locale] ?? $locationTranslations['en'] ?? [];
+        $locationCopy = LocalizedContent::section($locationRaw);
         $addressSetting = \App\Models\SiteSetting::query()->where('key', $locale === 'ar' ? 'contact.address_ar' : 'contact.address')->value('value');
         if (! $addressSetting) {
             $addressSetting = \App\Models\SiteSetting::query()->where('key', 'contact.address')->value('value');

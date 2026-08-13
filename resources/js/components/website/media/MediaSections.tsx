@@ -145,7 +145,7 @@ export function MediaNewsletter({ settings }: { settings: SectionSettings }) {
                 <Eyebrow className="justify-center text-ink">{t(settings.eyebrow ?? 'Newsletter')}</Eyebrow>
                 <h2 className="mt-5 text-3xl font-light text-ink sm:text-[3.5rem]">{t(settings.heading ?? 'Never miss an update.')}</h2>
                 {settings.description && <p className="mt-4 text-sm text-ink-muted">{settings.description}</p>}
-                {(flash?.success || recentlySuccessful) && <p className="mx-auto mt-6 max-w-[600px] rounded border border-emerald-700/40 bg-emerald-950/50 px-3 py-2 text-xs text-emerald-300">{flash?.success ?? 'You are subscribed.'}</p>}
+                {(flash?.success || recentlySuccessful) && <p className="mx-auto mt-6 max-w-[600px] rounded border border-emerald-700/40 bg-emerald-950/50 px-3 py-2 text-xs text-emerald-300">{t(flash?.success ?? 'You are subscribed.')}</p>}
                 <form className="mx-auto mt-8 flex max-w-[600px] flex-col gap-2 sm:flex-row" onSubmit={submit} noValidate>
                     <div className="min-w-0 flex-1">
                         <input type="email" required value={data.email} onChange={(event) => setData('email', event.target.value.replace(/\s/g, ''))} placeholder={t('Your email address')} className="w-full border border-hairline/60 bg-night px-4 py-5 text-sm text-ink outline-none placeholder:text-ink-muted focus:border-gold" />

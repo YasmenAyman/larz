@@ -116,7 +116,7 @@ final class ProjectPageCopy
                 'items' => $items->map(fn ($item) => [
                     'title' => $item->title,
                     'description' => $item->description,
-                    'icon' => null,
+                    'icon' => $item->icon_key,
                 ])->values()->all(),
             ])->values()->all();
         }
@@ -234,9 +234,9 @@ final class ProjectPageCopy
                 ['tag' => 'أقدم', 'title' => 'بداية أعمال الحفر'],
             ],
             'amenities' => ['heading' => 'أفضل لحظات يومك لن تكون داخل المنزل.', 'categories' => [
-                ['title' => 'العافية والحركة', 'items' => [['title' => 'سطح لليوغا', 'description' => 'صباحات هادئة فوق الماء.', 'icon' => null], ['title' => 'صالة رياضية', 'description' => 'تمرينك دون عناء التنقل.', 'icon' => null], ['title' => 'مسارات الجري', 'description' => 'حلقتك اليومية وسط الخضرة.', 'icon' => null]]],
-                ['title' => 'المياه والترفيه', 'items' => [['title' => 'حمام سباحة مجتمعي', 'description' => 'للسباحة والاسترخاء.', 'icon' => null], ['title' => 'حمام سباحة النادي', 'description' => 'مخصص للبالغين.', 'icon' => null], ['title' => 'نادي اجتماعي', 'description' => 'حيث يلتقي الجيران.', 'icon' => null]]],
-                ['title' => 'العائلة والحياة اليومية', 'items' => [['title' => 'مناطق لعب الأطفال', 'description' => 'مساحة آمنة للعب.', 'icon' => null], ['title' => 'مساحات خضراء', 'description' => 'خضرة أينما نظرت.', 'icon' => null], ['title' => 'منطقة شواء', 'description' => 'غداءات نهاية الأسبوع في الهواء الطلق.', 'icon' => null]]],
+                ['title' => 'العافية والحركة', 'items' => [['title' => 'سطح لليوغا', 'description' => 'صباحات هادئة فوق الماء.', 'icon' => 'user'], ['title' => 'ركن للقراءة', 'description' => 'زاوية هادئة لك وحدك.', 'icon' => 'book'], ['title' => 'مسارات الجري', 'description' => 'حلقتك اليومية وسط الخضرة.', 'icon' => 'bike'], ['title' => 'صالة رياضية', 'description' => 'تمرينك دون عناء التنقل.', 'icon' => 'dumbbell']]],
+                ['title' => 'المياه والترفيه', 'items' => [['title' => 'حمام سباحة مجتمعي', 'description' => 'للسباحة والاسترخاء.', 'icon' => 'waves'], ['title' => 'حمام سباحة النادي', 'description' => 'مخصص للبالغين.', 'icon' => 'moon'], ['title' => 'المياه والنوافير', 'description' => 'بحيرات ومياه تبرد الجو.', 'icon' => 'droplet'], ['title' => 'نادي اجتماعي', 'description' => 'حيث يلتقي الجيران.', 'icon' => 'users']]],
+                ['title' => 'العائلة والحياة اليومية', 'items' => [['title' => 'مناطق لعب الأطفال', 'description' => 'مساحة آمنة للعب.', 'icon' => 'baby'], ['title' => 'حديقة الكلاب', 'description' => 'أفضل جزء من يوم كلبك.', 'icon' => 'dog'], ['title' => 'مساحات خضراء', 'description' => 'خضرة أينما نظرت.', 'icon' => 'leaf'], ['title' => 'منطقة شواء', 'description' => 'غداءات نهاية الأسبوع في الهواء الطلق.', 'icon' => 'flame']]],
             ]],
             'location' => ['heading' => 'الهدوء لا يعني البُعد.', 'description' => 'يقع كلوف في القرنفل مقابل المربع الذهبي، على بعد دقائق من الطرق والمدارس والأماكن التي تستخدمها، وببوابتين تجعل العودة إلى المنزل سهلة دائمًا.', 'gateNote' => 'بوابتان للدخول، وُضعتا لتسهيل الحركة من وإلى المشروع', 'driveNote' => 'أوقات القيادة تقديرية.', 'image' => null],
             'nearbyLocations' => [

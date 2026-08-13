@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\PageSection;
 use Illuminate\Support\Facades\Cache;
 
 final class WebsiteCache
@@ -32,7 +33,18 @@ final class WebsiteCache
 
     public static function section(string $page, string $section): void
     {
-        Cache::forget(self::sectionKey($page, $section));
+        $cacheKey = self::sectionKey($page, $section);
+        Cache::forget($cacheKey);
+
+        $version = PageSection::query()
+            ->where('page_key', $page)
+            ->where('section_key', $section)
+            ->where('status', 'published')
+            ->value('updated_at');
+
+        if ($version) {
+            Cache::forget($cacheKey.'.'.$version->timestamp);
+        }
     }
 
     public static function flushSectionSnapshots(): void

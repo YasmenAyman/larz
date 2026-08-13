@@ -49,6 +49,7 @@ class CareerController extends Controller
             'values' => CompanyValue::query()->where('is_published', true)->orderBy('sort_order')->get()->map(fn ($value) => array_merge(['title' => $value->title, 'description' => $value->description, 'icon' => $value->icon_key], LocalizedContent::record($value, ['title', 'description'])))->values()->all(),
             'jobs' => Job::query()->where('is_published', true)->orderBy('sort_order')->get()->map(fn ($job) => array_merge([
                 'id' => $job->id,
+                'slug' => $job->slug,
                 'title' => $job->title,
                 'department' => $job->department,
                 'location' => $job->location,

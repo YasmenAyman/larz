@@ -27,7 +27,7 @@ export function ProjectHero({ project, sections }: { project: WebsiteProject; se
 }
 
 export function ProjectStats({ project }: { project: WebsiteProject }) {
-    return <section className="relative bg-night"><div className="border-t border-hairline/50"><div className="mx-auto grid max-w-site grid-cols-2 md:grid-cols-4">{project.facts.map((stat) => <div key={stat.label} className="border-r border-b border-hairline/50 px-6 py-8 last:border-r-0 sm:px-10 md:border-b-0"><p className="text-3xl font-light text-ink">{stat.value}</p><p className="mt-2 text-[0.65rem] font-light tracking-[0.22em] text-ink uppercase">{stat.label}</p><p className="mt-1 text-xs text-ink-muted">{stat.note}</p></div>)}</div></div></section>;
+    return <section className="relative bg-night"><div className="border-t border-hairline/50"><div className="mx-auto grid max-w-site grid-cols-2 md:grid-cols-4">{project.facts.map((stat) => <div key={stat.label} className="border-e border-b border-hairline/50 px-6 py-8 last:border-e-0 sm:px-10 md:border-b-0"><p className="text-3xl font-light text-ink">{stat.value}</p><p className="mt-2 text-[0.65rem] font-light tracking-[0.22em] text-ink uppercase">{stat.label}</p><p className="mt-1 text-xs text-ink-muted">{stat.note}</p></div>)}</div></div></section>;
 }
 
 export function ProjectOverview({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
@@ -167,25 +167,40 @@ export function ConstructionUpdates({ project, sections }: { project: WebsitePro
 export function Amenities({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
     const { t } = useI18n();
     const categories = sections.amenities.categories ?? [];
+    const iconFor = (item: { icon: string | null; title: string }) => {
+        const key = item.icon ?? project.amenities.find((amenity) => amenity.title === item.title)?.icon;
+        return key && key in icons ? icons[key as keyof typeof icons] : User;
+    };
+
     return (
         <section id="amenities" className="bg-night py-24">
             <div className="mx-auto max-w-[1440px] px-6 sm:px-10">
                 <Eyebrow className="text-ink">{t('Amenities & services')}</Eyebrow>
                 <h2 className="mt-6 max-w-lg text-3xl font-light leading-[1.2] text-ink sm:text-[3rem]">{sections.amenities.heading}</h2>
-                <div className="mt-12 space-y-10">
+                <div className="mt-12 space-y-16">
                     {categories.map((cat, ci) => (
-                        <div key={ci}>
-                            <p className="border-b border-hairline/40 pb-4 text-[0.6rem] tracking-[0.24em] text-ink-muted uppercase">{cat.title}</p>
-                            <div className="mt-7 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                                {cat.items.map((item, ii) => (
-                                    <div key={ii}>
-                                        <span className="grid size-12 place-items-center rounded-full border border-gold/60 overflow-hidden">
-                                            {item.icon ? <img src={item.icon} alt={item.title} className="size-5 object-contain" style={{filter: 'brightness(0) invert(0.6)'}} /> : <User className="size-4 text-gold" />}
-                                        </span>
-                                        <h3 className="mt-4 text-sm text-ink">{item.title}</h3>
-                                        <p className="mt-2 text-xs leading-relaxed text-ink-muted">{item.description}</p>
-                                    </div>
-                                ))}
+                        <div key={ci} className="flex justify-center">
+                            <div className="w-full max-w-[1080px]">
+                                <p className="text-[0.6rem] tracking-[0.24em] text-ink-muted uppercase">{cat.title}</p>
+                                <div className="mt-4 border-b border-hairline/40" />
+                                <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4 md:gap-x-8">
+                                    {cat.items.map((item, ii) => {
+                                        const Icon = iconFor(item);
+                                        return (
+                                            <div key={ii}>
+                                                <span className="grid size-12 place-items-center overflow-hidden rounded-full border border-gold/60">
+                                                    {item.icon && (item.icon.startsWith('http') || item.icon.startsWith('/')) ? (
+                                                        <img src={item.icon} alt={item.title} className="size-5 object-contain" style={{ filter: 'brightness(0) invert(0.6)' }} />
+                                                    ) : (
+                                                        <Icon className="size-4 text-gold" />
+                                                    )}
+                                                </span>
+                                                <h3 className="mt-4 text-sm text-ink">{item.title}</h3>
+                                                <p className="mt-2 text-xs leading-relaxed text-ink-muted">{item.description}</p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
                     ))}
