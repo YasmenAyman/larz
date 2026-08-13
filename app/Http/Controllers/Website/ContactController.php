@@ -17,7 +17,7 @@ class ContactController extends Controller
 {
     public function index(SeoMetadataService $seo): Response
     {
-        $settings = \App\Models\SiteSetting::query()->whereIn('key', ['social.instagram', 'social.facebook', 'social.linkedin', 'social.youtube', 'contact.phone', 'contact.email'])->pluck('value', 'key');
+        $settings = \App\Models\SiteSetting::query()->whereIn('key', ['social.instagram', 'social.facebook', 'social.linkedin', 'social.youtube', 'contact.phone', 'contact.email', 'whatsapp.number', 'whatsapp.message'])->pluck('value', 'key');
         $social = [
             'instagram' => $settings['social.instagram'] ?? null,
             'facebook' => $settings['social.facebook'] ?? null,
@@ -26,6 +26,8 @@ class ContactController extends Controller
         ];
         $heroRaw = WebsiteContent::sectionSnapshot('contact', 'hero');
         $hero = LocalizedContent::section($heroRaw);
+        $primaryCtaUrl = $this->resolvePrimaryCtaUrl($hero['primary_cta_url'] ?? '#request');
+        $secondaryCtaUrl = $this->resolveWhatsAppUrl($hero['secondary_cta_url'] ?? '#whatsapp', $settings);
         $methods = WebsiteContent::section('contact', 'contact_methods');
         $cards = $methods['items'] ?? [];
         $requestFormSnapshot = WebsiteContent::sectionSnapshot('contact', 'request_form');
@@ -81,9 +83,9 @@ class ContactController extends Controller
                 'heading' => $hero['heading'] ?? '',
                 'description' => $hero['description'] ?? '',
                 'primary_cta_label' => $hero['primary_cta_label'] ?? 'Request pricing & a tour',
-                'primary_cta_url' => $hero['primary_cta_url'] ?? '#request',
+                'primary_cta_url' => $primaryCtaUrl,
                 'secondary_cta_label' => $hero['secondary_cta_label'] ?? 'WhatsApp us',
-                'secondary_cta_url' => $hero['secondary_cta_url'] ?? '#whatsapp',
+                'secondary_cta_url' => $secondaryCtaUrl,
             ],
             'location' => WebsiteContent::section('contact', 'location'),
             'social' => $social,
@@ -97,6 +99,33 @@ class ContactController extends Controller
                 $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')], ['name' => 'Contact Us', 'url' => url('/contact-us')]]),
             ]),
         ]);
+    }
+
+    private function resolvePrimaryCtaUrl(string $url): string
+    {
+        return $url === '#contact-form' ? '#request' : $url;
+    }
+
+    /** @param  \Illuminate\Support\Collection<string, string|null>  $settings */
+    private function resolveWhatsAppUrl(string $url, \Illuminate\Support\Collection $settings): string
+    {
+        if ($url !== '#whatsapp' && ! str_starts_with($url, 'tel:')) {
+            return $url;
+        }
+
+        $whatsappNumber = $settings['whatsapp.number'] ?? null;
+        if (! $whatsappNumber) {
+            return $url;
+        }
+
+        $whatsappUrl = 'https://wa.me/'.preg_replace('/[^0-9]/', '', $whatsappNumber);
+        $whatsappMessage = $settings['whatsapp.message'] ?? null;
+
+        if ($whatsappMessage) {
+            $whatsappUrl .= '?text='.rawurlencode($whatsappMessage);
+        }
+
+        return $whatsappUrl;
     }
 
     public function submit(StoreContactInquiryRequest $request, FormSubmissionService $submissions): \Illuminate\Http\RedirectResponse

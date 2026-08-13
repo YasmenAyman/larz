@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\ValidatesApplicantContactFields;
 use App\Http\Requests\Concerns\ValidatesHoneypot;
 use App\Support\Honeypot;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -9,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreJobApplicationRequest extends FormRequest
 {
+    use ValidatesApplicantContactFields;
     use ValidatesHoneypot;
 
     public function authorize(): bool
@@ -31,9 +33,9 @@ class StoreJobApplicationRequest extends FormRequest
     {
         return array_merge($this->honeypotRules(), [
             'job_position_id' => ['required', 'integer', 'exists:job_positions,id'],
-            'name' => ['required', 'string', 'max:160'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'min:6', 'max:40'],
+            'name' => $this->applicantNameRules(),
+            'email' => $this->requiredApplicantEmailRules(),
+            'phone' => $this->applicantPhoneRules(),
             'city' => ['nullable', 'string', 'max:120'],
             'linkedin_url' => ['nullable', 'url', 'max:500'],
             'portfolio_url' => ['nullable', 'url', 'max:500'],
@@ -47,5 +49,13 @@ class StoreJobApplicationRequest extends FormRequest
     public function attributes(): array
     {
         return [Honeypot::FIELD => 'spam protection'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return $this->applicantContactMessages();
     }
 }

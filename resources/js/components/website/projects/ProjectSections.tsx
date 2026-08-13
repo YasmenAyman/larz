@@ -13,6 +13,9 @@ const imageSource = (...sources: Array<string | null | undefined>) => sources.fi
 type InquiryForm = { name: string; phone: string; email: string; project_id: string; project_unit_type_id: string; preferred_contact_method: string; message: string; consent_at: string; source_url: string; _hp_website: string };
 type BrochureForm = { name: string; phone: string; email: string; project_id: string; source_url: string; _hp_website: string };
 
+const NAME_PATTERN = /^[\p{L}\s]+$/u;
+const PHONE_PATTERN = /^[0-9]{6,40}$/;
+
 export function ProjectHero({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
     const { locale } = useI18n();
     const isRtl = locale === 'ar';
@@ -83,7 +86,7 @@ export function ProjectFacilities({ project }: { project: WebsiteProject }) {
 
 export function Masterplan({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
     const { t } = useI18n();
-    const { data, setData, post, processing, errors, recentlySuccessful } = useForm<BrochureForm>({
+    const { data, setData, post, processing, errors, recentlySuccessful, setError, clearErrors } = useForm<BrochureForm>({
         name: '',
         phone: '',
         email: '',
@@ -93,14 +96,33 @@ export function Masterplan({ project, sections }: { project: WebsiteProject; sec
     });
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
     const masterplanImage = imageSource(project.masterplanImage, project.gallery[1], project.gallery[0], project.heroImage);
-    const submit = (event: React.FormEvent) => { event.preventDefault(); post('/brochure-requests', { preserveScroll: true }); };
+    const submit = (event: React.FormEvent) => {
+        event.preventDefault();
+        clearErrors();
+
+        let hasErrors = false;
+        const name = data.name.trim();
+        if (!name || !NAME_PATTERN.test(name)) {
+            setError('name', t('Name must contain letters only.'));
+            hasErrors = true;
+        }
+        if (!PHONE_PATTERN.test(data.phone)) {
+            setError('phone', t('Phone must contain numbers only.'));
+            hasErrors = true;
+        }
+        if (hasErrors) {
+            return;
+        }
+
+        post('/brochure-requests', { preserveScroll: true });
+    };
 
     return <section id="brochure" className="bg-night py-24 sm:py-28"><div className="mx-auto grid max-w-[1440px] gap-12 px-6 sm:px-10 md:grid-cols-[1fr_40%]"><div><Eyebrow className="text-ink">{t('Masterplan & brochure')}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-ink sm:text-[2.9rem]">{sections.masterplan.heading}</h2><p className="mt-6 text-sm leading-relaxed text-ink-muted">{sections.masterplan.description}</p><figure className="relative mt-8">{masterplanImage && <img src={masterplanImage} alt="KLOVE masterplan render" className="h-[320px] w-full border-2 border-hairline/80 object-cover sm:h-[450px]" />}</figure></div>
         <div className="bg-surface-card/70 p-7"><h3 className="text-lg font-light text-ink">{sections.masterplan.brochureHeading}</h3><p className="mt-1 text-xs text-ink-muted">{sections.masterplan.brochureDescription}</p>
             <form className="mt-6 space-y-5" onSubmit={submit} noValidate>
                 {(flash?.success || recentlySuccessful) && <p className="rounded border border-emerald-700/40 bg-emerald-950/50 px-3 py-2 text-xs text-emerald-300">{flash?.success ?? t('Brochure request received.')}</p>}
-                <label className="block text-[0.6rem] tracking-[0.24em] text-ink-muted uppercase">{t('Name')}<input type="text" value={data.name} onChange={(event) => setData('name', event.target.value)} required placeholder={t('Your name')} className="mt-2 w-full border border-hairline/60 bg-night px-4 py-3 text-sm text-ink placeholder:text-ink-muted focus:border-gold focus:outline-none" />{errors.name && <span className="mt-1 block text-xs text-rose-400">{errors.name}</span>}</label>
-                <label className="block text-[0.6rem] tracking-[0.24em] text-ink-muted uppercase">{t('Phone')}<input type="tel" value={data.phone} onChange={(event) => setData('phone', event.target.value)} required placeholder={t('Your number')} className="mt-2 w-full border border-hairline/60 bg-night px-4 py-3 text-sm text-ink placeholder:text-ink-muted focus:border-gold focus:outline-none" />{errors.phone && <span className="mt-1 block text-xs text-rose-400">{errors.phone}</span>}</label>
+                <label className="block text-[0.6rem] tracking-[0.24em] text-ink-muted uppercase">{t('Name')}<input type="text" value={data.name} onChange={(event) => setData('name', event.target.value.replace(/[^\p{L}\s]/gu, ''))} required placeholder={t('Your name')} className="mt-2 w-full border border-hairline/60 bg-night px-4 py-3 text-sm text-ink placeholder:text-ink-muted focus:border-gold focus:outline-none" />{errors.name && <span className="mt-1 block text-xs text-rose-400">{errors.name}</span>}</label>
+                <label className="block text-[0.6rem] tracking-[0.24em] text-ink-muted uppercase">{t('Phone')}<input type="tel" inputMode="numeric" value={data.phone} onChange={(event) => setData('phone', event.target.value.replace(/\D/g, ''))} required placeholder={t('Your number')} className="mt-2 w-full border border-hairline/60 bg-night px-4 py-3 text-sm text-ink placeholder:text-ink-muted focus:border-gold focus:outline-none" />{errors.phone && <span className="mt-1 block text-xs text-rose-400">{errors.phone}</span>}</label>
                 <input type="hidden" value={data.source_url} onChange={() => undefined} />
                 <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true"><label>Do not fill<input type="text" tabIndex={-1} autoComplete="off" value={data._hp_website} onChange={(event) => setData('_hp_website', event.target.value)} /></label></div>
                 <button type="submit" disabled={processing} className="flex w-full items-center justify-center gap-3 border border-gold px-6 py-3.5 text-[0.7rem] tracking-[0.18em] text-ink uppercase transition-colors hover:bg-gold/10 disabled:opacity-60">{processing ? t('Sending...') : t('Download brochure')} <ArrowRight className="size-3.5 rtl:rotate-180" /></button>

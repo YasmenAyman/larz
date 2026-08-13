@@ -117,7 +117,7 @@ class CareersCmsTest extends TestCase
         $this->post('/career-general-applications', [
             'name' => 'Public Applicant',
             'email' => 'public@example.com',
-            'phone' => '+971500000000',
+            'phone' => '971500000000',
             'resume' => UploadedFile::fake()->create('public-resume.pdf', 20, 'application/pdf'),
             'consent_at' => now()->toISOString(),
         ])->assertRedirect();

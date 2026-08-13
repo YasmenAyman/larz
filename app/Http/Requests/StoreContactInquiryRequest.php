@@ -23,6 +23,7 @@ class StoreContactInquiryRequest extends FormRequest
         $this->merge([
             'source' => $this->input('source') ?: 'contact-us',
             'source_url' => $this->input('source_url') ?: $this->headers->get('referer'),
+            'email' => $this->filled('email') ? $this->input('email') : null,
         ]);
     }
 
@@ -32,9 +33,9 @@ class StoreContactInquiryRequest extends FormRequest
     public function rules(): array
     {
         return array_merge($this->honeypotRules(), [
-            'name' => ['required', 'string', 'max:160'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'min:6', 'max:40'],
+            'name' => ['required', 'string', 'max:160', 'regex:/^[\p{L}\s]+$/u'],
+            'email' => ['nullable', 'string', 'max:255', 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/'],
+            'phone' => ['required', 'string', 'regex:/^[0-9]+$/', 'min:6', 'max:40'],
             'project_id' => ['nullable', 'integer', Rule::exists('projects', 'id')->where('is_published', true)],
             'message' => ['nullable', 'string', 'max:5000'],
             'source' => ['required', 'string', 'max:40'],
@@ -46,5 +47,17 @@ class StoreContactInquiryRequest extends FormRequest
     public function attributes(): array
     {
         return [Honeypot::FIELD => 'spam protection'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.regex' => 'The name may only contain letters.',
+            'phone.regex' => 'The phone may only contain numbers.',
+            'email.regex' => 'Please enter a valid email address (e.g. name@example.com).',
+        ];
     }
 }

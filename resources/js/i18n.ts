@@ -183,6 +183,9 @@ const translations: Record<string, string> = {
     'Send request': 'إرسال الطلب',
     "We'll only use your details to follow up on this request.": 'سنستخدم بياناتك فقط لمتابعة هذا الطلب.',
     'Thanks — we received your request and will reply within one business day.': 'شكراً — تلقينا طلبك وسنتواصل خلال يوم عمل واحد.',
+    'Name must contain letters only.': 'يجب أن يحتوي الاسم على حروف فقط.',
+    'Phone must contain numbers only.': 'يجب أن يحتوي الهاتف على أرقام فقط.',
+    'Please enter a valid email address (e.g. name@example.com).': 'يرجى إدخال بريد إلكتروني صالح (مثل name@example.com).',
 
     'Our Story': 'قصتنا',
     'Awards & Achievements': 'الجوائز والإنجازات',

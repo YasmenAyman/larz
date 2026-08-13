@@ -10,6 +10,8 @@ type MediaPost = { slug: string; type: string; category: string | null; date: st
 type SectionSettings = { eyebrow: string; heading: string; description: string | null };
 type NewsletterForm = { email: string; consent_at: string; source_url: string; _hp_website: string };
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function MediaHero({ hero }: { hero: { eyebrow: string; heading: string; description: string } }) {
     const { t } = useI18n();
     return (
@@ -122,8 +124,19 @@ export function MediaGallery({ gallery, settings }: { gallery: string[]; setting
 
 export function MediaNewsletter({ settings }: { settings: SectionSettings }) {
     const { t } = useI18n();
-    const { data, setData, post, processing, errors, recentlySuccessful } = useForm<NewsletterForm>({ email: '', consent_at: new Date().toISOString(), source_url: typeof window !== 'undefined' ? window.location.href : '', _hp_website: '' });
-    const submit = (event: React.FormEvent) => { event.preventDefault(); post('/newsletter-subscriptions', { preserveScroll: true }); };
+    const { data, setData, post, processing, errors, recentlySuccessful, setError, clearErrors } = useForm<NewsletterForm>({ email: '', consent_at: new Date().toISOString(), source_url: typeof window !== 'undefined' ? window.location.href : '', _hp_website: '' });
+    const submit = (event: React.FormEvent) => {
+        event.preventDefault();
+        clearErrors();
+
+        const email = data.email.trim();
+        if (!email || !EMAIL_PATTERN.test(email)) {
+            setError('email', t('Please enter a valid email address (e.g. name@example.com).'));
+            return;
+        }
+
+        post('/newsletter-subscriptions', { preserveScroll: true });
+    };
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
 
     return (
@@ -134,8 +147,10 @@ export function MediaNewsletter({ settings }: { settings: SectionSettings }) {
                 {settings.description && <p className="mt-4 text-sm text-ink-muted">{settings.description}</p>}
                 {(flash?.success || recentlySuccessful) && <p className="mx-auto mt-6 max-w-[600px] rounded border border-emerald-700/40 bg-emerald-950/50 px-3 py-2 text-xs text-emerald-300">{flash?.success ?? 'You are subscribed.'}</p>}
                 <form className="mx-auto mt-8 flex max-w-[600px] flex-col gap-2 sm:flex-row" onSubmit={submit} noValidate>
-                    <input type="email" required value={data.email} onChange={(event) => setData('email', event.target.value)} placeholder={t('Your email address')} className="min-w-0 flex-1 border border-hairline/60 bg-night px-4 py-5 text-sm text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
-                    {errors.email && <span className="mt-1 block text-xs text-rose-400">{errors.email}</span>}
+                    <div className="min-w-0 flex-1">
+                        <input type="email" required value={data.email} onChange={(event) => setData('email', event.target.value.replace(/\s/g, ''))} placeholder={t('Your email address')} className="w-full border border-hairline/60 bg-night px-4 py-5 text-sm text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
+                        {errors.email && <span className="mt-1 block text-left text-xs text-rose-400">{errors.email}</span>}
+                    </div>
                     <input type="hidden" value={data.consent_at} onChange={() => undefined} />
                     <input type="hidden" value={data.source_url} onChange={() => undefined} />
                     <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">

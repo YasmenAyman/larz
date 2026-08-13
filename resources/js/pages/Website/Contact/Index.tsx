@@ -23,6 +23,10 @@ type ContactProps = {
 
 type ContactForm = { name: string; phone: string; project_id: string; email: string; message: string; consent_at: string; source_url: string; _hp_website: string };
 
+const NAME_PATTERN = /^[\p{L}\s]+$/u;
+const PHONE_PATTERN = /^[0-9]{6,40}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function Index({ contact, projects, contact_methods, request_form, hero, location_map, social, social_media, contact_phone, contact_email, seo }: ContactProps) {
     const { t } = useI18n();
     const [isAddressOpen, setIsAddressOpen] = useState(false);
@@ -38,7 +42,7 @@ export default function Index({ contact, projects, contact_methods, request_form
 
     const safeSocial = social ?? { instagram: null, facebook: null, linkedin: null };
 
-    const { data, setData, post, processing, errors, recentlySuccessful, reset } = useForm<ContactForm>({
+    const { data, setData, post, processing, errors, recentlySuccessful, reset, setError, clearErrors } = useForm<ContactForm>({
         name: '',
         phone: '',
         project_id: projects[0]?.id ? String(projects[0].id) : '',
@@ -48,7 +52,31 @@ export default function Index({ contact, projects, contact_methods, request_form
         source_url: typeof window !== 'undefined' ? window.location.href : '',
         _hp_website: '',
     });
-    const submit = (event: React.FormEvent) => { event.preventDefault(); post('/contact-us', { preserveScroll: true, onSuccess: () => reset() }); };
+    const submit = (event: React.FormEvent) => {
+        event.preventDefault();
+        clearErrors();
+
+        let hasErrors = false;
+        const name = data.name.trim();
+        if (!name || !NAME_PATTERN.test(name)) {
+            setError('name', t('Name must contain letters only.'));
+            hasErrors = true;
+        }
+        if (!PHONE_PATTERN.test(data.phone)) {
+            setError('phone', t('Phone must contain numbers only.'));
+            hasErrors = true;
+        }
+        const email = data.email.trim();
+        if (email && !EMAIL_PATTERN.test(email)) {
+            setError('email', t('Please enter a valid email address (e.g. name@example.com).'));
+            hasErrors = true;
+        }
+        if (hasErrors) {
+            return;
+        }
+
+        post('/contact-us', { preserveScroll: true, onSuccess: () => reset() });
+    };
     const { flash } = usePage<PageProps<{ flash?: { success?: string } }>>().props;
 
     return (
@@ -60,8 +88,8 @@ export default function Index({ contact, projects, contact_methods, request_form
                     <h1 className="mt-7 text-3xl font-light leading-[1.08] tracking-[-0.03em] text-ink sm:text-6xl lg:text-[4.25rem]">{hero.heading}</h1>
                     <p className="mt-6 max-w-md text-sm leading-relaxed text-ink-muted">{hero.description}</p>
                     <div className="mt-8 flex flex-wrap items-center gap-6">
-                        <a href={hero.primary_cta_url || '#'} className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase transition-colors hover:bg-gold/10">{hero.primary_cta_label} <ArrowRight className="size-3.5 rtl:rotate-180" /></a>
-                        <a href={hero.secondary_cta_url || '#'} className="text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">{hero.secondary_cta_label}</a>
+                        <a href={hero.primary_cta_url || '#request'} className="inline-flex items-center gap-3 border border-gold px-5 py-3 text-[0.62rem] tracking-[0.2em] text-ink uppercase transition-colors hover:bg-gold/10">{hero.primary_cta_label} <ArrowRight className="size-3.5 rtl:rotate-180" /></a>
+                        <a href={hero.secondary_cta_url || '#'} target="_blank" rel="noopener noreferrer" className="text-[0.6rem] tracking-[0.2em] text-ink-muted uppercase hover:text-ink">{hero.secondary_cta_label}</a>
                     </div>
                 </div>
             </section>
@@ -99,12 +127,12 @@ export default function Index({ contact, projects, contact_methods, request_form
                         <div className="mt-6 grid gap-5 sm:grid-cols-2">
                             <label className="text-sm tracking-[0.2em] text-ink-muted uppercase">
                                 {t('Name')}
-                                <input type="text" value={data.name} onChange={(event) => setData('name', event.target.value)} required placeholder={t('Your name')} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
+                                <input type="text" value={data.name} onChange={(event) => setData('name', event.target.value.replace(/[^\p{L}\s]/gu, ''))} required placeholder={t('Your name')} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
                                 {errors.name && <span className="mt-1 block text-xs text-rose-400">{errors.name}</span>}
                             </label>
                             <label className="text-sm tracking-[0.2em] text-ink-muted uppercase">
                                 {t('Phone')}
-                                <input type="tel" value={data.phone} onChange={(event) => setData('phone', event.target.value)} required placeholder={t('Your number')} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
+                                <input type="tel" inputMode="numeric" value={data.phone} onChange={(event) => setData('phone', event.target.value.replace(/\D/g, ''))} required placeholder={t('Your number')} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
                                 {errors.phone && <span className="mt-1 block text-xs text-rose-400">{errors.phone}</span>}
                             </label>
                         </div>
@@ -116,7 +144,7 @@ export default function Index({ contact, projects, contact_methods, request_form
                         </label>
                         <label className="mt-5 block text-sm tracking-[0.2em] text-ink-muted uppercase">
                             {t('Email')}
-                            <input type="email" value={data.email} onChange={(event) => setData('email', event.target.value)} placeholder={t('Optional')} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
+                            <input type="email" value={data.email} onChange={(event) => setData('email', event.target.value.replace(/\s/g, ''))} placeholder={t('Optional')} className="mt-2 block w-full border border-hairline/60 bg-night px-3 py-3 text-xs tracking-normal text-ink outline-none placeholder:text-ink-muted focus:border-gold" />
                             {errors.email && <span className="mt-1 block text-xs text-rose-400">{errors.email}</span>}
                         </label>
                         <label className="mt-5 block text-sm tracking-[0.2em] text-ink-muted uppercase">

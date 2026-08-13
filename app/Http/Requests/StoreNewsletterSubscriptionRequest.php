@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\ValidatesApplicantContactFields;
 use App\Http\Requests\Concerns\ValidatesHoneypot;
 use App\Support\Honeypot;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -9,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreNewsletterSubscriptionRequest extends FormRequest
 {
+    use ValidatesApplicantContactFields;
     use ValidatesHoneypot;
 
     public function authorize(): bool
@@ -31,7 +33,7 @@ class StoreNewsletterSubscriptionRequest extends FormRequest
     public function rules(): array
     {
         return array_merge($this->honeypotRules(), [
-            'email' => ['required', 'email:rfc', 'max:255'],
+            'email' => $this->requiredApplicantEmailRules(),
             'source' => ['nullable', 'string', 'max:40'],
             'source_url' => ['nullable', 'url', 'max:2000'],
             'consent_at' => ['nullable', 'date'],
@@ -41,5 +43,13 @@ class StoreNewsletterSubscriptionRequest extends FormRequest
     public function attributes(): array
     {
         return [Honeypot::FIELD => 'spam protection'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return $this->applicantContactMessages();
     }
 }

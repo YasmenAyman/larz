@@ -91,7 +91,7 @@ class PublicFormSubmissionsTest extends TestCase
 
         $response = $this->post('/contact-us', [
             'name' => 'Layla Visitor',
-            'phone' => '+201000000000',
+            'phone' => '201000000000',
             'email' => 'layla@example.test',
             'project_id' => $project->id,
             'message' => 'Tell me about pricing.',
@@ -103,7 +103,7 @@ class PublicFormSubmissionsTest extends TestCase
         $this->assertDatabaseHas('contact_inquiries', [
             'name' => 'Layla Visitor',
             'email' => 'layla@example.test',
-            'phone' => '+201000000000',
+            'phone' => '201000000000',
             'project_id' => $project->id,
             'status' => 'new',
             'source_url' => 'https://larz.test/contact-us',
@@ -117,6 +117,24 @@ class PublicFormSubmissionsTest extends TestCase
             'name' => '',
             'phone' => '',
         ])->assertSessionHasErrors(['name', 'phone']);
+
+        $this->assertDatabaseCount('contact_inquiries', 0);
+        Mail::assertNothingQueued();
+    }
+
+    public function test_contact_submission_rejects_invalid_name_phone_and_email_formats(): void
+    {
+        $this->post('/contact-us', [
+            'name' => 'John123',
+            'phone' => '+201000000000',
+            'email' => 'not-an-email',
+        ])->assertSessionHasErrors(['name', 'phone', 'email']);
+
+        $this->post('/contact-us', [
+            'name' => 'Jane Doe',
+            'phone' => '201000000000',
+            'email' => 'partial@',
+        ])->assertSessionHasErrors(['email']);
 
         $this->assertDatabaseCount('contact_inquiries', 0);
         Mail::assertNothingQueued();
@@ -186,7 +204,7 @@ class PublicFormSubmissionsTest extends TestCase
         $this->post('/brochure-requests', [
             'project_id' => $project->id,
             'name' => 'Reader',
-            'phone' => '+201000000004',
+            'phone' => '201000000004',
             'email' => 'reader@example.test',
         ])->assertSessionHas('success');
 
@@ -195,6 +213,19 @@ class PublicFormSubmissionsTest extends TestCase
             'name' => 'Reader',
             'status' => 'new',
         ]);
+    }
+
+    public function test_brochure_request_rejects_invalid_name_and_phone(): void
+    {
+        $project = $this->publishedProject();
+
+        $this->post('/brochure-requests', [
+            'project_id' => $project->id,
+            'name' => 'John$$',
+            'phone' => '2rr',
+        ])->assertSessionHasErrors(['name', 'phone']);
+
+        $this->assertDatabaseCount('brochure_requests', 0);
     }
 
     // -----------------------------------------------------------------
@@ -237,6 +268,14 @@ class PublicFormSubmissionsTest extends TestCase
             'email' => 'not-an-email',
         ])->assertSessionHasErrors('email');
 
+        $this->post('/newsletter-subscriptions', [
+            'email' => 'partial@',
+        ])->assertSessionHasErrors('email');
+
+        $this->post('/newsletter-subscriptions', [
+            'email' => 'user@domain',
+        ])->assertSessionHasErrors('email');
+
         $this->assertDatabaseCount('newsletter_subscribers', 0);
     }
 
@@ -272,7 +311,7 @@ class PublicFormSubmissionsTest extends TestCase
         $this->post("/careers/{$job->slug}/apply", [
             'name' => 'Applicant',
             'email' => 'applicant@example.test',
-            'phone' => '+201000000010',
+            'phone' => '201000000010',
             'city' => 'Cairo',
             'linkedin_url' => 'https://linkedin.com/in/applicant',
             'cover_note' => 'I would love to join.',
@@ -294,7 +333,7 @@ class PublicFormSubmissionsTest extends TestCase
         $this->post("/careers/{$job->slug}/apply", [
             'name' => 'Applicant',
             'email' => 'applicant@example.test',
-            'phone' => '+201000000011',
+            'phone' => '201000000011',
             'resume' => $bad,
         ])->assertSessionHasErrors('resume');
 
@@ -310,7 +349,7 @@ class PublicFormSubmissionsTest extends TestCase
         $this->post("/careers/{$job->slug}/apply", [
             'name' => 'Applicant',
             'email' => 'applicant@example.test',
-            'phone' => '+201000000012',
+            'phone' => '201000000012',
             'resume' => $huge,
         ])->assertSessionHasErrors('resume');
 
@@ -324,7 +363,7 @@ class PublicFormSubmissionsTest extends TestCase
         $this->post("/careers/{$job->slug}/apply", [
             'name' => 'Applicant',
             'email' => 'applicant@example.test',
-            'phone' => '+201000000013',
+            'phone' => '201000000013',
         ])->assertSessionHasErrors('resume');
     }
 
@@ -333,7 +372,7 @@ class PublicFormSubmissionsTest extends TestCase
         $this->post('/careers/does-not-exist/apply', [
             'name' => 'Applicant',
             'email' => 'applicant@example.test',
-            'phone' => '+201000000014',
+            'phone' => '201000000014',
             'resume' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
         ])->assertNotFound();
 
@@ -351,7 +390,7 @@ class PublicFormSubmissionsTest extends TestCase
         $this->post('/career-general-applications', [
             'name' => 'General Candidate',
             'email' => 'general@example.test',
-            'phone' => '+201000000020',
+            'phone' => '201000000020',
             'city' => 'Cairo',
             'linkedin_url' => 'https://linkedin.com/in/general',
             'cover_letter' => 'Open to any opportunity.',
@@ -371,6 +410,13 @@ class PublicFormSubmissionsTest extends TestCase
             'email' => 'broken',
             'phone' => '',
         ])->assertSessionHasErrors(['name', 'email', 'phone', 'resume']);
+
+        $this->post('/career-general-applications', [
+            'name' => 'John123',
+            'email' => 'partial@example',
+            'phone' => '+201000000000',
+            'resume' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
+        ])->assertSessionHasErrors(['name', 'phone', 'email']);
     }
 
     // -----------------------------------------------------------------
@@ -386,7 +432,7 @@ class PublicFormSubmissionsTest extends TestCase
             'internship_program_id' => $program->id,
             'name' => 'Intern',
             'email' => 'intern@example.test',
-            'phone' => '+201000000030',
+            'phone' => '201000000030',
             'university' => 'AUC',
             'graduation_year' => 2026,
             'resume' => $resume,
@@ -406,7 +452,7 @@ class PublicFormSubmissionsTest extends TestCase
             'internship_program_id' => $program->id,
             'name' => 'Intern',
             'email' => 'intern@example.test',
-            'phone' => '+201000000031',
+            'phone' => '201000000031',
             'resume' => $huge,
         ])->assertSessionHasErrors('resume');
     }
@@ -420,7 +466,7 @@ class PublicFormSubmissionsTest extends TestCase
             'internship_program_id' => $program->id,
             'name' => 'Intern',
             'email' => 'intern@example.test',
-            'phone' => '+201000000032',
+            'phone' => '201000000032',
             'resume' => $bad,
         ])->assertSessionHasErrors('resume');
     }
@@ -435,12 +481,12 @@ class PublicFormSubmissionsTest extends TestCase
         for ($i = 0; $i < 5; $i++) {
             $this->post('/contact-us', [
                 'name' => "User {$i}",
-                'phone' => "+201111111{$i}",
+                'phone' => "201111111{$i}0",
             ])->assertSessionHas('success');
         }
         $this->post('/contact-us', [
             'name' => 'Over the limit',
-            'phone' => '+201111111199',
+            'phone' => '201111111199',
         ])->assertStatus(429);
     }
 
@@ -457,7 +503,7 @@ class PublicFormSubmissionsTest extends TestCase
 
         $this->post('/contact-us', [
             'name' => 'Still Persisted',
-            'phone' => '+201000000099',
+            'phone' => '201000000099',
         ]);
 
         $this->assertDatabaseHas('contact_inquiries', [

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\ValidatesApplicantContactFields;
 use App\Http\Requests\Concerns\ValidatesHoneypot;
 use App\Support\Honeypot;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -10,6 +11,7 @@ use Illuminate\Validation\Rule;
 
 class StoreBrochureRequest extends FormRequest
 {
+    use ValidatesApplicantContactFields;
     use ValidatesHoneypot;
 
     public function authorize(): bool
@@ -33,9 +35,9 @@ class StoreBrochureRequest extends FormRequest
     {
         return array_merge($this->honeypotRules(), [
             'project_id' => ['required', 'integer', Rule::exists('projects', 'id')->where('is_published', true)],
-            'name' => ['required', 'string', 'max:160'],
+            'name' => $this->applicantNameRules(),
             'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['required', 'string', 'min:6', 'max:40'],
+            'phone' => $this->applicantPhoneRules(),
             'source' => ['required', 'string', 'max:40'],
             'source_url' => ['nullable', 'url', 'max:2000'],
         ]);
@@ -44,5 +46,13 @@ class StoreBrochureRequest extends FormRequest
     public function attributes(): array
     {
         return [Honeypot::FIELD => 'spam protection'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return $this->applicantContactMessages();
     }
 }
