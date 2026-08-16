@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import type { WebsiteSharedProps } from '@/types/website';
@@ -20,32 +20,23 @@ function canonicalNavUrl(url: string) {
     return `${canonical}${suffix ?? ''}`;
 }
 
+function ArrowIcon({ className = '' }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 24 24" className={`size-2.5 shrink-0 fill-current ${className}`} aria-hidden="true">
+            <path d="M8 5v14l11-7z" />
+        </svg>
+    );
+}
+
 export function Header() {
     const [open, setOpen] = useState(false);
     const [megaOpen, setMegaOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [activeProject, setActiveProject] = useState<string | null>(null);
     const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);
-    const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const { url, props } = usePage<WebsiteSharedProps>();
     const { t, dir } = useI18n();
     const isRtl = dir === 'rtl';
-
-    const cancelScheduledClose = () => {
-        if (closeTimer.current) {
-            clearTimeout(closeTimer.current);
-            closeTimer.current = null;
-        }
-    };
-
-    const scheduleClose = (close: () => void) => {
-        cancelScheduledClose();
-        // Give users enough time to move from a navigation label into its
-        // floating panel, including on trackpads with less precise movement.
-        closeTimer.current = setTimeout(close, 700);
-    };
-
-    useEffect(() => () => cancelScheduledClose(), []);
 
     const dropdownMenus: Record<string, { label: string; hash: string }[]> = {
         '/about': [
@@ -122,8 +113,8 @@ export function Header() {
                                 <div
                                     key={link.label}
                                     className="relative"
-                                    onMouseEnter={() => { cancelScheduledClose(); setMegaOpen(true); }}
-                                    onMouseLeave={() => scheduleClose(() => { setMegaOpen(false); setActiveProject(null); })}
+                                    onMouseEnter={() => setMegaOpen(true)}
+                                    onMouseLeave={() => { setMegaOpen(false); setActiveProject(null); }}
                                 >
                                     <Link
                                         href={canonicalNavUrl(link.to)}
@@ -149,24 +140,26 @@ export function Header() {
                                                             className="flex items-center justify-between text-sm text-white/60 hover:text-white"
                                                         >
                                                             {project.title}
-                                                            <span className="ms-2 text-[0.6rem] text-white/30 rtl:rotate-180">▶</span>
+                                                            <ArrowIcon className="ms-2 text-white/30 rtl:rotate-180" />
                                                         </Link>
 
                                                         {/* Sub-dropdown for project sections */}
                                                         {activeProject === project.slug && (
-                                                            <div className="absolute left-full top-0 z-50 ml-2 min-w-[200px] rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 backdrop-blur-md shadow-2xl">
-                                                                <ul className="space-y-2">
-                                                                    {projectSections.map((section) => (
-                                                                        <li key={section.hash}>
-                                                                            <Link
-                                                                                href={`/projects/${project.slug}${section.hash}`}
-                                                                                className="block text-sm text-white/60 hover:text-white"
-                                                                            >
-                                                                                {section.label}
-                                                                            </Link>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
+                                                            <div className="absolute left-full top-0 z-50 min-w-[200px] ps-2 rtl:left-auto rtl:right-full">
+                                                                <div className="rounded-xl border border-white/10 bg-[#1a1a1c]/95 p-4 shadow-2xl backdrop-blur-md">
+                                                                    <ul className="space-y-2">
+                                                                        {projectSections.map((section) => (
+                                                                            <li key={section.hash}>
+                                                                                <Link
+                                                                                    href={`/projects/${project.slug}${section.hash}`}
+                                                                                    className="block text-sm text-white/60 hover:text-white"
+                                                                                >
+                                                                                    {section.label}
+                                                                                </Link>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
                                                             </div>
                                                         )}
                                                     </li>
@@ -184,8 +177,8 @@ export function Header() {
                                 <div
                                     key={link.label}
                                     className="relative"
-                                    onMouseEnter={() => { cancelScheduledClose(); setActiveDropdown(link.to); }}
-                                    onMouseLeave={() => scheduleClose(() => setActiveDropdown(null))}
+                                    onMouseEnter={() => setActiveDropdown(link.to)}
+                                    onMouseLeave={() => setActiveDropdown(null)}
                                 >
                                     <Link
                                         href={canonicalNavUrl(link.to)}
@@ -259,7 +252,7 @@ export function Header() {
                                             className={`flex w-full items-center justify-between text-sm font-light text-white/60 ${isExpanded ? 'text-white' : ''}`}
                                         >
                                             {link.label}
-                                            <span className={`text-[0.6rem] text-white/30 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''} ${isRtl ? 'rotate-180' : ''}`}>▶</span>
+                                            <ArrowIcon className={`text-white/30 transition-transform duration-200 ${isExpanded ? 'rotate-90' : (isRtl ? 'rotate-180' : '')}`} />
                                         </button>
                                         {isExpanded && projects.length > 0 && (
                                             <div className="mt-3 me-4 space-y-3">
@@ -302,7 +295,7 @@ export function Header() {
                                             className={`flex w-full items-center justify-between text-sm font-light text-white/60 ${isExpanded ? 'text-white' : ''}`}
                                         >
                                             {link.label}
-                                            <span className={`text-[0.6rem] text-white/30 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''} ${isRtl ? 'rotate-180' : ''}`}>▶</span>
+                                            <ArrowIcon className={`text-white/30 transition-transform duration-200 ${isExpanded ? 'rotate-90' : (isRtl ? 'rotate-180' : '')}`} />
                                         </button>
                                         {isExpanded && (
                                             <div className="mt-2 me-4 space-y-2">
