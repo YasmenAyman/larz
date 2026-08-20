@@ -85,7 +85,7 @@ export function Header() {
     return (
         <header className="absolute inset-x-0 top-0 z-50 flex flex-col items-center px-4 pt-5 sm:px-8">
             {/* Desktop navigation: the logo and language control sit outside the navigation pill. */}
-            <div className="hidden w-full max-w-[980px] items-center gap-8 lg:flex">
+            <div className="hidden w-full max-w-[1000px] items-center gap-8 lg:flex">
                 <Link href="/" aria-label="LARZ home" className="shrink-0">
                     {logo ? (
                         <img src={logo} alt="LARZ" className="h-9 w-auto max-w-[160px] object-contain" />
