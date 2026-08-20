@@ -10,7 +10,6 @@ use App\Models\PageSection;
 use App\Models\Partner;
 use App\Models\Project;
 use App\Models\SiteSetting;
-use App\Models\Testimonial;
 use App\Support\LocalizedContent;
 use Database\Seeders\Support\ProjectPageCopy;
 use Illuminate\Database\Seeder;
@@ -59,12 +58,6 @@ class ArabicContentSeeder extends Seeder
             'why-low-density-living-changes-everything' => ['title' => 'لماذا تغيّر الحياة منخفضة الكثافة كل شيء؟', 'excerpt' => 'كيف تؤثر المباني الأقل ارتفاعًا والمساحات المفتوحة على النور والخصوصية والقيمة.', 'content' => '<p>المخططات منخفضة الكثافة تغيّر إيقاع الحياة اليومية: صباحات أهدأ ونور أفضل وإطلالات غير محجوبة.</p><p>في لارز، نخطط مجتمعات لا تشغل المباني فيها سوى جزء من الأرض ليحتفظ السكان بالهدوء والمساحة.</p>'],
             'payment-plans-explained-simply' => ['title' => 'خطط السداد، ببساطة', 'excerpt' => 'دليل مبسّط للمقدم والأقساط وجداول التسليم.', 'content' => '<p>خطط السداد لا يجب أن تكون معقدة. تدمج معظم خطط لارز مقدمًا أوليًا مع أقساط مرتبطة بمراحل الإنشاء.</p><p>فهم مواعيد السداد وما يحدث عند التسليم يساعدك على التخطيط بثقة — هذا الدليل يشرح ذلك بلغة واضحة.</p>'],
         ]);
-        $this->translateModels(Testimonial::class, 'name', [
-            'Ahmed K.' => ['role' => 'صاحب عمل', 'quote' => '«كان اختيار لارز لاستثمارنا التجاري القرار الصحيح. منحنا الموقع الاستراتيجي والتصميم العصري والدعم الاحترافي ثقة كاملة في استثمارنا.»'],
-            'Muhammed Y.' => ['role' => 'مالك منزل', 'quote' => '«من أول استشارة وحتى التسليم النهائي كانت التجربة سلسة. تجاوز الاهتمام بالتفاصيل وجودة التنفيذ توقعاتنا وجعل منزلنا الجديد كما تخيلناه.»'],
-            'Sara M.' => ['role' => 'مستثمرة', 'quote' => '«قدمت لارز ما وعدت به — مجتمعًا مخططًا جيدًا مع طلب إيجار قوي وتواصل شفاف في كل مرحلة.»'],
-            'Omar H.' => ['role' => 'مقيم', 'quote' => '«المساحات الخضراء والتصميم منخفض الارتفاع والمرافق المدروسة تجعل الحياة اليومية أكثر هدوءًا.»'],
-        ]);
         $this->translateModels(Partner::class, 'name', [
             'Hany Saad Innovations' => ['name' => 'هاني سعد للابتكار', 'role' => 'العمارة والتصميم — كوف', 'description' => 'الشريك المعماري الرئيسي لمشروع كوف القاهرة الجديدة.'],
             'GRID Architects' => ['name' => 'GRID Architects', 'role' => 'التخطيط الرئيسي — مدى', 'description' => 'شريك التخطيط الرئيسي لمشروع مدى منخفض الكثافة.'],
@@ -94,7 +87,6 @@ class ArabicContentSeeder extends Seeder
             ['home', 'stats', ['items' => [['value' => '40+', 'label' => 'خبرة'], ['value' => '60+', 'label' => 'مشروع'], ['value' => '15k', 'label' => 'عميل'], ['value' => '2', 'label' => 'دولة']]]],
             ['home', 'featured_projects', ['eyebrow' => 'مشاريع مميزة', 'heading' => 'تطويراتنا الأيقونية', 'description' => 'اكتشف مجموعة منتقاة من أرقى مشاريعنا المصممة لرفع معايير المعيشة العصرية.', 'cta_label' => 'استكشف الكل', 'cta_url' => '/projects']],
             ['home', 'gallery', ['eyebrow' => 'معرض الصور', 'heading' => 'مساحات تُلهم', 'description' => 'لمحة عن التفاصيل والتصاميم والوجهات التي تعرّف تجربة لارز.', 'cta_label' => 'استكشف الكل', 'cta_url' => '/projects']],
-            ['home', 'testimonials', ['eyebrow' => 'آراء العملاء', 'heading' => 'مبني على الثقة. مثبت بالخبرة.', 'description' => 'رضا عملائنا يعكس التزامنا بتقديم تطويرات مدروسة وخدمة استثنائية.']],
             ['home', 'final_cta', ['eyebrow' => 'ابدأ الآن', 'heading' => 'هل أنت مستعد لإيجاد منزلك؟', 'description' => 'استكشف مجتمعاتنا أو تحدث مع فريقنا لاختيار الأنسب لك.', 'cta_label' => 'عرض المشاريع', 'cta_url' => '/projects']],
             ['about', 'hero', ['eyebrow' => 'عن لارز', 'heading' => 'أنت لا تختار مبنى. أنت تختار كيف ستعيش.', 'description' => 'لأكثر من 40 عامًا، تعلّم مؤسسو لارز كيف يصنعون ذلك — في القاهرة الجديدة والعاصمة الإدارية.', 'cta_label' => 'استكشف مشاريعنا', 'cta_url' => '/projects', 'secondary_cta_label' => 'تواصل معنا', 'secondary_cta_url' => '/contact-us']],
             ['about', 'stats', ['items' => [['value' => '+60', 'label' => 'مشروع', 'note' => 'مكتمل وقيد التنفيذ'], ['value' => '2', 'label' => 'دولة', 'note' => 'مصر والتوسع مستمر'], ['value' => '+15k', 'label' => 'عميل', 'note' => 'عائلات وشركات'], ['value' => '+40', 'label' => 'سنة خبرة', 'note' => 'خبرة المؤسسين']]]],

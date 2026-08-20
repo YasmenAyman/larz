@@ -8,7 +8,6 @@ use App\Models\Award;
 use App\Models\PageSection;
 use App\Models\Partner;
 use App\Models\Project;
-use App\Models\Testimonial;
 use Illuminate\Http\RedirectResponse;
 use App\Services\RichTextSanitizer;
 use App\Support\WebsiteCache;
@@ -83,6 +82,8 @@ class ContentController extends Controller
 
     /** Section keys that have dedicated controllers and should not appear in the generic editor. */
     private const RESERVED_SECTIONS = [
+        'home' => ['testimonials'],
+        'media' => ['newsletter'],
         'careers' => ['hero', 'values', 'internship'],
     ];
 
@@ -98,7 +99,6 @@ class ContentController extends Controller
             'projects' => Project::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title']),
             'awards' => Award::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title', 'year']),
             'partners' => Partner::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'name']),
-            'testimonials' => Testimonial::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'name']),
         ]);
     }
 
@@ -156,7 +156,6 @@ class ContentController extends Controller
             'projects' => Project::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title']),
             'awards' => Award::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'title', 'year']),
             'partners' => Partner::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'name']),
-            'testimonials' => Testimonial::query()->where('is_published', true)->orderBy('sort_order')->get(['id', 'name']),
         ]);
     }
 }

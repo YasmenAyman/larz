@@ -25,7 +25,7 @@ export function Footer() {
         { Icon: Youtube, label: 'YouTube', href: settings['social.youtube'] },
     ].flatMap((social) => social.href && social.href !== '#' ? [{ ...social, href: social.href }] : []);
     return (
-        <footer className="relative overflow-hidden rounded-t-[2.5rem]" style={{ backgroundImage: `url(${footerBackground})`, backgroundSize: 'cover' }}>
+        <footer className="relative overflow-hidden rounded-t-[2.5rem]" style={{ backgroundImage: `url(${footerBackground})`, backgroundSize: 'cover',marginTop: '-38px' }}>
             <div className="relative mx-auto max-w-[1440px] px-4 py-12 !pb-5 sm:px-8 sm:py-20">
                 <h2 className="text-center text-2xl leading-[1.3] font-bold text-ink sm:text-4xl md:text-[55px]">
                     {footerTitle.map((line, index) => (

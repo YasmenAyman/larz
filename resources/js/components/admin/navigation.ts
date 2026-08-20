@@ -20,7 +20,6 @@ export const adminNavigation: AdminNavigationGroup[] = [
                 { label: 'Statistics', href: '/admin/pages/home/stats', permission: 'pages.view' },
                 { label: 'Featured Projects', href: '/admin/pages/home/featured-projects', permission: 'pages.view' },
                 { label: 'Gallery', href: '/admin/pages/home/gallery', permission: 'pages.view' },
-                { label: 'Testimonials', href: '/admin/pages/home/testimonials', permission: 'pages.view' },
             ] },
             { label: 'About Us', href: '/admin/pages/about', permission: 'pages.view', children: [
                 { label: 'Hero Section', href: '/admin/pages/about/hero', permission: 'pages.view' },
@@ -36,7 +35,6 @@ export const adminNavigation: AdminNavigationGroup[] = [
                 { label: 'News & Press Releases', href: '/admin/pages/media/news', permission: 'pages.view' },
                 { label: 'Blogs', href: '/admin/pages/media/stories', permission: 'pages.view' },
                 { label: 'Photo Gallery', href: '/admin/pages/media/gallery', permission: 'pages.view' },
-                { label: 'Newsletter CTA', href: '/admin/pages/media/newsletter', permission: 'pages.view' },
             ] },
             { label: 'Careers', href: '/admin/pages/careers', permission: 'pages.view', children: [
                 { label: 'Hero Section', href: '/admin/pages/careers/hero', permission: 'pages.view' },
@@ -80,7 +78,6 @@ export const adminNavigation: AdminNavigationGroup[] = [
             { label: 'Contact Inquiries', href: '/admin/contact-inquiries', permission: 'inquiries.view' },
             { label: 'Project Inquiries', href: '/admin/project-inquiries', permission: 'inquiries.view' },
             { label: 'Brochure Requests', href: '/admin/brochure-requests', permission: 'inquiries.view' },
-            { label: 'Newsletter Subscribers', href: '/admin/newsletter-subscribers', permission: 'newsletter.view' },
         ],
     },
 ];

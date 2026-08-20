@@ -7,25 +7,31 @@ export function SectionHeading({
     title,
     description,
     className,
+    eyebrowClassName,
+    titleClassName,
+    descriptionClassName,
 }: {
     eyebrow: string;
     title: ReactNode;
     description?: ReactNode;
     className?: string;
+    eyebrowClassName?: string;
+    titleClassName?: string;
+    descriptionClassName?: string;
 }) {
     const { t } = useI18n();
     const translatedTitle = typeof title === 'string' ? t(title) : title;
     const translatedDescription = typeof description === 'string' ? t(description) : description;
     return (
         <div className={cn('text-center', className)}>
-            <p className="text-[0.9rem] lg:text-[1.2rem] tracking-[0.32em] text-ink-dim uppercase">
+            <p className={cn('text-[0.9rem] lg:text-[1.2rem] tracking-[0.32em] text-ink-dim uppercase', eyebrowClassName)}>
                 {t(eyebrow)}
             </p>
-            <h2 className="mx-auto mt-2 max-w-3xl text-2xl leading-[1.25] font-normal text-ink sm:text-3xl md:text-[3.3rem]">
+            <h2 className={cn('mx-auto mt-2 max-w-3xl text-2xl leading-[1.25] font-normal text-ink sm:text-3xl md:text-[3.3rem]', titleClassName)}>
                 {translatedTitle}
             </h2>
             {description && (
-                <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ink-muted">
+                <p className={cn('mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ink-muted', descriptionClassName)}>
                     {translatedDescription}
                 </p>
             )}

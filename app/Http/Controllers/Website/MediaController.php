@@ -20,7 +20,6 @@ class MediaController extends Controller
         $news = LocalizedContent::section(WebsiteContent::section('media', 'news'));
         $stories = LocalizedContent::section(WebsiteContent::section('media', 'stories'));
         $gallerySettings = LocalizedContent::section(WebsiteContent::section('media', 'gallery'));
-        $newsletterSettings = LocalizedContent::section(WebsiteContent::section('media', 'newsletter'));
 
         return Inertia::render('Website/Media/Index', [
             'hero' => LocalizedContent::section(WebsiteContent::section('media', 'hero')),
@@ -39,11 +38,6 @@ class MediaController extends Controller
                 'eyebrow' => $gallerySettings['eyebrow'] ?? 'Photo gallery',
                 'heading' => $gallerySettings['heading'] ?? 'Inside our communities.',
                 'description' => $gallerySettings['description'] ?? null,
-            ],
-            'newsletterSettings' => [
-                'eyebrow' => $newsletterSettings['eyebrow'] ?? 'Newsletter',
-                'heading' => $newsletterSettings['heading'] ?? 'Never miss an update.',
-                'description' => $newsletterSettings['description'] ?? null,
             ],
             'gallery' => $gallery->map(fn ($item) => WebsiteContent::assetUrl($item->media))->filter()->values()->all(),
             'seo' => $seo->forPage('media', '/media', ['title' => 'Media | LARZ Developments'], [

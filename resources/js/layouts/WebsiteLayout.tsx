@@ -13,7 +13,7 @@ export default function WebsiteLayout({ children }: { children: ReactNode }) {
         document.documentElement.dir = dir;
     }, [dir]);
     return (
-        <div dir={dir} className="min-h-screen bg-surface font-sans text-ink">
+        <div dir={dir} className="min-h-screen font-sans text-ink">
             <WebsiteFlashToast />
             <Header />
             <main>{children}</main>

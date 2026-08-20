@@ -84,9 +84,8 @@ export function Header() {
 
     return (
         <header className="absolute inset-x-0 top-0 z-50 flex flex-col items-center px-4 pt-5 sm:px-8">
-            {/* Pill navbar */}
-            <div className="website-mobile-header-bar flex w-[914px] max-w-full items-center gap-8 rounded-full border border-white/10 bg-[#1a1a1c]/90 px-6 py-3.5 shadow-[0_4px_32px_rgba(0,0,0,0.55)] backdrop-blur-md">
-                {/* Logo */}
+            {/* Desktop navigation: the logo and language control sit outside the navigation pill. */}
+            <div className="hidden w-full max-w-[900px] items-center gap-8 lg:flex">
                 <Link href="/" aria-label="LARZ home" className="shrink-0">
                     {logo ? (
                         <img src={logo} alt="LARZ" className="h-9 w-auto max-w-[160px] object-contain" />
@@ -102,7 +101,7 @@ export function Header() {
                     )}
                 </Link>
 
-                {/* Desktop nav */}
+                <div className="flex flex-1 items-center rounded-full border border-white/10 bg-[#1a1a1c]/90 px-8 py-3.5 shadow-[0_4px_32px_rgba(0,0,0,0.55)] backdrop-blur-md">
                 <nav className="hidden flex-1 items-center justify-between lg:flex">
                     {navLinks.map((link) => {
                         const isProjects = link.to === '/projects';
@@ -221,7 +220,27 @@ export function Header() {
                         );
                     })}
                 </nav>
+                </div>
 
+                <LanguageSwitcher dark />
+            </div>
+
+            {/* Keep the compact layout unchanged on mobile. */}
+            <div className="website-mobile-header-bar flex w-[914px] max-w-full items-center gap-8 rounded-full border border-white/10 bg-[#1a1a1c]/90 px-6 py-3.5 shadow-[0_4px_32px_rgba(0,0,0,0.55)] backdrop-blur-md lg:hidden">
+                <Link href="/" aria-label="LARZ home" className="shrink-0">
+                    {logo ? (
+                        <img src={logo} alt="LARZ" className="h-9 w-auto max-w-[160px] object-contain" />
+                    ) : (
+                        <>
+                            <span className="block text-base font-semibold tracking-[0.2em] text-white">
+                                LARZ<sup className="ml-0.5 align-super text-[0.38em]">®</sup>
+                            </span>
+                            <span className="mt-0.5 block text-[0.42rem] tracking-[0.32em] text-white/40 uppercase">
+                                {t('developments')}
+                            </span>
+                        </>
+                    )}
+                </Link>
                 <LanguageSwitcher dark />
                 <button
                     type="button"

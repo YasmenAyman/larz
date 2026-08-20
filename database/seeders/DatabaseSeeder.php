@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
             CareersSeeder::class,
             PartnersSeeder::class,
             AwardsSeeder::class,
-            TestimonialsSeeder::class,
             ArabicContentSeeder::class,
             ArabicSeoMetadataSeeder::class,
         ]);

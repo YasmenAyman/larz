@@ -64,15 +64,17 @@ export function Gallery({ gallery, settings }: { gallery: string[]; settings: { 
     }, [emblaApi]);
 
     return (
-        <section dir={isRtl ? 'rtl' : 'ltr'} className="overflow-hidden py-20 lg:py-28">
+        <section dir={isRtl ? 'rtl' : 'ltr'} className="overflow-hidden bg-[#EFEFF1] py-20 lg:py-28">
             <div className="mx-auto max-w-[1440px] px-4 sm:px-8">
                 <SectionHeading
                     eyebrow={t(settings.eyebrow)}
                     title={t(settings.heading)}
                     description={<>{t(settings.description)}</>}
+                    titleClassName="text-paper-ink"
+                    descriptionClassName="text-paper-ink"
                 />
                 <div className="mt-8 flex justify-center">
-                    <PillButton label={t(settings.cta_label)} to={settings.cta_url} />
+                    <PillButton label={t(settings.cta_label)} to={settings.cta_url} className="border-paper-ink/30 bg-transparent text-paper-ink hover:bg-paper-ink/10" />
                 </div>
             </div>
 
@@ -114,19 +116,19 @@ export function Gallery({ gallery, settings }: { gallery: string[]; settings: { 
                 </div>
 
                 {/* Navigation Buttons */}
-                <div className="mt-6 flex items-center justify-center gap-4">
+                <div className="flex items-center justify-center gap-4">
                     <button
                         type="button"
                         aria-label="Previous slide"
                         onClick={scrollPrev}
-                        className={`grid size-10 place-items-center bg-white/20 text-white transition-colors hover:bg-neutral-800 ${isRtl ? 'rounded-r-2xl' : 'rounded-l-2xl'}`}>
+                        className={`grid size-10 place-items-center bg-[var(--paper-ink)] text-[#EFEFF1] transition-colors hover:bg-paper-ink/80 ${isRtl ? 'rounded-r-2xl' : 'rounded-l-2xl'}`}>
                         <PrevIcon className="size-5" strokeWidth={1.75} />
                     </button>
                     <button
                         type="button"
                         aria-label="Next slide"
                         onClick={scrollNext}
-                        className={`grid size-10 place-items-center bg-white/20 text-white transition-colors hover:bg-neutral-800 ${isRtl ? 'rounded-l-2xl' : 'rounded-r-2xl'}`}
+                        className={`grid size-10 place-items-center bg-[var(--paper-ink)] text-[#EFEFF1] transition-colors hover:bg-paper-ink/80 ${isRtl ? 'rounded-l-2xl' : 'rounded-r-2xl'}`}
                     >
                         <NextIcon className="size-5" strokeWidth={1.75} />
                     </button>

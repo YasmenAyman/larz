@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Website;
 use App\Http\Controllers\Controller;
 use App\Models\PhotoGalleryItem;
 use App\Models\Project;
-use App\Models\Testimonial;
 use App\Support\LocalizedContent;
 use App\Support\WebsiteContent;
 use App\Services\SeoMetadataService;
@@ -25,8 +24,6 @@ class HomeController extends Controller
         $projects = $selectedProjectIds === [] ? $allProjects->where('is_featured', true)->values() : collect($selectedProjectIds)->map(fn ($id) => $allProjects->firstWhere('id', $id))->filter()->values();
         $gallery = PhotoGalleryItem::query()->with('media')->where('is_published', true)->orderBy('sort_order')->get();
         $gallerySettings = WebsiteContent::section('home', 'gallery');
-        $testimonialSettings = WebsiteContent::section('home', 'testimonials');
-        $testimonials = Testimonial::query()->with('media')->where('is_published', true)->orderBy('sort_order')->get();
 
         $heroRaw = WebsiteContent::section('home', 'hero');
         $hero = [
@@ -66,13 +63,6 @@ class HomeController extends Controller
                 'cta_label' => $gallerySettings['cta_label'] ?? 'Explore All',
                 'cta_url' => $gallerySettings['cta_url'] ?? '/projects',
             ],
-            'testimonialSettings' => LocalizedContent::section(WebsiteContent::section('home', 'testimonials')),
-            'testimonials' => $testimonials->map(fn ($item) => array_merge([
-                'name' => $item->name,
-                'role' => $item->role,
-                'quote' => $item->quote,
-                'image' => WebsiteContent::assetUrl($item->media),
-            ], LocalizedContent::record($item, ['name', 'role', 'quote'])))->values()->all(),
             'seo' => $seo->forPage('home', '/', ['title' => 'LARZ Developments | Designed for the Way You Live'], [
                 $seo->breadcrumbs([['name' => 'Home', 'url' => url('/')]]),
             ]),

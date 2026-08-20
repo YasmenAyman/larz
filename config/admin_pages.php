@@ -6,7 +6,7 @@ return [
         'sections' => [
             'hero' => 'Hero Section', 'stats' => 'Statistics',
             'featured-projects' => 'Featured Projects', 'gallery' => 'Gallery',
-            'testimonials' => 'Testimonials', 'final-cta' => 'Final CTA',
+            'final-cta' => 'Final CTA',
         ],
     ],
     'about' => [
@@ -20,7 +20,7 @@ return [
         'label' => 'Media Page',
         'sections' => [
             'hero' => 'Hero Section', 'news' => 'News & Press Section', 'stories' => 'Stories & Insights Section',
-            'gallery' => 'Photo Gallery Section', 'newsletter' => 'Newsletter CTA',
+            'gallery' => 'Photo Gallery Section',
         ],
     ],
     'careers' => [
