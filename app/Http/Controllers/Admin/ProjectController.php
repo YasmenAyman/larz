@@ -223,6 +223,7 @@ class ProjectController extends Controller
         if ($request->hasFile('masterplan_image') && $oldMasterplan) $uploads->deleteIfUnreferenced($oldMasterplan);
 
         WebsiteCache::projectTree($project->slug);
+        WebsiteCache::projectsIndex();
         WebsiteCache::sitemap();
         WebsiteCache::homepage();
 
@@ -234,6 +235,7 @@ class ProjectController extends Controller
         $slug = $project->slug;
         $project->delete();
         WebsiteCache::projectTree($slug);
+        WebsiteCache::projectsIndex();
         WebsiteCache::sitemap();
         WebsiteCache::homepage();
         return back()->with('success', 'Project moved to trash.');
@@ -244,6 +246,7 @@ class ProjectController extends Controller
         $record = Project::withTrashed()->findOrFail($project);
         $record->restore();
         WebsiteCache::projectTree($record->slug);
+        WebsiteCache::projectsIndex();
         WebsiteCache::sitemap();
         WebsiteCache::homepage();
         return back()->with('success', 'Project restored.');
@@ -256,6 +259,7 @@ class ProjectController extends Controller
             'published_at' => ! $project->is_published ? now() : null,
         ]);
         WebsiteCache::projectTree($project->slug);
+        WebsiteCache::projectsIndex();
         WebsiteCache::sitemap();
         WebsiteCache::homepage();
         return back();
