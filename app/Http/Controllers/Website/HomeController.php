@@ -29,8 +29,8 @@ class HomeController extends Controller
         $hero = [
             'heading' => LocalizedContent::sanitizeNewlines($heroRaw['heading'] ?? 'Designed for the Way You Live'),
             'description' => $heroRaw['description'] ?? '',
-            'cta_label' => $heroRaw['cta_label'] ?? $heroRaw['primary_cta_label'] ?? "Our Project's",
-            'cta_url' => $heroRaw['cta_url'] ?? $heroRaw['primary_cta_url'] ?? '/projects',
+            'cta_label' => $heroRaw['primary_cta_label'] ?? $heroRaw['cta_label'] ?? "Our Project's",
+            'cta_url' => $heroRaw['primary_cta_url'] ?? $heroRaw['cta_url'] ?? '/projects',
             'heroImage' => asset('assets/tower_img.png'),
         ];
 

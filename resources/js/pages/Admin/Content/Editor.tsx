@@ -21,6 +21,7 @@ type Field = { key: string; label: string; type?: 'input' | 'textarea' };
 
 const fields: Record<string, Field[]> = {
     hero: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Heading', type: 'textarea' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'primary_cta_label', label: 'Primary CTA label' }, { key: 'primary_cta_url', label: 'Primary CTA URL' }, { key: 'secondary_cta_label', label: 'Secondary CTA label' }, { key: 'secondary_cta_url', label: 'Secondary CTA URL' }],
+    home_hero: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Heading', type: 'textarea' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'primary_cta_label', label: 'Primary CTA label' }, { key: 'primary_cta_url', label: 'Primary CTA URL' }],
     media_hero: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Heading', type: 'textarea' }, { key: 'description', label: 'Description', type: 'textarea' }],
     about: [{ key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
     stats: [],
@@ -105,7 +106,7 @@ export default function Editor({ page, label, section, sections }: { page: strin
                             </div>
 
                             <div className="mt-6 grid gap-5 md:grid-cols-2">
-                                {(fields[page === 'media' && record.section_key === 'hero' ? 'media_hero' : record.section_key] ?? fields.hero).map((field) => (
+                                {(fields[page === 'home' && record.section_key === 'hero' ? 'home_hero' : page === 'media' && record.section_key === 'hero' ? 'media_hero' : record.section_key] ?? fields.hero).map((field) => (
                                     <FormField key={field.key} label={ui(field.label)} error={errors[`sections.${record.section_key}.${field.key}`]}>
                                         {field.type === 'textarea' ? (
                                             <textarea
