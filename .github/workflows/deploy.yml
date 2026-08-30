@@ -38,6 +38,13 @@ jobs:
       - name: Build Frontend
         run: npm run build
 
+      - name: Verify and package frontend build
+        run: |
+          test -f public/build/manifest.json
+          test -d public/build/assets
+          php -r '$manifest = json_decode(file_get_contents("public/build/manifest.json"), true, 512, JSON_THROW_ON_ERROR); $files = []; foreach ($manifest as $entry) { $files[] = $entry["file"] ?? null; foreach ($entry["css"] ?? [] as $file) { $files[] = $file; } } $missing = array_filter($files, fn ($file) => ! is_string($file) || ! is_file("public/build/".$file)); if ($missing !== []) { fwrite(STDERR, "Missing Vite assets: ".implode(", ", $missing).PHP_EOL); exit(1); }'
+          tar -C public/build -czf vite-build.tar.gz .
+
 
       - name: Copy files to server (SCP)
         uses: appleboy/scp-action@v0.1.7
@@ -75,6 +82,18 @@ jobs:
 
 
             cd "$NEW_RELEASE_DIR"
+
+            # Always restore the exact Vite build produced by CI. The build
+            # directory is intentionally gitignored, so it must be treated as
+            # a deployment artifact rather than a repository file.
+            test -f "$NEW_RELEASE_DIR/vite-build.tar.gz"
+            rm -rf "$NEW_RELEASE_DIR/public/build"
+            mkdir -p "$NEW_RELEASE_DIR/public/build"
+            tar -xzf "$NEW_RELEASE_DIR/vite-build.tar.gz" -C "$NEW_RELEASE_DIR/public/build"
+            rm -f "$NEW_RELEASE_DIR/vite-build.tar.gz"
+
+            test -f "$NEW_RELEASE_DIR/public/build/manifest.json"
+            /usr/local/bin/ea-php84 -r '$manifest = json_decode(file_get_contents("public/build/manifest.json"), true, 512, JSON_THROW_ON_ERROR); $files = []; foreach ($manifest as $entry) { $files[] = $entry["file"] ?? null; foreach ($entry["css"] ?? [] as $file) { $files[] = $file; } } $missing = array_filter($files, fn ($file) => ! is_string($file) || ! is_file("public/build/".$file)); if ($missing !== []) { fwrite(STDERR, "Missing Vite assets: ".implode(", ", $missing).PHP_EOL); exit(1); }'
 
             # ربط الملفات المشتركة
             rm -rf storage public/storage
