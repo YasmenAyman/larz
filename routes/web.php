@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ContactInquiryController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\HomeGalleryController;
 use App\Http\Controllers\Admin\HomeFeaturedProjectsController;
+use App\Http\Controllers\Admin\HomeHeroController;
 use App\Http\Controllers\Admin\BrochureRequestController;
 use App\Http\Controllers\Admin\MediaCategoryController;
 use App\Http\Controllers\Admin\MediaPostController;
@@ -119,6 +120,7 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
                     $page === 'careers' && $section === 'hero' => CareersHeroController::class,
                     $page === 'careers' && $section === 'values' => CompanyValueController::class,
                     $page === 'careers' && $section === 'internship' => CareersInternshipController::class,
+                    $page === 'home' && $section === 'hero' => HomeHeroController::class,
                     $page === 'home' && $section === 'gallery' => HomeGalleryController::class,
                     $page === 'home' && $section === 'featured-projects' => HomeFeaturedProjectsController::class,
                     $page === 'about' && $section === 'partners' => PartnerController::class,
@@ -129,8 +131,8 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
                     $page === 'contact' && $section === 'social-media' => SocialMediaController::class,
                     default => AdminPageRouteController::class,
                 };
-                $editAction = in_array($sectionController, [MediaNewsController::class, MediaBlogController::class, CompanyValueController::class], true) ? 'index' : (in_array($sectionController, [AboutHeroController::class, AboutStoryController::class, CareersHeroController::class, CareersInternshipController::class, HomeGalleryController::class, HomeFeaturedProjectsController::class, MediaGalleryController::class, ContactMethodsController::class, ContactRequestHeroController::class, LocationMapController::class, SocialMediaController::class], true) ? 'edit' : (in_array($sectionController, [PartnerController::class, PromiseCtaController::class], true) ? 'index' : 'section'));
-                $updateAction = in_array($sectionController, [MediaNewsController::class, MediaBlogController::class, CompanyValueController::class], true) ? 'updateSettings' : (in_array($sectionController, [AboutHeroController::class, AboutStoryController::class, CareersHeroController::class, CareersInternshipController::class, HomeGalleryController::class, HomeFeaturedProjectsController::class, MediaGalleryController::class, ContactMethodsController::class, LocationMapController::class], true) ? 'update' : (in_array($sectionController, [PartnerController::class, PromiseCtaController::class, ContactRequestHeroController::class, SocialMediaController::class], true) ? 'updateSettings' : 'updateSection'));
+                $editAction = in_array($sectionController, [MediaNewsController::class, MediaBlogController::class, CompanyValueController::class], true) ? 'index' : (in_array($sectionController, [AboutHeroController::class, AboutStoryController::class, CareersHeroController::class, CareersInternshipController::class, HomeHeroController::class, HomeGalleryController::class, HomeFeaturedProjectsController::class, MediaGalleryController::class, ContactMethodsController::class, ContactRequestHeroController::class, LocationMapController::class, SocialMediaController::class], true) ? 'edit' : (in_array($sectionController, [PartnerController::class, PromiseCtaController::class], true) ? 'index' : 'section'));
+                $updateAction = in_array($sectionController, [MediaNewsController::class, MediaBlogController::class, CompanyValueController::class], true) ? 'updateSettings' : (in_array($sectionController, [AboutHeroController::class, AboutStoryController::class, CareersHeroController::class, CareersInternshipController::class, HomeHeroController::class, HomeGalleryController::class, HomeFeaturedProjectsController::class, MediaGalleryController::class, ContactMethodsController::class, LocationMapController::class], true) ? 'update' : (in_array($sectionController, [PartnerController::class, PromiseCtaController::class, ContactRequestHeroController::class, SocialMediaController::class], true) ? 'updateSettings' : 'updateSection'));
                 Route::get('/pages/'.$page.'/'.$section, [$sectionController, $editAction])->middleware('permission:pages.view')->name('pages.'.$page.'.'.$sectionName.'.edit');
                  Route::put('/pages/'.$page.'/'.$section, [$sectionController, $updateAction])->defaults('page', $page)->defaults('section', $section)->middleware('permission:pages.update')->name('pages.'.$page.'.'.$sectionName.'.update');
              }

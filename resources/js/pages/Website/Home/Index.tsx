@@ -6,7 +6,7 @@ import { Gallery } from '@/components/website/home/Gallery';
 import { Hero } from '@/components/website/home/Hero';
 import type { WebsiteProject } from '@/types/website';
 
-export default function Index({ hero, stats, projects, featuredProjectsSettings, gallery, gallerySettings, seo }: { hero: { heading: string; description: string; cta_label: string; cta_url: string; heroImage: string }; stats: Array<{ value: string; label: string }>; projects: Array<Pick<WebsiteProject, 'slug' | 'title' | 'location' | 'heroImage'> & { image?: string | null }>; featuredProjectsSettings: { eyebrow: string; heading: string; description: string; cta_label: string; cta_url: string }; gallery: string[]; gallerySettings: { eyebrow: string; heading: string; description: string; cta_label: string; cta_url: string }; seo: SeoMetadata }) {
+export default function Index({ hero, stats, projects, featuredProjectsSettings, gallery, gallerySettings, seo }: { hero: { heading: string; description: string; cta_label: string; cta_url: string; heroImage: string; heroVideo?: string | null }; stats: Array<{ value: string; label: string }>; projects: Array<Pick<WebsiteProject, 'slug' | 'title' | 'location' | 'heroImage'> & { image?: string | null }>; featuredProjectsSettings: { eyebrow: string; heading: string; description: string; cta_label: string; cta_url: string }; gallery: string[]; gallerySettings: { eyebrow: string; heading: string; description: string; cta_label: string; cta_url: string }; seo: SeoMetadata }) {
     return (
         <WebsiteLayout>
             <SeoHead seo={seo} />

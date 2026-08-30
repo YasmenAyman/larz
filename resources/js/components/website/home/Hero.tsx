@@ -1,12 +1,14 @@
 import { PillButton } from '@/components/shared/PillButton';
 import { useI18n } from '@/i18n';
+import defaultHeroVideo from '@assets/tower_video.mp4';
 
 function displayHeading(value: string): string {
     return value.replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-export function Hero({ hero }: { hero: { heading: string; description: string; cta_label: string; cta_url: string; heroImage: string } }) {
-    const { t } = useI18n();
+export function Hero({ hero }: { hero: { heading: string; description: string; cta_label: string; cta_url: string; heroImage: string; heroVideo?: string | null } }) {
+    const { t, locale } = useI18n();
+    const isArabic = locale === 'ar';
     const heading = displayHeading(t(hero.heading ?? 'Designed for the Way You Live'));
     return (
         <section className="relative min-h-[400px] overflow-hidden bg-surface bg_pattern pt-32 pb-16 lg:min-h-[850px] lg:pb-0">
@@ -29,7 +31,35 @@ export function Hero({ hero }: { hero: { heading: string; description: string; c
                 </div>
 
                 <div className="relative hidden lg:block">
-                    <img src={hero.heroImage} alt="LARZ tower exterior" className="ms-auto w-full object-cover" />
+                    <div
+                        className="ms-auto aspect-[767/889] w-full overflow-hidden"
+                        style={{
+                            maskImage: `url(${hero.heroImage})`,
+                            maskMode: 'alpha',
+                            maskPosition: 'center',
+                            maskRepeat: 'no-repeat',
+                            maskSize: '100% 100%',
+                            WebkitMaskImage: `url(${hero.heroImage})`,
+                            WebkitMaskPosition: 'center',
+                            WebkitMaskRepeat: 'no-repeat',
+                            WebkitMaskSize: '100% 100%',
+                            transform: isArabic ? 'scaleX(-1)' : undefined,
+                        }}
+                    >
+                        <video
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                            poster={hero.heroImage}
+                            aria-label="LARZ tower exterior"
+                            className="h-full w-full object-cover"
+                            style={{ transform: isArabic ? 'scaleX(-1)' : undefined }}
+                        >
+                            <source src={hero.heroVideo ?? defaultHeroVideo} type="video/mp4" />
+                        </video>
+                    </div>
                 </div>
             </div>
         </section>

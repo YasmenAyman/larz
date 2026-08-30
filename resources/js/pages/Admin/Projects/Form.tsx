@@ -205,6 +205,15 @@ export default function Form({ project, categories }: { project: Project | null;
     const isArabic = lang === 'ar';
     const ui = (english: string, arabic: string) => locale === 'ar' ? arabic : english;
     const textFieldClass = "w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm";
+    const fieldClass = (field: keyof typeof form.errors) => `${textFieldClass} ${form.errors[field] ? 'border-rose-500 focus:border-rose-400 focus:ring-1 focus:ring-rose-400/40' : ''}`;
+    const showValidationErrors = (errors: Record<string, string>) => {
+        form.setError(errors);
+
+        // The required project fields are shared and are shown on the English tab.
+        if (errors.title || errors.slug) {
+            setLanguage('en');
+        }
+    };
 
     return (
         <AdminLayout>
@@ -215,6 +224,11 @@ export default function Form({ project, categories }: { project: Project | null;
                     <h1 className="mt-3 text-3xl font-semibold">{project ? 'Edit project' : 'Create project'}</h1>
                 </div>
                 <Notification message={flash?.success ?? null} />
+                {Object.keys(form.errors).length > 0 && (
+                    <div role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+                        {ui('Please correct the highlighted fields and try again.', 'يرجى تصحيح الحقول الموضحة باللون الأحمر ثم المحاولة مرة أخرى.')}
+                    </div>
+                )}
 
                 {/* Language tabs */}
                 <div className="flex gap-2 border-b border-slate-800 pb-3">
@@ -274,7 +288,7 @@ export default function Form({ project, categories }: { project: Project | null;
                             preserveScroll: true,
                             onSuccess: () => router.visit('/admin/projects'),
                             onFinish: () => setSubmitting(false),
-                            onError: (errors) => console.error('Project update validation errors', errors),
+                            onError: showValidationErrors,
                         });
                     } else {
                         setSubmitting(true);
@@ -282,7 +296,7 @@ export default function Form({ project, categories }: { project: Project | null;
                             forceFormData: true,
                             preserveScroll: true,
                             onFinish: () => setSubmitting(false),
-                            onError: (errors) => console.error('Project create validation errors', errors),
+                            onError: showValidationErrors,
                         });
                     }
                 }} encType="multipart/form-data" className="space-y-6">
@@ -291,8 +305,8 @@ export default function Form({ project, categories }: { project: Project | null;
                     {!isArabic && (
                         <SectionCard title="Basics">
                             <div className="grid gap-5 md:grid-cols-2">
-                                <FormField label="Title" error={form.errors.title}><input value={form.data.title} onChange={(e) => form.setData('title', e.target.value)} className={textFieldClass} /></FormField>
-                                <FormField label="Slug" error={form.errors.slug}><input value={form.data.slug} onChange={(e) => form.setData('slug', e.target.value)} className={textFieldClass} /></FormField>
+                                <FormField label="Title" error={form.errors.title}><input value={form.data.title} onChange={(e) => { form.setData('title', e.target.value); form.clearErrors('title'); }} className={fieldClass('title')} /></FormField>
+                                <FormField label="Slug" error={form.errors.slug}><input value={form.data.slug} onChange={(e) => { form.setData('slug', e.target.value); form.clearErrors('slug'); }} className={fieldClass('slug')} /></FormField>
                                 <FormField label={ui('Category', 'التصنيف')}><select value={form.data.project_category_id ?? ''} onChange={(e) => form.setData('project_category_id', e.target.value ? Number(e.target.value) : null)} className={textFieldClass}><option value="">{ui('No category', 'بدون تصنيف')}</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></FormField>
                                 <FormField label="Project type"><select value={form.data.project_type ?? ''} onChange={(e) => form.setData('project_type', e.target.value)} className={textFieldClass}><option value="residential">Residential</option><option value="commercial">Commercial</option><option value="mixed-use">Mixed-use</option><option value="medical">Medical</option><option value="office">Office</option></select></FormField>
                                 <FormField label={ui('Status', 'الحالة')}><select value={form.data.status ?? ''} onChange={(e) => form.setData('status', e.target.value)} className={textFieldClass}><option value="available">{ui('Available', 'متاح')}</option><option value="selling">{ui('Selling', 'قيد البيع')}</option><option value="sold">{ui('Sold out', 'تم البيع')}</option><option value="upcoming">{ui('Upcoming', 'قريباً')}</option></select></FormField>

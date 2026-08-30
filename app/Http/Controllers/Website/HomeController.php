@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Website;
 
 use App\Http\Controllers\Controller;
+use App\Models\MediaAsset;
 use App\Models\PhotoGalleryItem;
 use App\Models\Project;
 use App\Support\LocalizedContent;
@@ -25,13 +26,18 @@ class HomeController extends Controller
         $gallery = PhotoGalleryItem::query()->with('media')->where('is_published', true)->orderBy('sort_order')->get();
         $gallerySettings = WebsiteContent::section('home', 'gallery');
 
-        $heroRaw = WebsiteContent::section('home', 'hero');
+        $heroSnapshot = WebsiteContent::sectionSnapshot('home', 'hero');
+        $heroRaw = LocalizedContent::section($heroSnapshot);
+        $heroVideo = ! empty($heroSnapshot['hero_video_id'])
+            ? WebsiteContent::assetUrl(MediaAsset::find($heroSnapshot['hero_video_id']))
+            : (! empty($heroSnapshot['hero_video']) ? asset($heroSnapshot['hero_video']) : null);
         $hero = [
             'heading' => LocalizedContent::sanitizeNewlines($heroRaw['heading'] ?? 'Designed for the Way You Live'),
             'description' => $heroRaw['description'] ?? '',
             'cta_label' => $heroRaw['primary_cta_label'] ?? $heroRaw['cta_label'] ?? "Our Project's",
             'cta_url' => $heroRaw['primary_cta_url'] ?? $heroRaw['cta_url'] ?? '/projects',
             'heroImage' => asset('assets/tower_img.png'),
+            'heroVideo' => $heroVideo,
         ];
 
         return Inertia::render('Website/Home/Index', [

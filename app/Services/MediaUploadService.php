@@ -55,6 +55,11 @@ final class MediaUploadService
         return $this->storeValidated($file, $directory, 'public_brochure');
     }
 
+    public function storePublicVideo(UploadedFile $file, string $directory = 'media/videos'): MediaAsset
+    {
+        return $this->storeValidated($file, $directory, 'public_video');
+    }
+
     /**
      * Backwards-compatible private CV entry point.
      */
@@ -246,6 +251,12 @@ final class MediaUploadService
                 'max_size' => 20 * 1024 * 1024,
                 'extensions' => ['pdf'],
                 'mimes' => ['application/pdf'],
+            ],
+            'public_video' => [
+                'disk' => self::PUBLIC_DISK,
+                'max_size' => 50 * 1024 * 1024,
+                'extensions' => ['mp4'],
+                'mimes' => ['video/mp4', 'application/mp4'],
             ],
             'private_cv' => [
                 'disk' => self::PRIVATE_DISK,
