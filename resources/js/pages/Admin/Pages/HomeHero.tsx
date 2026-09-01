@@ -38,7 +38,7 @@ export default function HomeHero({ translations, video }: { translations: { en?:
                 <div>
                     <Breadcrumbs items={['Dashboard', 'Website Pages', 'Home Page', 'Hero Section']} />
                     <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">Home hero</h1>
-                    <p className="mt-1 text-sm text-white/50">Manage the home hero copy, primary CTA, and tower video.</p>
+                    <p className="mt-1 text-sm text-white/50">Manage the home hero copy, primary CTA, and background video.</p>
                 </div>
                 <Notification message={flash?.success} />
                 {Object.keys(form.errors).length > 0 && (
@@ -72,11 +72,11 @@ export default function HomeHero({ translations, video }: { translations: { en?:
                     </section>
                     <section className="space-y-4 rounded-2xl border border-white/10 bg-[#161619]/90 p-6 shadow-xl">
                         <div className="border-b border-white/10 pb-4">
-                            <h2 className="text-lg font-bold text-white">Tower video</h2>
-                            <p className="mt-1 text-xs text-white/45">Upload an MP4 video up to 50 MB. If no custom video is uploaded, the supplied tower video is used.</p>
+                            <h2 className="text-lg font-bold text-white">Hero background video</h2>
+                            <p className="mt-1 text-xs text-white/45">Upload an MP4 video up to 50 MB. If no custom video is uploaded, the supplied hero video is used.</p>
                         </div>
                         {video && <video src={video} controls preload="metadata" className="max-h-72 w-full rounded-xl border border-white/10 bg-black object-contain" />}
-                        <FormField label="Upload new tower video" error={form.errors.hero_video}>
+                        <FormField label="Upload new background video" error={form.errors.hero_video}>
                             <input
                                 type="file"
                                 accept="video/mp4"
