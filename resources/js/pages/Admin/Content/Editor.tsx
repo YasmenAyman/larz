@@ -43,7 +43,6 @@ const fields: Record<string, Field[]> = {
     vacancies_settings: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'Section heading' }, { key: 'description', label: 'Description', type: 'textarea' }],
     general_cv_cta: [{ key: 'eyebrow', label: 'Eyebrow' }, { key: 'heading', label: 'CTA heading', type: 'textarea' }, { key: 'cta_label', label: 'CTA label' }],
     masterplan: [{ key: 'heading', label: 'Masterplan heading' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'brochureHeading', label: 'Brochure heading' }, { key: 'brochureDescription', label: 'Brochure description' }],
-    virtual_tour: [{ key: 'heading', label: 'Virtual tour heading' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'videoUrl', label: 'Video URL' }],
 };
 
 export default function Editor({ page, label, section, sections }: { page: string; label?: string; section?: string; sections: Section[] }) {

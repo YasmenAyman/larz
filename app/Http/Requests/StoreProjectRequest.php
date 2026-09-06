@@ -43,7 +43,6 @@ class StoreProjectRequest extends FormRequest
             'hero_heading' => ['nullable', 'string', 'max:255'],
             'hero_description' => ['nullable', 'string'],
             'video_url' => ['nullable', 'url', 'max:500'],
-            'virtual_tour_url' => ['nullable', 'url', 'max:500'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'is_featured' => ['boolean'],

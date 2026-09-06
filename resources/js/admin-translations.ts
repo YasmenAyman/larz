@@ -8,6 +8,7 @@ const arabic: Record<string, string> = {
     'Open Graph title': '\u0639\u0646\u0648\u0627\u0646 Open Graph', 'Open Graph description': '\u0648\u0635\u0641 Open Graph', 'Open Graph image': '\u0635\u0648\u0631\u0629 Open Graph',
     'Current Open Graph image': '\u0635\u0648\u0631\u0629 Open Graph الحالية', 'Allow indexing': '\u0627\u0644\u0633\u0645\u0627\u062d بالفهرسة', 'Allow link following': '\u0627\u0644\u0633\u0645\u0627\u062d بتتبع الروابط',
     'Save SEO metadata': '\u062d\u0641\u0638 بيانات SEO',
+    'Maintenance Mode': 'وضع الصيانة',
     'Request Form Settings': '\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0646\u0645\u0648\u0630\u062c \u0627\u0644\u0637\u0644\u0628',
     'Social Media Section': '\u0642\u0633\u0645 \u0648\u0633\u0627\u0626\u0644 \u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0627\u0644\u0627\u062c\u062a\u0645\u0627\u0639\u064a',
     'Why LARZ / Company Values': '\u0644\u0645\u0627\u0630\u0627 \u0644\u0627\u0631\u0632 / \u0642\u064a\u0645 \u0627\u0644\u0634\u0631\u0643\u0629',

@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\ProjectAmenityController;
 use App\Http\Controllers\Admin\ProjectUpdateController;
 use App\Http\Controllers\Admin\ProjectInquiryController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\MaintenanceController;
 use App\Http\Controllers\Admin\PromiseCtaController;
 use App\Http\Controllers\Admin\AboutHeroController;
 use App\Http\Controllers\Admin\AboutStoryController;
@@ -160,6 +161,8 @@ Route::middleware(['auth', 'verified', 'permission:dashboard.view'])
         Route::put('/content/{page}', [ContentController::class, 'update'])->middleware('permission:pages.update')->name('content.update');
         Route::get('/settings', [SettingsController::class, 'edit'])->middleware('permission:settings.view')->name('settings.edit');
         Route::put('/settings', [SettingsController::class, 'update'])->middleware('permission:settings.update')->name('settings.update');
+        Route::get('/maintenance', [MaintenanceController::class, 'edit'])->middleware('permission:settings.view')->name('maintenance.edit');
+        Route::put('/maintenance', [MaintenanceController::class, 'update'])->middleware('permission:settings.update')->name('maintenance.update');
         Route::get('/seo', [AdminSeoController::class, 'index'])->middleware('permission:seo.view')->name('seo.index');
         Route::put('/seo/{target}', [AdminSeoController::class, 'update'])->middleware('permission:seo.update')->name('seo.update');
         Route::get('/navigation', [NavigationController::class, 'index'])->middleware('permission:navigation.view')->name('navigation.index');

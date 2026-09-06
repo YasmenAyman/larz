@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ArrowRight, Baby, Bike, BookOpen, ChevronLeft, ChevronRight, Dog, Droplet, Dumbbell, Flame, Leaf, Moon, Play, User, Users, Waves, X } from 'lucide-react';
+import { ArrowRight, Baby, Bike, BookOpen, ChevronLeft, ChevronRight, Dog, Droplet, Dumbbell, Flame, Leaf, Moon, User, Users, Waves } from 'lucide-react';
 import { Eyebrow } from '@/components/shared/Eyebrow';
 import { useI18n } from '@/i18n';
 import type { ProjectSections, WebsiteProject } from '@/types/website';
@@ -39,7 +39,7 @@ export function ProjectOverview({ project, sections }: { project: WebsiteProject
 export function ProjectGallery({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
     if (!project.gallery.length) return null;
     const gallery = sections.gallery ?? { eyebrow: 'Gallery', heading: 'A closer look.' };
-    return <section id="gallery" className="bg-night py-24"><div className="mx-auto max-w-5xl px-6 sm:px-10"><Eyebrow className="text-ink">{gallery.eyebrow}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-ink sm:text-[2.25rem]">{gallery.heading}</h2><div className="mt-10 grid gap-4 sm:grid-cols-3">{project.gallery.map((src, i) => <img key={`${src}-${i}`} src={src} alt={`Gallery image ${i + 1}`} className="h-[220px] w-full object-cover" loading="lazy" />)}</div></div></section>;
+    return <section id="gallery" className="bg-night py-24"><div className="mx-auto max-w-5xl px-6 sm:px-10"><Eyebrow className="text-ink">{gallery.eyebrow}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-ink sm:text-[2.25rem]">{gallery.heading}</h2><div className="mt-10 grid gap-4 sm:grid-cols-3">{project.gallery.slice(0, 3).map((src, i) => <img key={`${src}-${i}`} src={src} alt={`Gallery image ${i + 1}`} className="h-[220px] w-full object-cover" loading="lazy" />)}</div></div></section>;
 }
 
 export function Homes3D({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
@@ -131,12 +131,6 @@ export function Masterplan({ project, sections }: { project: WebsiteProject; sec
         </div></div></section>;
 }
 
-export function VirtualTour({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
-    const [open, setOpen] = useState(false);
-    const { t } = useI18n();
-    return <><section id="virtual-tour" className="relative overflow-hidden border-b border-hairline/30 py-20" style={{ backgroundImage: 'radial-gradient(ellipse 100% 100% at 55% 10%, rgba(164, 121, 43, 0.30) 0%, rgba(115, 79, 27, 0.2) 55%, transparent 72%)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}><div className="mx-auto max-w-3xl px-6 text-center"><button type="button" onClick={() => setOpen(true)} aria-label={t('Play virtual tour video')} className="mx-auto grid size-11 place-items-center rounded-full border border-gold text-gold transition-all duration-300 hover:scale-110 hover:bg-gold/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"><Play className="size-4 translate-x-[1px]" /></button><Eyebrow className="mt-6 justify-center text-ink">{t('Virtual tour')}</Eyebrow><h2 className="mt-5 text-3xl font-light leading-[1.2] text-ink sm:text-[2.3rem]">{sections.virtualTour.heading}</h2><p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink-muted">{sections.virtualTour.description}</p><button type="button" onClick={() => setOpen(true)} className="mt-8 inline-flex items-center gap-3 border border-gold px-7 py-3.5 text-[0.7rem] tracking-[0.18em] text-ink uppercase transition-colors hover:bg-gold/10">{t('Start the virtual tour')} <ArrowRight className="size-3.5 rtl:rotate-180" /></button></div></section>{open && <div className="fixed inset-0 z-50 flex items-center justify-center bg-night/90 backdrop-blur-sm" onClick={() => setOpen(false)}><div className="relative mx-4 w-full max-w-4xl" onClick={(e) => e.stopPropagation()}><button type="button" onClick={() => setOpen(false)} className="absolute -top-10 right-0 flex items-center gap-2 text-xs tracking-[0.15em] text-ink-muted uppercase hover:text-ink">{t('Close')} <X className="size-3.5" /></button><div className="relative aspect-video w-full border border-hairline/30"><iframe src={sections.virtualTour.videoUrl} title="KLOVE New Cairo — Virtual Tour" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="size-full" /></div></div></div>}</>;
-}
-
 export function ConstructionUpdates({ project, sections }: { project: WebsiteProject; sections: ProjectSections }) {
     const { t } = useI18n();
     const items = sections.construction.items ?? [];
@@ -217,7 +211,7 @@ export function LocationMap({ project, sections }: { project: WebsiteProject; se
     const locationImage = imageSource(sections.location.image, project.mapImage, project.gallery[2], project.gallery[0], project.heroImage);
 
     return <><section id="location" className="bg-paper py-24"><div className="mx-auto grid max-w-[1440px] gap-12 px-6 sm:px-10 md:grid-cols-2 md:items-center md:grid-cols-[1fr_50%]"><div><Eyebrow tone="light">{t('Location & map')}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.2] text-paper-ink sm:text-[3rem]">{sections.location.heading}</h2><p className="mt-6 text-sm leading-relaxed text-paper-muted">{sections.location.description}</p>{nearby.length > 0 && <ul className="mt-8">{nearby.map((drive, i) => <li key={i} className="flex items-baseline justify-between border-b border-paper-muted/25 py-4"><span className="text-md text-paper-ink/80">{drive.place}</span><span className="text-lg font-light text-paper-muted">{drive.time}</span></li>)}</ul>}<p className="mt-5 text-xs text-paper-muted">{sections.location.gateNote}</p><p className="mt-2 text-[0.7rem] text-paper-muted/70">{sections.location.driveNote}</p></div><figure className="relative">{locationImage && <img src={locationImage} alt={t('Interactive map')} className="h-full max-h-[600px] w-full object-cover" loading="lazy" />}</figure></div></section>
-        <section className="bg-gradient-to-b from-surface-deep to-night py-24 text-center" style={{ backgroundImage: 'radial-gradient(ellipse 100% 100% at 55% 10%, rgba(164, 121, 43, 0.30) 0%, rgba(115, 79, 27, 0.2) 55%, transparent 72%)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}><div className="mx-auto max-w-2xl px-6"><Eyebrow className="justify-center text-ink">{sections.cta.eyebrow}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.3] text-ink sm:text-[3rem]">{sections.cta.heading}</h2>
+        <section className="bg-[#000] py-24 text-center" style={{ backgroundImage: 'radial-gradient(100% 100% at 55% 10%, rgba(164, 121, 43, 0.3) 0%, rgba(115, 79, 27, 0.2) 55%, transparent 72%)' }}><div className="mx-auto max-w-2xl px-6"><Eyebrow className="justify-center text-ink">{sections.cta.eyebrow}</Eyebrow><h2 className="mt-6 text-3xl font-light leading-[1.3] text-ink sm:text-[3rem]">{sections.cta.heading}</h2>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
                 <a href="#brochure" className="inline-flex items-center gap-3 border border-gold px-6 py-4 text-[0.7rem] tracking-[0.18em] text-ink uppercase transition-colors hover:bg-gold/10">{sections.cta.primaryCtaLabel || t('Request pricing & payment plan')} <ArrowRight className="size-3.5 rtl:rotate-180" /></a>
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="text-[0.7rem] tracking-[0.18em] text-ink-muted uppercase hover:text-ink">{sections.cta.secondaryCtaLabel || t('WhatsApp us')}</a>

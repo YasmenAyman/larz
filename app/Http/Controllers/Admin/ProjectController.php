@@ -72,7 +72,6 @@ class ProjectController extends Controller
             'hero_heading' => $request->input('hero_heading'),
             'hero_description' => $request->input('hero_description'),
             'video_url' => $request->input('video_url'),
-            'virtual_tour_url' => $request->input('virtual_tour_url'),
             'latitude' => $request->input('latitude'),
             'longitude' => $request->input('longitude'),
             'is_published' => $request->boolean('is_published'),
@@ -106,7 +105,8 @@ class ProjectController extends Controller
                 if ($data['is_published'] && empty($data['published_at'])) {
                     $data['published_at'] = now();
                 }
-                Project::create($data);
+                $project = Project::create($data);
+                $this->syncGalleryImages($request, $uploads, $project, $newAssets);
             });
         } catch (\Throwable $exception) {
             foreach ($newAssets as $asset) $uploads->delete($asset);
@@ -121,7 +121,7 @@ class ProjectController extends Controller
 
     public function edit(Project $project): Response
     {
-        $project->load(['category', 'heroImage', 'logo', 'brochure', 'mapImage', 'overviewImage', 'masterplanImage', 'statistics']);
+        $project->load(['category', 'heroImage', 'logo', 'brochure', 'mapImage', 'overviewImage', 'masterplanImage', 'statistics', 'galleries.media']);
 
         $hasSavedSections = ! empty($project->sections['en'] ?? []) || ! empty($project->sections['ar'] ?? []);
 
@@ -164,7 +164,6 @@ class ProjectController extends Controller
             'overview' => $raw['overview'] ?? ['heading' => '', 'body' => ''],
             'gallery' => $raw['gallery'] ?? ['eyebrow' => 'Gallery', 'heading' => 'A closer look.'],
             'masterplan' => $raw['masterplan'] ?? ['heading' => '', 'description' => '', 'brochureHeading' => '', 'brochureDescription' => ''],
-            'virtualTour' => $raw['virtual_tour'] ?? ['heading' => '', 'description' => '', 'videoUrl' => ''],
             'cta' => $raw['cta'] ?? ['eyebrow' => '', 'heading' => '', 'whatsappNumber' => '', 'primaryCtaLabel' => '', 'secondaryCtaLabel' => ''],
             'homes3d' => $raw['homes3d'] ?? ['heading' => '', 'description' => '', 'note' => '', 'items' => []],
             'construction' => $raw['construction'] ?? ['heading' => '', 'description' => '', 'items' => []],
@@ -195,8 +194,9 @@ class ProjectController extends Controller
         $oldOverview = $project->overviewImage;
         $oldMasterplan = $project->masterplanImage;
         $newAssets = [];
+        $replacedGalleryAssets = [];
         try {
-            DB::transaction(function () use ($request, $uploads, $project, &$data, &$newAssets) {
+            DB::transaction(function () use ($request, $uploads, $project, &$data, &$newAssets, &$replacedGalleryAssets) {
                 $data['hero_image_id'] = $this->uploadImage($request, $uploads, 'hero_image', 'projects/hero', $newAssets, $project->hero_image_id);
                 $data['logo_id'] = $this->uploadImage($request, $uploads, 'logo', 'projects/logos', $newAssets, $project->logo_id);
                 $data['brochure_id'] = $this->uploadBrochure($request, $uploads, 'brochure', 'projects/brochures', $newAssets, $project->brochure_id);
@@ -210,6 +210,7 @@ class ProjectController extends Controller
                     $data['published_at'] = now();
                 }
                 $project->update($data);
+                $this->syncGalleryImages($request, $uploads, $project, $newAssets, $replacedGalleryAssets);
             });
         } catch (\Throwable $exception) {
             foreach ($newAssets as $asset) $uploads->delete($asset);
@@ -221,6 +222,7 @@ class ProjectController extends Controller
         if ($request->hasFile('map_image') && $oldMap) $uploads->deleteIfUnreferenced($oldMap);
         if ($request->hasFile('overview_image') && $oldOverview) $uploads->deleteIfUnreferenced($oldOverview);
         if ($request->hasFile('masterplan_image') && $oldMasterplan) $uploads->deleteIfUnreferenced($oldMasterplan);
+        foreach (collect($replacedGalleryAssets)->unique('id') as $asset) $uploads->deleteIfUnreferenced($asset);
 
         WebsiteCache::projectTree($project->slug);
         WebsiteCache::projectsIndex();
@@ -307,7 +309,7 @@ class ProjectController extends Controller
                 $sections[$locale] = [];
                 continue;
             }
-            foreach (['overview.body', 'masterplan.description', 'virtualTour.description', 'homes3d.description', 'construction.description', 'location.description'] as $dot) {
+            foreach (['overview.body', 'masterplan.description', 'homes3d.description', 'construction.description', 'location.description'] as $dot) {
                 $parts = explode('.', $dot);
                 if (isset($sections[$locale][$parts[0]][$parts[1]]) && is_string($sections[$locale][$parts[0]][$parts[1]])) {
                     $sections[$locale][$parts[0]][$parts[1]] = $sanitizer->sanitize($sections[$locale][$parts[0]][$parts[1]]);
@@ -397,6 +399,38 @@ class ProjectController extends Controller
         return $sections;
     }
 
+    /** Update the three gallery slots displayed on the public project page. */
+    private function syncGalleryImages(Request $request, MediaUploadService $uploads, Project $project, array &$newAssets, array &$replacedAssets = []): void
+    {
+        $galleryItems = $project->galleries()->with('media')->get()->values();
+        $nextSortOrder = ((int) ($galleryItems->max('sort_order') ?? -1)) + 1;
+
+        for ($index = 0; $index < 3; $index++) {
+            $field = "gallery_image_{$index}";
+            if (! $request->hasFile($field)) {
+                continue;
+            }
+
+            $asset = $uploads->storePublicImage($request->file($field), 'projects/gallery');
+            $newAssets[] = $asset;
+            $galleryItem = $galleryItems->get($index);
+
+            if ($galleryItem) {
+                if ($galleryItem->media) {
+                    $replacedAssets[] = $galleryItem->media;
+                }
+                $galleryItem->update(['media_asset_id' => $asset->id, 'is_published' => true]);
+                continue;
+            }
+
+            $galleryItems->push($project->galleries()->create([
+                'media_asset_id' => $asset->id,
+                'sort_order' => $nextSortOrder++,
+                'is_published' => true,
+            ]));
+        }
+    }
+
     private function present(Project $project, bool $full = false): array
     {
         $base = [
@@ -435,7 +469,6 @@ class ProjectController extends Controller
             $base['brochure_id'] = $project->brochure_id;
             $base['brochure'] = WebsiteContent::assetUrl($project->brochure);
             $base['video_url'] = $project->video_url;
-            $base['virtual_tour_url'] = $project->virtual_tour_url;
             $base['map_image_id'] = $project->map_image_id;
             $base['map_image'] = WebsiteContent::assetUrl($project->mapImage);
             $base['overview_image_id'] = $project->overview_image_id;
@@ -450,6 +483,10 @@ class ProjectController extends Controller
             $base['robots'] = $project->robots;
             $base['translations'] = $project->translations ?? ['en' => [], 'ar' => []];
             $base['sections'] = $project->sections ?? ['en' => [], 'ar' => []];
+            $base['gallery_images'] = $project->galleries->take(3)->map(fn ($item) => [
+                'id' => $item->id,
+                'image' => WebsiteContent::assetUrl($item->media),
+            ])->values()->all();
         }
         return $base;
     }

@@ -31,7 +31,6 @@ type Project = {
     logo: string | null;
     brochure: string | null;
     video_url: string | null;
-    virtual_tour_url: string | null;
     map_image: string | null;
     overview_image: string | null;
     masterplan_image: string | null;
@@ -44,11 +43,13 @@ type Project = {
     seo_description: string | null;
     canonical_url: string | null;
     robots: string | null;
+    gallery_images: GalleryImage[];
     translations?: { en?: Record<string, string>; ar?: Record<string, string> };
     sections?: { en?: Record<string, any>; ar?: Record<string, any> };
 };
 
 type Category = { id: number; name: string };
+type GalleryImage = { id?: number; image: string | File | null };
 
 type HeroSlide = { eyebrow: string; titleLine1: string; titleLine2: string; description: string; cta1Label: string; cta1Url: string; cta2Label: string; cta2Url: string };
 type SectionData = {
@@ -57,7 +58,6 @@ type SectionData = {
     overview: { heading: string; body: string };
     gallery: { eyebrow: string; heading: string };
     masterplan: { heading: string; description: string; brochureHeading: string; brochureDescription: string };
-    virtualTour: { heading: string; description: string; videoUrl: string };
     homes3d: { heading: string; description: string; note: string; items: Array<{ tag: string; name: string; size: string; url: string }> };
     construction: { heading: string; description: string; items: Array<{ tag: string; title: string; image: string | null }> };
     amenities: { heading: string; categories: Array<{ title: string; items: Array<{ icon: string | null; title: string; description: string }> }> };
@@ -71,7 +71,6 @@ const emptySections: SectionData = {
     overview: { heading: '', body: '' },
     gallery: { eyebrow: 'Gallery', heading: 'A closer look.' },
     masterplan: { heading: '', description: '', brochureHeading: '', brochureDescription: '' },
-    virtualTour: { heading: '', description: '', videoUrl: '' },
     homes3d: { heading: '', description: '', note: '', items: [] },
     construction: { heading: '', description: '', items: [] },
     amenities: { heading: '', categories: [] },
@@ -96,7 +95,6 @@ function normaliseSections(saved?: Partial<SectionData>): SectionData {
         overview: { ...emptySections.overview, ...(savedSections.overview ?? {}) },
         gallery: { ...emptySections.gallery, ...(savedSections.gallery ?? {}) },
         masterplan: { ...emptySections.masterplan, ...(savedSections.masterplan ?? {}) },
-        virtualTour: { ...emptySections.virtualTour, ...(savedSections.virtualTour ?? {}) },
         homes3d: {
             ...emptySections.homes3d,
             ...(savedHomes3d ?? {}),
@@ -176,7 +174,6 @@ export default function Form({ project, categories }: { project: Project | null;
         logo: project?.logo ?? null,
         brochure: project?.brochure ?? null,
         video_url: project?.video_url ?? '',
-        virtual_tour_url: project?.virtual_tour_url ?? '',
         map_image: project?.map_image ?? null,
         overview_image: project?.overview_image ?? null,
         masterplan_image: project?.masterplan_image ?? null,
@@ -189,6 +186,7 @@ export default function Form({ project, categories }: { project: Project | null;
         seo_description: project?.seo_description ?? '',
         canonical_url: project?.canonical_url ?? '',
         robots: project?.robots ?? '',
+        gallery_images: Array.from({ length: 3 }, (_, index) => project?.gallery_images?.[index] ?? { image: null }),
         translations: { en: project?.translations?.en ?? {}, ar: project?.translations?.ar ?? {} },
         sections: {
             en: normaliseSections(project?.sections?.en),
@@ -247,7 +245,7 @@ export default function Form({ project, categories }: { project: Project | null;
                         price_to: d.price_to ?? '', currency: d.currency ?? 'EGP', installment_information: d.installment_information ?? '',
                         area_min: d.area_min ?? '', area_max: d.area_max ?? '', area_unit: d.area_unit ?? 'm2',
                         hero_heading: d.hero_heading ?? '', hero_description: d.hero_description ?? '',
-                        video_url: d.video_url ?? '', virtual_tour_url: d.virtual_tour_url ?? '',
+                        video_url: d.video_url ?? '',
                         latitude: d.latitude ?? '', longitude: d.longitude ?? '',
                         is_published: d.is_published ? '1' : '0', is_featured: d.is_featured ? '1' : '0',
                         sort_order: d.sort_order ?? 0, seo_title: d.seo_title ?? '', seo_description: d.seo_description ?? '',
@@ -268,6 +266,9 @@ export default function Form({ project, categories }: { project: Project | null;
                     if (overviewImage instanceof File) fd.append('overview_image', overviewImage);
                     const masterplanImage = d.masterplan_image as unknown;
                     if (masterplanImage instanceof File) fd.append('masterplan_image', masterplanImage);
+                    d.gallery_images.forEach((item, index) => {
+                        if (item.image instanceof File) fd.append(`gallery_image_${index}`, item.image);
+                    });
                     const constructionItems = d.sections[lang]?.construction?.items ?? [];
                     constructionItems.forEach((item: { tag: string; title: string; image: unknown }, idx: number) => {
                         if (item.image instanceof File) fd.append(`construction_image_${idx}`, item.image);
@@ -409,17 +410,6 @@ export default function Form({ project, categories }: { project: Project | null;
                         </div>
                     </SectionCard>
 
-                    {/* ===== VIRTUAL TOUR (per-language) ===== */}
-                    <SectionCard title="Virtual Tour">
-                        <div dir={isArabic ? 'rtl' : 'ltr'}>
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <FormField label="Heading"><input value={sections.virtualTour.heading} onChange={(e) => setSection('virtualTour', { ...sections.virtualTour, heading: e.target.value })} className={textFieldClass} /></FormField>
-                                <FormField label="Video URL (YouTube embed)"><input value={sections.virtualTour.videoUrl} onChange={(e) => setSection('virtualTour', { ...sections.virtualTour, videoUrl: e.target.value })} className={textFieldClass} /></FormField>
-                            </div>
-                            <div className="mt-4"><FormField label="Description"><textarea rows={3} value={sections.virtualTour.description} onChange={(e) => setSection('virtualTour', { ...sections.virtualTour, description: e.target.value })} className={textFieldClass} /></FormField></div>
-                        </div>
-                    </SectionCard>
-
                     {/* ===== 3D GALLERY / HOMES3D (per-language) ===== */}
                     <SectionCard title="3D Gallery">
                         <div dir={isArabic ? 'rtl' : 'ltr'}>
@@ -456,6 +446,21 @@ export default function Form({ project, categories }: { project: Project | null;
                             <div className="grid gap-4 md:grid-cols-2">
                                 <FormField label="Eyebrow"><input value={sections.gallery.eyebrow} onChange={(e) => setSection('gallery', { ...sections.gallery, eyebrow: e.target.value })} className={textFieldClass} /></FormField>
                                 <FormField label="Heading"><input value={sections.gallery.heading} onChange={(e) => setSection('gallery', { ...sections.gallery, heading: e.target.value })} className={textFieldClass} /></FormField>
+                            </div>
+                            <div className="mt-5 grid gap-4 md:grid-cols-3">
+                                {form.data.gallery_images.map((item, index) => (
+                                    <ImageUploadField
+                                        key={index}
+                                        label={ui(`Gallery image ${index + 1}`, `صورة المعرض ${index + 1}`)}
+                                        current={item.image}
+                                        onChange={(file) => {
+                                            const image = Array.isArray(file) ? null : file;
+                                            const galleryImages = [...form.data.gallery_images];
+                                            galleryImages[index] = { ...galleryImages[index], image };
+                                            form.setData('gallery_images', galleryImages);
+                                        }}
+                                    />
+                                ))}
                             </div>
                         </div>
                     </SectionCard>

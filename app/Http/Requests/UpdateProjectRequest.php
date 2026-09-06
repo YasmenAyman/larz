@@ -35,7 +35,6 @@ class UpdateProjectRequest extends FormRequest
             'price_from' => ['nullable', 'numeric', 'min:0'],
             'price_to' => ['nullable', 'numeric', 'gte:price_from'],
             'video_url' => ['nullable', 'url', 'max:500'],
-            'virtual_tour_url' => ['nullable', 'url', 'max:500'],
             'is_featured' => ['boolean'],
             'is_published' => ['boolean'],
         ];

@@ -69,7 +69,6 @@ export function Header() {
     const projectSections = [
         { label: t('Overview'), hash: '#overview' },
         { label: t('Masterplan & Brochure'), hash: '#brochure' },
-        { label: t('Virtual Tour'), hash: '#virtual-tour' },
         { label: t('3D Gallery'), hash: '#homes3d' },
         { label: t('Gallery'), hash: '#gallery' },
         { label: t('Construction Updates'), hash: '#construction' },

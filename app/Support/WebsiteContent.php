@@ -59,7 +59,6 @@ final class WebsiteContent
             'heroDescription' => $localized['hero_description'] ?? $project->hero_description,
             'heroImage' => self::assetUrl($project->heroImage),
             'brochure' => self::assetUrl($project->brochure),
-            'virtualTourUrl' => $project->virtual_tour_url,
             'mapImage' => self::assetUrl($project->mapImage),
             'overviewImage' => self::assetUrl($project->overviewImage),
             'masterplanImage' => self::assetUrl($project->masterplanImage),

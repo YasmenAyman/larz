@@ -14,7 +14,6 @@ export type WebsiteProject = {
     heroDescription: string | null;
     heroImage: string | null;
     brochure: string | null;
-    virtualTourUrl: string | null;
     mapImage: string | null;
     overviewImage: string | null;
     masterplanImage: string | null;
@@ -32,7 +31,6 @@ export type ProjectSections = {
     overview: { heading: string; body: string };
     gallery: { eyebrow: string; heading: string };
     masterplan: { heading: string; description: string; brochureHeading: string; brochureDescription: string };
-    virtualTour: { heading: string; description: string; videoUrl: string };
     cta: { eyebrow: string; heading: string; whatsappNumber: string; primaryCtaLabel: string; secondaryCtaLabel: string };
     homes3d: { heading: string; description: string; note: string; items: Array<{ tag: string; name: string; size: string; url: string }> };
     construction: { heading: string; description: string; items: Array<{ tag: string; title: string; image: string | null }> };

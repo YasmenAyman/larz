@@ -57,6 +57,7 @@ export const adminNavigation: AdminNavigationGroup[] = [
         items: [
             { label: 'Navigation', href: '/admin/navigation', permission: 'navigation.view' },
             { label: 'Global Settings', href: '/admin/settings', permission: 'settings.view' },
+            { label: 'Maintenance Mode', href: '/admin/maintenance', permission: 'settings.view' },
             { label: 'SEO Settings', href: '/admin/seo', permission: 'seo.view' },
         ],
     },
